@@ -7,11 +7,8 @@ export enum AppAvatarSize { sm, md, lg }
 export component AppAvatar inherits Rectangle {
     /// Full name; the first character (uppercased) becomes the fallback glyph.
     in property <string> name;
-    /// Explicit initials; overrides the derived first letter.
+    /// Explicit initials; overrides the name fallback.
     in property <string> initials-override;
-    /// Second initial (e.g. surname initial); Slint has no string split, so
-    /// multi-word initials are assembled by the caller.
-    in property <string> second-initial;
     /// Optional image (overrides initials).
     in property <image> source;
     in property <AppAvatarSize> size: AppAvatarSize.md;
@@ -44,11 +41,12 @@ export component AppAvatar inherits Rectangle {
     }
 
     if root.source.width == 0 : Text {
+        // Slint strings cannot be indexed or split, so the glyph is either
+        // the caller-provided initials or the raw name (callers pass a
+        // short string such as a first name or pre-built initials).
         text: root.initials-override != ""
             ? root.initials-override
-            : root.name != ""
-                ? root.name[0].to-uppercase() + (root.second-initial != "" ? root.second-initial : "")
-                : "?";
+            : root.name != "" ? root.name : "?";
         font-size: root.initials-size;
         font-weight: Typography.font-weight-medium;
         color: Palette.text-on-primary;

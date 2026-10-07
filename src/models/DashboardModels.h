@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <slint/shared_string.h>
+#include <slint.h>
 
 #include "app-window.h"
 
@@ -37,9 +37,9 @@ struct ActivityItem
 };
 
 /// Convert a StatCard POCO into the generated `app::StatCard` struct.
-app::StatCard toSlint(const StatCard &card);
+::app::StatCard toSlint(const StatCard &card);
 
 /// Convert a vector of StatCards into the generated model type.
-std::shared_ptr<slint::Model<app::StatCard>> toSlintModel(const std::vector<StatCard> &cards);
+std::shared_ptr<slint::Model<::app::StatCard>> toSlintModel(const std::vector<StatCard> &cards);
 
 } // namespace cpp_slint_boilerplate::models

@@ -2,13 +2,13 @@
 
 #include "models/DashboardModels.h"
 
-#include <slint/vec_model.h>
+#include <slint.h>
 
 namespace cpp_slint_boilerplate::models {
 
-app::StatCard toSlint(const StatCard &card)
+::app::StatCard toSlint(const StatCard &card)
 {
-    app::StatCard result;
+    ::app::StatCard result;
     result.title = slint::SharedString(card.title);
     result.value = slint::SharedString(card.value);
     result.delta = slint::SharedString(card.delta);
@@ -17,14 +17,14 @@ app::StatCard toSlint(const StatCard &card)
     return result;
 }
 
-std::shared_ptr<slint::Model<app::StatCard>> toSlintModel(const std::vector<StatCard> &cards)
+std::shared_ptr<slint::Model<::app::StatCard>> toSlintModel(const std::vector<StatCard> &cards)
 {
-    std::vector<app::StatCard> converted;
+    std::vector<::app::StatCard> converted;
     converted.reserve(cards.size());
     for (const auto &card : cards) {
         converted.push_back(toSlint(card));
     }
-    return std::make_shared<slint::VecModel<app::StatCard>>(std::move(converted));
+    return std::make_shared<slint::VectorModel<::app::StatCard>>(std::move(converted));
 }
 
 } // namespace cpp_slint_boilerplate::models

@@ -2,8 +2,6 @@
 
 #include "services/AboutService.h"
 
-#include <slint/config.h>
-
 namespace cpp_slint_boilerplate::services {
 
 void AboutService::initialize()
@@ -12,7 +10,10 @@ void AboutService::initialize()
         .applicationName = "cpp-slint-boilerplate",
         .version = "0.1.0",
         .description = "A professional C++20 + Slint desktop application boilerplate.",
-        .slintVersion = slint::version_string(),
+        // The Slint C++ API exposes no public runtime version accessor; the
+        // fetched release is recorded in CMake/FetchSlint.cmake. Keep this
+        // string in sync when pinning SLINT_FETCH_TAG.
+        .slintVersion = "1.x (release/1)",
         .compiler =
 #if defined(_MSC_VER)
             "MSVC " + std::to_string(_MSC_VER),

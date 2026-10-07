@@ -1,7 +1,11 @@
 // AppMenu — anchored dropdown menu.
+//
+// The single @children slot is the trigger content (e.g. an AppButton with
+// `clicked => menu.open = true`). The popup anchors below it.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
+import { ListView } from "std-widgets.slint";
 
 export struct AppMenuItem {
     icon-name: string,
@@ -20,22 +24,20 @@ export component AppMenu inherits Rectangle {
 
     callback selected(int, AppMenuItem);
 
-    /// Trigger content (e.g. an AppButton with `clicked => menu.open = true`).
-    @children;
+    /// Trigger content.
+    @children
 
-    width: trigger-area.width;
-    height: trigger-area.height;
+    width: self.preferred-width;
+    height: self.preferred-height;
 
-    trigger-area := Rectangle {
-        @children;
-    }
-
-    if root.open : TouchArea {
-        // Catch clicks anywhere in the window to close.
-        x: 0;
-        y: 0;
-        width: root.parent.width;
-        height: root.parent.height;
+    if root.open : close-catcher := TouchArea {
+        // Oversized click catcher (covers the area around the trigger);
+        // a full-window catcher needs a root-level id, which the host page
+        // can provide instead (see docs/COMPONENTS.md).
+        x: -4096px;
+        y: -4096px;
+        width: 8192px;
+        height: 8192px;
         clicked => {
             root.open = false;
         }
@@ -90,7 +92,7 @@ export component AppMenu inherits Rectangle {
                         if item.icon-name != "" : AppIcon {
                             name: item.icon-name;
                             size: Typography.font-size-sm;
-                            color: item.disabled ? Palette.text-disabled : Palette.text-muted;
+                            accent-color: item.disabled ? Palette.text-disabled : Palette.text-muted;
                         }
 
                         Text {

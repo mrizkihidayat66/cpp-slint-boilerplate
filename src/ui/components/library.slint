@@ -2,42 +2,45 @@
 //
 // Pages must import components from this file only, never from individual
 // component files, so internal file layout can change freely.
+//
+// NOTE: Slint allows only ONE `export * from` per file, so this index uses
+// explicit named re-exports instead.
 
 // Actions
-export * from "app-button.slint";
-export * from "app-spinner.slint";
+export { AppButton, AppButtonVariant, AppButtonSize } from "app-button.slint";
+export { AppSpinner } from "app-spinner.slint";
 
 // Containers
-export * from "app-card.slint";
-export * from "app-dialog.slint";
+export { AppCard, AppCardElevation } from "app-card.slint";
+export { AppDialog } from "app-dialog.slint";
 
 // Forms
-export * from "app-input.slint";
-export * from "app-textarea.slint";
-export * from "app-checkbox.slint";
-export * from "app-radio.slint";
-export * from "app-switch.slint";
-export * from "app-select.slint";
-export * from "app-slider.slint";
+export { AppInput } from "app-input.slint";
+export { AppTextarea } from "app-textarea.slint";
+export { AppCheckbox } from "app-checkbox.slint";
+export { AppRadio } from "app-radio.slint";
+export { AppSwitch } from "app-switch.slint";
+export { AppSelect } from "app-select.slint";
+export { AppSlider } from "app-slider.slint";
 
 // Feedback
-export * from "app-badge.slint";
-export * from "app-alert.slint";
-export * from "app-progress.slint";
-export * from "app-tooltip.slint";
+export { AppBadge, AppBadgeVariant } from "app-badge.slint";
+export { AppAlert, AppAlertVariant } from "app-alert.slint";
+export { AppProgress } from "app-progress.slint";
+export { AppTooltip } from "app-tooltip.slint";
 
 // Data display
-export * from "app-table.slint";
-export * from "app-tabs.slint";
-export * from "app-avatar.slint";
-export * from "app-accordion.slint";
+export { AppTable, AppTableColumn, AppTableRow } from "app-table.slint";
+export { AppTabs, AppTabsVariant } from "app-tabs.slint";
+export { AppAvatar, AppAvatarSize } from "app-avatar.slint";
+export { AppAccordion, AppAccordionItem } from "app-accordion.slint";
 
 // Navigation
-export * from "app-navbar.slint";
-export * from "app-sidebar.slint";
-export * from "app-breadcrumb.slint";
-export * from "app-menu.slint";
-export * from "app-pagination.slint";
+export { AppNavbar } from "app-navbar.slint";
+export { AppSidebar, AppSidebarItem } from "app-sidebar.slint";
+export { AppBreadcrumb } from "app-breadcrumb.slint";
+export { AppMenu, AppMenuItem } from "app-menu.slint";
+export { AppPagination } from "app-pagination.slint";
 
 // Primitives
-export * from "app-icon.slint";
+export { AppIcon, AppIcons } from "app-icon.slint";

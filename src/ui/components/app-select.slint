@@ -2,6 +2,7 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
+import { ListView } from "std-widgets.slint";
 
 export component AppSelect inherits Rectangle {
     /// Option list, e.g. ["Red", "Green", "Blue"].
@@ -57,7 +58,7 @@ export component AppSelect inherits Rectangle {
         AppIcon {
             name: root.open ? "chevron-up" : "chevron-down";
             size: Typography.font-size-sm;
-            color: Palette.text-muted;
+            accent-color: Palette.text-muted;
         }
     }
 
@@ -92,7 +93,7 @@ export component AppSelect inherits Rectangle {
 
                 Text {
                     x: Metrics.space-2;
-                    vertical-center: parent.height / 2;
+                    y: parent.height / 2 - self.height / 2;
                     text: option;
                     font-size: Typography.font-size-md;
                     color: i == root.selected-index ? Palette.primary : Palette.text;

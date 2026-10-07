@@ -55,7 +55,7 @@ export component AppRadio inherits Rectangle {
 
     label-text := Text {
         x: root.circle-size + Metrics.space-2;
-        vertical-center: root.circle-size / 2;
+        y: root.circle-size / 2 - self.height / 2;
         text: root.label;
         font-size: Typography.font-size-md;
         color: root.disabled ? Palette.text-disabled : Palette.text;

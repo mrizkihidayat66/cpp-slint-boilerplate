@@ -29,7 +29,11 @@ export component AppButton inherits Rectangle {
     /// Fired on click (pointer or keyboard) unless disabled or loading.
     callback clicked <=> touch.clicked;
 
-    width: root.block ? 100% : label-holder.preferred-width + horizontal-padding * 2;
+    // Width: preferred (content) size; `block` stretches via the parent's
+    // layout (horizontal-stretch) — mixing % and length in one binding is
+    // not allowed, so block-mode width is handled by layout containers.
+    width: label-holder.preferred-width + horizontal-padding * 2;
+    horizontal-stretch: root.block ? 1 : 0;
     height: root.size == AppButtonSize.sm ? Metrics.control-height-sm
           : root.size == AppButtonSize.lg ? Metrics.control-height-lg
           : Metrics.control-height-md;
@@ -66,7 +70,7 @@ export component AppButton inherits Rectangle {
     touch := TouchArea {
         mouse-cursor: root.effective-disabled ? MouseCursor.default : MouseCursor.pointer;
         enabled: !root.effective-disabled;
-        clicked: {
+        clicked => {
             // Guarded by `enabled` above, but kept explicit for readers.
             if (!root.effective-disabled) {
                 root.clicked();
@@ -83,7 +87,7 @@ export component AppButton inherits Rectangle {
 
         if root.loading : AppSpinner {
             size: root.icon-size;
-            color: root.filled ? Palette.text-on-primary : Palette.primary;
+            accent-color: root.filled ? Palette.text-on-primary : Palette.primary;
         }
 
         if !root.loading && root.icon.width > 0 : Image {

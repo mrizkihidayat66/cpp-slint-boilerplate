@@ -2,8 +2,9 @@
 //
 // Every component imports { Palette, Typography, Metrics } from this file
 // (never from the individual token files), so token layout stays an
-// implementation detail of the theme.
+// implementation detail of the theme. Slint allows only one `export * from`
+// per file, so re-exports here are explicit.
 
-export * from "colors.slint";
-export * from "typography.slint";
-export * from "metrics.slint";
+export { Palette } from "colors.slint";
+export { Typography } from "typography.slint";
+export { Metrics } from "metrics.slint";

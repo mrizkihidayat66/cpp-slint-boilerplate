@@ -26,7 +26,7 @@ export component AppAccordion inherits Rectangle {
     sections := VerticalLayout {
         spacing: 1px;
 
-        for item[i] in root.items : VerticalLayout {
+        for item[i] in root.items : section := VerticalLayout {
             property <bool> is-open:
                 root.multiple
                     ? (i < root.open-flags.length && root.open-flags[i])
@@ -39,19 +39,14 @@ export component AppAccordion inherits Rectangle {
                 header-area := TouchArea {
                     mouse-cursor: MouseCursor.pointer;
                     clicked => {
-                        if (self.is-open) {
+                        if (section.is-open) {
                             root.collapsed(i);
-                            if (root.multiple) {
-                                // Owner mutates open-flags; see docs note on
-                                // updating models from C++.
-                            } else {
+                            if (!root.multiple) {
                                 root.expanded-index = -1;
                             }
                         } else {
                             root.expanded(i);
-                            if (root.multiple) {
-                                // dito — owner updates open-flags.
-                            } else {
+                            if (!root.multiple) {
                                 root.expanded-index = i;
                             }
                         }
@@ -81,12 +76,12 @@ export component AppAccordion inherits Rectangle {
                     AppIcon {
                         name: "chevron-down";
                         size: Typography.font-size-sm;
-                        color: Palette.text-muted;
+                        accent-color: Palette.text-muted;
                     }
                 }
             }
 
-            if self.is-open : Rectangle {
+            if section.is-open : Rectangle {
                 background: Palette.background;
                 height: Metrics.space-5;
                 // Section body: host content in a page-level layout keyed to

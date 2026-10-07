@@ -1,4 +1,7 @@
 // AppNavbar — top application bar.
+//
+// The single @children slot holds leading content (navigation menu button,
+// brand, etc.); title/subtitle/icon render after it.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
@@ -10,12 +13,12 @@ export component AppNavbar inherits Rectangle {
     in property <string> icon-name;
 
     /// Leading slot (navigation menu button, etc.).
-    @children;
+    @children
 
     height: Metrics.navbar-height;
     width: 100%;
     background: Palette.surface;
-    border-width: 0;
+
     Rectangle {
         y: parent.height - 1px;
         height: 1px;
@@ -28,8 +31,6 @@ export component AppNavbar inherits Rectangle {
         padding-right: Metrics.space-4;
         spacing: Metrics.space-3;
         alignment: start;
-
-        @children;
 
         if root.icon-name != "" : AppIcon {
             name: root.icon-name;

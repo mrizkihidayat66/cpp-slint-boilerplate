@@ -44,7 +44,7 @@ export component AppIcon inherits Text {
     /// Glyph size (square).
     in property <length> size: 16px;
     /// Glyph color. Defaults to current-text.
-    in property <color> color: Palette.text;
+    in property <color> accent-color: Palette.text;
 
     text: name == "home" ? AppIcons.home
         : name == "settings" ? AppIcons.settings
@@ -73,7 +73,7 @@ export component AppIcon inherits Text {
         : name == "sort" ? AppIcons.sort
         : AppIcons.placeholder;
     font-size: root.size;
-    color: root.color;
+    color: root.accent-color;
     font-family: "Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Symbol";
     vertical-alignment: center;
     horizontal-alignment: center;

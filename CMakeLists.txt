@@ -18,30 +18,45 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CMake/FetchSlint.cmake)
 
 # ---------------------------------------------------------------------------
-# Application executable
+# Core library (everything except main.cpp) — linked by the app and the tests
 # ---------------------------------------------------------------------------
 
-add_executable(slint-boilerplate
-    src/main.cpp
+add_library(boilerplate-core STATIC
     src/app/Application.cpp
     src/app/ServiceLocator.cpp
     src/models/DashboardModels.cpp
     src/services/DashboardService.cpp
     src/services/AboutService.cpp)
 
-target_include_directories(slint-boilerplate
-    PRIVATE
+target_include_directories(boilerplate-core
+    PUBLIC
         src
         ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(slint-boilerplate PRIVATE Slint::Slint)
+target_link_libraries(boilerplate-core PUBLIC Slint::Slint)
 
 # Compiles every .slint file reachable from app-window.slint (theme,
 # components, pages are imported transitively) into generated C++.
-slint_target_sources(slint-boilerplate PRIVATE src/ui/app-window.slint)
+slint_target_sources(boilerplate-core src/ui/app-window.slint NAMESPACE app)
 
 include(CMake/CompilerWarnings.cmake)
-target_apply_warnings(slint-boilerplate)
+target_apply_warnings(boilerplate-core)
+
+# ---------------------------------------------------------------------------
+# Application executable
+# ---------------------------------------------------------------------------
+
+add_executable(slint-boilerplate src/main.cpp)
+target_link_libraries(slint-boilerplate PRIVATE boilerplate-core)
+
+# Copy the Slint runtime DLL next to the exe so it runs from the build dir
+# without a custom PATH.
+add_custom_command(
+    TARGET slint-boilerplate POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:slint_cpp-shared>
+        $<TARGET_FILE_DIR:slint-boilerplate>)
+
 
 # ---------------------------------------------------------------------------
 # Unit tests (models/services only — UI correctness is enforced by

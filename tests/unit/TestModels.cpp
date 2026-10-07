@@ -2,9 +2,21 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <string>
+
 #include "models/DashboardModels.h"
 
 using cpp_slint_boilerplate::models::StatCard;
+
+namespace {
+
+/// SharedString has no operator== with std::string; compare via std::string.
+std::string asStd(const slint::SharedString &s)
+{
+    return std::string(s);
+}
+
+} // namespace
 
 TEST_CASE("toSlint copies all StatCard fields", "[models]")
 {
@@ -18,11 +30,11 @@ TEST_CASE("toSlint copies all StatCard fields", "[models]")
 
     const auto converted = cpp_slint_boilerplate::models::toSlint(input);
 
-    CHECK(converted.title == input.title);
-    CHECK(converted.value == input.value);
-    CHECK(converted.delta == input.delta);
+    CHECK(asStd(converted.title) == input.title);
+    CHECK(asStd(converted.value) == input.value);
+    CHECK(asStd(converted.delta) == input.delta);
     CHECK(converted.trend_positive == input.trendPositive);
-    CHECK(converted.icon_name == input.iconName);
+    CHECK(asStd(converted.icon_name) == input.iconName);
 }
 
 TEST_CASE("toSlint keeps trend direction distinct", "[models]")
@@ -48,6 +60,6 @@ TEST_CASE("toSlintModel preserves order and count", "[models]")
 
     REQUIRE(model->row_count() == cards.size());
     for (std::size_t i = 0; i < cards.size(); ++i) {
-        CHECK(model->row_data(int(i))->title == cards[i].title);
+        CHECK(asStd(model->row_data(int(i))->title) == cards[i].title);
     }
 }

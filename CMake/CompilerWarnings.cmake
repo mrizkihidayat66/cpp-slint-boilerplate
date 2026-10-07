@@ -27,10 +27,11 @@ function(target_apply_warnings target)
             /w14905       # wide string literal cast
             /w14906       # string literal cast
             /w14928)      # illegal copy-initialization
-        # Warnings-as-errors only on the boilerplate's own sources (Debug and
-        # Release); third-party code (Slint via FetchContent) is unaffected
-        # because this is applied per-target, not globally.
-        if(CMAKE_CXX_FLAGS MATCHES "/WX" OR "$ENV{CI}")
+        # Warnings-as-errors in CI (and locally via -DWARNING_AS_ERROR=ON).
+        # Third-party code (Slint via FetchContent) is unaffected because
+        # this is applied per-target, not globally.
+        option(WARNING_AS_ERROR "Treat compiler warnings as errors" OFF)
+        if(WARNING_AS_ERROR OR DEFINED ENV{CI})
             target_compile_options(${target} PRIVATE /WX)
         endif()
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")

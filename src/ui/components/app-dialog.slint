@@ -1,7 +1,9 @@
 // AppDialog — modal overlay dialog.
 //
 // Usage: instantiate inside the window's root (it covers everything), drive
-// `open` from state, and put actions in the `footer` slot.
+// `open` from state, and put ALL content — body and action buttons — in the
+// single @children slot (Slint allows one per component). Call accepted() /
+// rejected() from the buttons.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 
@@ -12,12 +14,9 @@ export component AppDialog inherits Rectangle {
     /// Modal overlay blocks interaction with everything below.
     in property <bool> dismiss-on-overlay: true;
 
-    /// Body content.
-    @children;
+    /// Body + footer content.
+    @children
 
-    /// Footer slot (buttons, typically AppButton).
-    // (a second @children is not allowed; host a `footer` via a public
-    //  property on the page instead — see docs/COMPONENTS.md)
     callback accepted();
     callback rejected();
 
@@ -45,7 +44,8 @@ export component AppDialog inherits Rectangle {
             x: (root.width - self.width) / 2;
             y: (root.height - self.height) / 2;
             width: min(440px, root.width - 2 * Metrics.space-4);
-            height: min(content.preferred-height + 2 * Metrics.space-4, root.height - 2 * Metrics.space-4);
+            height: min(content.preferred-height + 2 * Metrics.space-4,
+                root.height - 2 * Metrics.space-4);
             border-radius: Metrics.radius-lg;
             background: Palette.surface;
             drop-shadow-blur: Metrics.elevation-3;
@@ -64,7 +64,10 @@ export component AppDialog inherits Rectangle {
                     overflow: elide;
                 }
 
-                @children;
+                if root.title != "" : Rectangle {
+                    height: 1px;
+                    background: Palette.border;
+                }
             }
         }
     }

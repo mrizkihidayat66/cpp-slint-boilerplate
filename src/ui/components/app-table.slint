@@ -6,6 +6,17 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
+import { ListView } from "std-widgets.slint";
+
+export struct AppTableColumn {
+    title: string,
+    /// Relative column width weight (all columns share 100%).
+    weight: float,
+}
+
+export struct AppTableRow {
+    cells: [string],
+}
 
 export component AppTable inherits Rectangle {
     /// Column definitions.
@@ -21,6 +32,11 @@ export component AppTable inherits Rectangle {
     in property <length> row-height: Metrics.control-height-md;
     in property <bool> striped: true;
     in property <bool> bordered: true;
+    /// Sum of all column weights; column widths are proportional to
+    /// weight/total. Slint has no loop statements, so the owner supplies
+    /// this when columns are set (defaults to the column count so that
+    /// unset weights mean "equal widths").
+    in property <float> total-weight: root.columns.length;
 
     callback row-activated(int, AppTableRow);
     callback sort-requested(int, bool);
@@ -34,14 +50,17 @@ export component AppTable inherits Rectangle {
     border-color: Palette.border;
     clip: true;
 
-    header := HorizontalLayout {
+    header := Rectangle {
         y: 0;
         height: Metrics.control-height-sm;
         width: parent.width;
         background: Palette.surface-alt;
 
+        HorizontalLayout {
+            height: 100%;
+
         for col[c] in root.columns : Rectangle {
-            width: root.width * (col.weight > 0 ? col.weight : 1) / root.column-weight-sum;
+            width: root.width * (col.weight > 0 ? col.weight : 1) / root.total-weight;
 
             if root.sortable : sort-area := TouchArea {
                 mouse-cursor: MouseCursor.pointer;
@@ -71,6 +90,7 @@ export component AppTable inherits Rectangle {
                 }
             }
         }
+        }
     }
 
     rows-view := ListView {
@@ -81,7 +101,7 @@ export component AppTable inherits Rectangle {
         for row[r] in root.rows : Rectangle {
             height: root.row-height;
             background: row-area.has-hover ? Palette.surface-alt
-                : root.striped && mod(r, 2) == 1 ? Palette.background
+                : root.striped && Math.mod(r, 2) == 1 ? Palette.background
                 : transparent;
 
             row-area := TouchArea {
@@ -95,7 +115,7 @@ export component AppTable inherits Rectangle {
 
                 for cell[i] in row.cells : Text {
                     width: root.width * (root.columns[i].weight > 0 ? root.columns[i].weight : 1)
-                        / root.column-weight-sum;
+                        / root.total-weight;
                     text: cell;
                     font-size: Typography.font-size-sm;
                     color: Palette.text;
@@ -113,21 +133,5 @@ export component AppTable inherits Rectangle {
         }
     }
 
-    public pure property <float> column-weight-sum: {
-        let sum = 0;
-        for col in root.columns : {
-            sum += col.weight > 0 ? col.weight : 1;
-        }
-        return sum > 0 ? sum : 1;
-    }
-}
 
-export struct AppTableColumn {
-    title: string,
-    /// Relative column width weight (all columns share 100%).
-    weight: float,
-}
-
-export struct AppTableRow {
-    cells: [string],
 }

@@ -5,6 +5,9 @@
 
 include(FetchContent)
 
+# Static Catch2: the test exe then runs standalone (catch_discover_tests
+# executes it during the build, where the DLL paths are not on PATH).
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_Declare(
     catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
@@ -15,19 +18,18 @@ add_executable(slint-boilerplate-tests
     unit/TestModels.cpp
     unit/TestServices.cpp)
 
-target_include_directories(slint-boilerplate-tests
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_BINARY_DIR})
-
 target_link_libraries(slint-boilerplate-tests
     PRIVATE
         Catch2::Catch2WithMain
-        Slint::Slint)
+        boilerplate-core)
 
-# The test executable compiles the same .slint sources so the generated
-# structs used by the toSlint adapters exist in this translation context.
-slint_target_sources(slint-boilerplate-tests PRIVATE ${CMAKE_SOURCE_DIR}/src/ui/app-window.slint)
+# catch_discover_tests runs the exe at BUILD time, before anything can set
+# PATH; copy the slint runtime DLL next to it so it loads.
+add_custom_command(
+    TARGET slint-boilerplate-tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:slint_cpp-shared>
+        $<TARGET_FILE_DIR:slint-boilerplate-tests>)
 
 include(Catch)
 catch_discover_tests(slint-boilerplate-tests)

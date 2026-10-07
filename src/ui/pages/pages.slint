@@ -1,6 +1,7 @@
 // pages.slint — the page index. app-window.slint imports pages from here
-// only, mirroring components/library.slint.
+// only, mirroring components/library.slint. Explicit named re-exports
+// (Slint allows just one `export * from` per file).
 
-export * from "dashboard-page.slint";
-export * from "settings-page.slint";
-export * from "about-page.slint";
+export { DashboardPage } from "dashboard-page.slint";
+export { SettingsPage } from "settings-page.slint";
+export { AboutPage } from "about-page.slint";

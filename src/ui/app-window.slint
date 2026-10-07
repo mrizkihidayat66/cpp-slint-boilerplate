@@ -5,9 +5,13 @@
 // in app-state.slint; see docs/ARCHITECTURE.md for the data-flow rules.
 
 import { Palette, Typography, Metrics } from "theme/theme.slint";
-import { app, StatCard, ActivityItem } from "app-state.slint";
+import { StatCard, ActivityItem, AppState } from "app-state.slint";
 import { AppSidebar } from "components/library.slint";
 import { DashboardPage, SettingsPage, AboutPage } from "pages/pages.slint";
+
+// Re-export so the C++ side can reach it via window->global<AppState>();
+// only exported globals appear in the generated API.
+export { AppState } from "app-state.slint";
 
 export component AppWindow inherits Window {
     title: "cpp-slint-boilerplate";
@@ -28,17 +32,17 @@ export component AppWindow inherits Window {
                 { icon-name: "settings", label: "Settings" },
                 { icon-name: "info", label: "About" },
             ];
-            current-index <=> app::AppState.current-page;
+            current-index <=> AppState.current-page;
             collapsed: root.width < 600px;
             navigate(index) => {
-                app::AppState.request-navigation(index);
+                AppState.request-navigation(index);
             }
         }
 
         Rectangle {
             background: Palette.background;
 
-            if app::AppState.current-page == 0 : DashboardPage {
+            if AppState.current-page == 0 : DashboardPage {
                 x: 0;
                 y: 0;
                 width: parent.width;
@@ -46,13 +50,13 @@ export component AppWindow inherits Window {
                 stat-cards: root.stat-cards;
                 recent-activity: root.recent-activity;
             }
-            if app::AppState.current-page == 1 : SettingsPage {
+            if AppState.current-page == 1 : SettingsPage {
                 x: 0;
                 y: 0;
                 width: parent.width;
                 height: parent.height;
             }
-            if app::AppState.current-page == 2 : AboutPage {
+            if AppState.current-page == 2 : AboutPage {
                 x: 0;
                 y: 0;
                 width: parent.width;

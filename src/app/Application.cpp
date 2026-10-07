@@ -2,7 +2,7 @@
 
 #include "app/Application.h"
 
-#include <slint/vec_model.h>
+#include <slint.h>
 
 #include "models/AboutModels.h"
 #include "models/DashboardModels.h"
@@ -13,7 +13,7 @@ namespace cpp_slint_boilerplate::app {
 
 Application::Application()
 {
-    m_window = app::AppWindow::create();
+    m_window = ::app::AppWindow::create();
     registerServices();
     m_services.initializeAll();
     bindUiCallbacks();
@@ -33,37 +33,39 @@ void Application::registerServices()
 
 void Application::bindUiCallbacks()
 {
-    auto &state = m_window->global<app::AppState>();
+    auto &window = **m_window;
+    auto &state = window.global<::app::AppState>();
 
-    state.on_request_navigation([this](int page) {
+    state.on_request_navigation([&state](int page) {
         // Page indices mirror the sidebar entries (see app-window.slint).
         if (page >= 0 && page < 3) {
-            m_window->global<app::AppState>().set_current_page(page);
+            state.set_current_page(page);
         }
     });
 
-    state.on_request_quit([this] { quit(); });
+    state.on_request_quit([] { slint::quit_event_loop(); });
 }
 
 void Application::loadInitialData()
 {
+    auto &window = **m_window;
     const auto &dashboard = m_services.get<services::DashboardService>();
-    m_window->set_stat_cards(models::toSlintModel(dashboard->statCards()));
+    window.set_stat_cards(models::toSlintModel(dashboard->statCards()));
 
-    std::vector<app::ActivityItem> activity;
+    std::vector<::app::ActivityItem> activity;
     for (const auto &item : dashboard->recentActivity()) {
-        app::ActivityItem converted;
+        ::app::ActivityItem converted;
         converted.actor = slint::SharedString(item.actor);
         converted.action = slint::SharedString(item.action);
         converted.timestamp = slint::SharedString(item.timestamp);
         converted.icon_name = slint::SharedString(item.iconName);
         activity.push_back(std::move(converted));
     }
-    m_window->set_recent_activity(
-            std::make_shared<slint::VecModel<app::ActivityItem>>(std::move(activity)));
+    window.set_recent_activity(
+            std::make_shared<slint::VectorModel<::app::ActivityItem>>(std::move(activity)));
 
     const auto &about = m_services.get<services::AboutService>()->aboutInfo();
-    auto &state = m_window->global<app::AppState>();
+    auto &state = window.global<::app::AppState>();
     state.set_about_text(slint::SharedString(
             about.applicationName + " v" + about.version + "\n" + about.description + "\n\n"
             + "Slint: " + about.slintVersion + "\nCompiler: " + about.compiler + "\nBuild: "
@@ -72,7 +74,7 @@ void Application::loadInitialData()
 
 int Application::run()
 {
-    m_window->run();
+    (**m_window).run();
     return 0;
 }
 

@@ -22,7 +22,9 @@ export component AppProgress inherits Rectangle {
         y: root.show-percentage
             ? (parent.height - root.thickness) / 2
             : 0;
-        width: root.show-percentage ? parent.width - percentage-text.preferred-width - Metrics.space-2 : 100%;
+        width: root.show-percentage
+            ? parent.width - percentage-text.preferred-width - Metrics.space-2
+            : parent.width;
         height: root.thickness;
         border-radius: root.thickness / 2;
         background: Palette.surface-alt;
@@ -35,23 +37,22 @@ export component AppProgress inherits Rectangle {
             border-radius: root.thickness / 2;
             background: Palette.primary;
 
+            animate width { duration: 300ms; easing: ease-out; }
+
             if root.indeterminate : Rectangle {
-                x: parent.width * mod(animation-tick(), 1.2s) / 1.2s - parent.width / 2;
+                x: parent.width * Math.mod(animation-tick(), 1.2s) / 1.2s - parent.width / 2;
                 width: parent.width;
                 height: parent.height;
                 border-radius: root.thickness / 2;
                 background: Palette.primary;
             }
         }
-
-        // Indeterminate slide animation.
-        animate fill.width { duration: 300ms; easing: ease-out; }
     }
 
     percentage-text := Text {
         visible: root.show-percentage;
         x: parent.width - self.preferred-width;
-        vertical-center: root.thickness / 2;
+        y: root.thickness / 2 - self.height / 2;
         text: round(root.clamped * 100) + "%";
         font-size: Typography.font-size-xs;
         color: Palette.text-muted;

@@ -7,8 +7,10 @@ import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { StatCard, ActivityItem } from "../app-state.slint";
 import {
     AppCard,
+    AppCardElevation,
     AppIcon,
     AppBadge,
+    AppBadgeVariant,
     AppAvatar,
 } from "../components/library.slint";
 
@@ -41,7 +43,7 @@ export component DashboardPage inherits Rectangle {
                         AppIcon {
                             name: card.icon-name;
                             size: Typography.font-size-lg;
-                            color: Palette.primary;
+                            accent-color: Palette.primary;
                         }
 
                         Text {
@@ -80,7 +82,7 @@ export component DashboardPage inherits Rectangle {
 
                 for activity[i] in recent-activity : Rectangle {
                     height: 52px;
-                    background: i % 2 == 0 ? transparent : Palette.background;
+                    background: Math.mod(i, 2) == 0 ? transparent : Palette.background;
 
                     HorizontalLayout {
                         padding-left: Metrics.space-2;

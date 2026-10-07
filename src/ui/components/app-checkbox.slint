@@ -52,7 +52,7 @@ export component AppCheckbox inherits Rectangle {
 
     label-text := Text {
         x: root.box-size + Metrics.space-2;
-        vertical-center: root.box-size / 2;
+        y: root.box-size / 2 - self.height / 2;
         text: root.label;
         font-size: Typography.font-size-md;
         color: root.disabled ? Palette.text-disabled : Palette.text;

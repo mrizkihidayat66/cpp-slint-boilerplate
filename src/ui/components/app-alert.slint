@@ -13,7 +13,6 @@ export component AppAlert inherits Rectangle {
     in property <string> title;
     /// Show the dismiss (×) button.
     in property <bool> dismissible: false;
-    in property <bool> visible: true;
 
     callback dismissed();
 
@@ -56,7 +55,7 @@ export component AppAlert inherits Rectangle {
                 : root.variant == AppAlertVariant.danger ? "error"
                 : "info";
             size: Typography.font-size-md;
-            color: root.accent;
+            accent-color: root.accent;
         }
 
         VerticalLayout {

@@ -1,7 +1,7 @@
 // about-page.slint — build/runtime metadata from the AboutService.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
-import { app } from "../app-state.slint";
+import { AppState } from "../app-state.slint";
 import { AppCard, AppIcon, AppButton, AppButtonVariant } from "../components/library.slint";
 
 export component AboutPage inherits Rectangle {
@@ -15,7 +15,7 @@ export component AboutPage inherits Rectangle {
         header-icon: "ⓘ";
 
         Text {
-            text: app::AppState.about-text;
+            text: AppState.about-text;
             font-size: Typography.font-size-md;
             color: Palette.text;
             wrap: word-wrap;

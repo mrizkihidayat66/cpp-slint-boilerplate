@@ -1,4 +1,8 @@
-// AppCard — surface container with optional header and footer slot.
+// AppCard — surface container with optional header and body slot.
+//
+// Note: the body slot is the single @children placeholder; the header is
+// built from properties (title/subtitle/header-icon), which keeps the
+// component composable without a second slot.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 
@@ -13,15 +17,13 @@ export component AppCard inherits Rectangle {
     in property <string> header-icon;
     /// Elevation preset (shadow depth).
     in property <AppCardElevation> elevation: AppCardElevation.raised;
-    /// Body padding.
-    in property <length> padding: Metrics.space-4;
+    /// Body padding (named body-padding: `padding` clashes with the
+    /// inherited element property).
+    in property <length> body-padding: Metrics.space-4;
     /// Show the built-in border (kept when flat).
     in property <bool> bordered: true;
 
-    /// Body content.
-    @children;
-
-    height: content.preferred-height + (header.visible ? header.preferred-height : 0);
+    height: content.preferred-height;
     border-radius: Metrics.radius-md;
     background: Palette.surface;
     border-width: root.bordered || root.elevation == AppCardElevation.flat ? Metrics.border-width : 0;
@@ -32,7 +34,7 @@ export component AppCard inherits Rectangle {
 
     content := VerticalLayout {
         if root.title != "" : header := HorizontalLayout {
-            padding: root.padding;
+            padding: root.body-padding;
             padding-bottom: root.subtitle == "" ? Metrics.space-3 : 0;
             spacing: Metrics.space-3;
 
@@ -58,12 +60,15 @@ export component AppCard inherits Rectangle {
             }
         }
 
-        body := VerticalLayout {
-            padding-top: root.title == "" ? root.padding : Metrics.space-2;
-            padding-bottom: root.padding;
-            padding-left: root.padding;
-            padding-right: root.padding;
-            @children;
+        body := Flickable {
+            height: self.preferred-height;
+            VerticalLayout {
+                padding-top: root.title == "" ? root.body-padding : Metrics.space-2;
+                padding-bottom: root.body-padding;
+                padding-left: root.body-padding;
+                padding-right: root.body-padding;
+                @children
+            }
         }
     }
 }

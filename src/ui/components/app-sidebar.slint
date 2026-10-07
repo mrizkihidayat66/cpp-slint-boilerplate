@@ -66,7 +66,7 @@ export component AppSidebar inherits Rectangle {
                 AppIcon {
                     name: item.icon-name;
                     size: Typography.font-size-md;
-                    color: i == root.current-index ? Palette.primary : Palette.text-muted;
+                    accent-color: i == root.current-index ? Palette.primary : Palette.text-muted;
                 }
 
                 if root.expanded : Text {

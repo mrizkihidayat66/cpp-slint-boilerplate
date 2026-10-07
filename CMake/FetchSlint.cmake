@@ -47,13 +47,27 @@ set(SLINT_FEATURE_RENDERER_SOFTWARE OFF CACHE BOOL "software renderer")
 #   git -C .deps-cache/... checkout v1.18.1
 # or set GIT_TAG to a specific tag below before configuring.
 
+set(SLINT_FETCH_TAG "release/1" CACHE STRING
+    "Git ref of slint-ui/slint to fetch (release/1 moves; pin e.g. v1.18.1 for reproducibility)")
+set(SLINT_VERSION_STRING "1.x (release/1)" CACHE STRING
+    "Human-readable Slint version shown on the About page")
+
 FetchContent_Declare(
     slint
     GIT_REPOSITORY https://github.com/slint-ui/slint.git
-    GIT_TAG release/1
+    GIT_TAG ${SLINT_FETCH_TAG}
     SOURCE_SUBDIR api/cpp
     GIT_SHALLOW FALSE)
 
+# FetchContent_MakeAvailable adds the api/cpp subdirectory directly; it
+# defines the Slint::Slint target (and the slint_target_sources command) in
+# the current build — no find_package needed.
 FetchContent_MakeAvailable(slint)
 
-find_package(Slint REQUIRED)
+if(NOT TARGET Slint::Slint)
+    message(FATAL_ERROR
+        "Slint::Slint target missing after FetchContent — the slint checkout "
+        "at ${slint_SOURCE_DIR} did not define its C++ API. Check that "
+        "GIT_TAG/SOURCE_SUBDIR in CMake/FetchSlint.cmake still match the "
+        "upstream layout.")
+endif()

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "app/ServiceLocator.h"
 #include "app-window.h"
@@ -36,7 +37,10 @@ private:
     void loadInitialData();
 
     ServiceLocator m_services;
-    std::shared_ptr<app::AppWindow> m_window;
+
+    /// ComponentHandle has no default constructor; the window is created in
+    /// the constructor body and stored here afterwards.
+    std::optional<slint::ComponentHandle<::app::AppWindow>> m_window;
 };
 
 } // namespace cpp_slint_boilerplate::app

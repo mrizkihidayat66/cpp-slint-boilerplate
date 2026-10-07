@@ -1,4 +1,8 @@
 // AppSlider — numeric range input.
+//
+// Interaction follows Slint's own SliderBase idiom: pointer-event + moved,
+// with value updates going through set-value() so snapping and clamping
+// live in one place.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 
@@ -17,28 +21,42 @@ export component AppSlider inherits Rectangle {
     width: 100%;
 
     private property <float> range: max(0.0001, root.maximum - root.minimum);
-    private property <float> fraction: min(1, max(0, (root.value - root.minimum) / root.range));
+    private property <float> fraction:
+        min(1, max(0, (root.value - root.minimum) / root.range));
 
-    public pure function apply-step(raw: float) -> float {
-        if (root.snap && root.step > 0) {
-            return root.minimum
-                + round((raw - root.minimum) / root.step) * root.step;
+    function set-value(raw: float) {
+        let clamped = min(root.maximum, max(root.minimum, raw));
+        // let bindings are immutable; snap via a second binding.
+        let v = root.snap && root.step > 0
+            ? root.minimum + Math.round((clamped - root.minimum) / root.step) * root.step
+            : clamped;
+        if (v != root.value) {
+            root.value = v;
+            root.changed(v);
         }
-        return raw;
+    }
+
+    function position-to-value(x: length) -> float {
+        return root.minimum + (x / max(1px, track.width)) * root.range;
     }
 
     touch := TouchArea {
         enabled: !root.disabled;
         mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
-        changed => {
-            if self.pressed && !root.disabled {
-                const raw = root.minimum + (self.position-x - track.x)
-                    / max(1px, track.width) * root.range;
-                const snapped = min(root.maximum, max(root.minimum, root.apply-step(raw)));
-                if (snapped != root.value) {
-                    root.value = snapped;
-                    root.changed(snapped);
-                }
+
+        pointer-event(event) => {
+            if (event.button != PointerEventButton.left) {
+                return;
+            }
+            if (event.kind == PointerEventKind.up) {
+                return;
+            }
+            root.set-value(root.position-to-value(self.mouse-x));
+        }
+
+        moved => {
+            if (self.enabled && self.pressed) {
+                root.set-value(root.position-to-value(self.mouse-x));
             }
         }
     }

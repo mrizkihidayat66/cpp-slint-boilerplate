@@ -1,16 +1,18 @@
 // AppTooltip — wraps arbitrary content and shows a tip on hover.
+//
+// The wrapped content is the single @children slot; the tip renders above
+// (or beside) it on hover.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export enum AppTooltipPlacement { top, bottom, left, right }
 
 export component AppTooltip inherits Rectangle {
     in property <string> text;
     /// Tip placement.
-    in property <Placement> placement: Placement.top;
+    in property <AppTooltipPlacement> placement: AppTooltipPlacement.top;
     /// Delay before the tip appears.
     in property <duration> delay: 400ms;
-
-    /// Content to wrap.
-    @children;
 
     width: content-holder.width;
     height: content-holder.height;
@@ -20,15 +22,15 @@ export component AppTooltip inherits Rectangle {
     }
 
     content-holder := Rectangle {
-        @children;
+        @children
     }
 
     if touch.has-hover : tip := Rectangle {
-        x: root.placement == Placement.left ? -self.width - Metrics.space-2
-            : root.placement == Placement.right ? root.width + Metrics.space-2
+        x: root.placement == AppTooltipPlacement.left ? -self.width - Metrics.space-2
+            : root.placement == AppTooltipPlacement.right ? root.width + Metrics.space-2
             : (root.width - self.width) / 2;
-        y: root.placement == Placement.top ? -self.height - Metrics.space-2
-            : root.placement == Placement.bottom ? root.height + Metrics.space-2
+        y: root.placement == AppTooltipPlacement.top ? -self.height - Metrics.space-2
+            : root.placement == AppTooltipPlacement.bottom ? root.height + Metrics.space-2
             : (root.height - self.height) / 2;
         height: tip-text.preferred-height + 2 * Metrics.space-1;
         width: min(tip-text.preferred-width + 2 * Metrics.space-2, 280px);
@@ -40,7 +42,7 @@ export component AppTooltip inherits Rectangle {
         tip-text := Text {
             x: Metrics.space-2;
             width: parent.width - 2 * Metrics.space-2;
-            vertical-center: parent.height / 2;
+            y: parent.height / 2 - self.height / 2;
             text: root.text;
             font-size: Typography.font-size-xs;
             color: Palette.surface;

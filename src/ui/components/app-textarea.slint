@@ -1,6 +1,9 @@
 // AppTextarea — multi-line text editor with label and counter.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
+// std-widgets is compiled into the slint-compiler per style (fluent here);
+// importing it by file name resolves to the builtin style copy.
+import { TextEdit } from "std-widgets.slint";
 
 export component AppTextarea inherits Rectangle {
     in-out property <string> text;
@@ -13,7 +16,6 @@ export component AppTextarea inherits Rectangle {
     in property <string> error-text;
 
     callback edited <=> editor.edited;
-    callback accepted <=> editor.accepted;
 
     height: label-row.height + editor-holder.height
         + (status-row.visible ? status-row.height : 0);
@@ -42,11 +44,12 @@ export component AppTextarea inherits Rectangle {
         editor := TextEdit {
             x: Metrics.space-3;
             width: parent.width - 2 * Metrics.space-3;
+            height: parent.height - 2 * Metrics.space-3;
             text <=> root.text;
             font-size: Typography.font-size-md;
             font-family: Typography.font-family;
-            color: root.disabled ? Palette.text-disabled : Palette.text;
-            enabled: !root.disabled && !root.read-only;
+            read-only: root.disabled || root.read-only;
+            enabled: !root.disabled;
         }
     }
 
@@ -63,9 +66,9 @@ export component AppTextarea inherits Rectangle {
         }
 
         if root.maxlength > 0 : Text {
-            text: root.text.length + " / " + root.maxlength;
+            text: root.text.character-count + " / " + root.maxlength;
             font-size: Typography.font-size-xs;
-            color: root.text.length > root.maxlength ? Palette.danger : Palette.text-muted;
+            color: root.text.character-count > root.maxlength ? Palette.danger : Palette.text-muted;
         }
     }
 }
