@@ -10,7 +10,7 @@ export component AppInput inherits Rectangle {
     in property <string> label;
     /// Placeholder shown when empty.
     in property <string> placeholder;
-    /// Leading icon name (AppIcons).
+    /// Leading icon name (AppIcon).
     in property <string> icon-name;
     /// Validation error; non-empty shows the message and error styling.
     in property <string> error-text;
@@ -29,14 +29,12 @@ export component AppInput inherits Rectangle {
     /// Emitted when the clear button is used.
     callback cleared();
 
-    height: label-row.visible ? label-row.height + input-holder.height
-        + (status-text.visible ? status-text.height : 0)
-        : input-holder.height + (status-text.visible ? status-text.height : 0);
-    width: input-holder.width;
+    background: transparent;
 
     private property <bool> has-error: root.error-text != "";
 
-    label-row := VerticalLayout {
+    VerticalLayout {
+        // Label
         if root.label != "" : Text {
             text: root.label;
             font-size: Typography.font-size-sm;
@@ -44,61 +42,63 @@ export component AppInput inherits Rectangle {
             color: root.disabled ? Palette.text-disabled
                 : root.has-error ? Palette.danger : Palette.text-muted;
         }
-    }
+        if root.label != "" : Rectangle { height: Metrics.space-1; }
 
-    input-holder := Rectangle {
-        height: Metrics.control-height-md;
-        border-radius: Metrics.radius-md;
-        background: root.disabled ? Palette.surface-alt : Palette.surface;
-        border-width: Metrics.border-width;
-        border-color: root.has-error ? Palette.danger
-            : input.has-focus ? Palette.primary : Palette.border;
+        // Field
+        Rectangle {
+            height: Metrics.control-height-md;
+            border-radius: Metrics.radius-md;
+            background: root.disabled ? Palette.surface-alt : Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: root.has-error ? Palette.danger
+                : input.has-focus ? Palette.primary : Palette.border;
 
-        HorizontalLayout {
-            padding-left: Metrics.space-3;
-            padding-right: Metrics.space-2;
-            spacing: Metrics.space-2;
+            HorizontalLayout {
+                padding-left: Metrics.space-3;
+                padding-right: Metrics.space-2;
+                spacing: Metrics.space-2;
 
-            if root.icon-name != "" : AppIcon {
-                name: root.icon-name;
-                size: Typography.font-size-md;
-                accent-color: root.disabled ? Palette.text-disabled : Palette.text-muted;
-            }
-
-            input := TextInput {
-                text <=> root.text;
-                font-size: Typography.font-size-md;
-                font-family: Typography.font-family;
-                color: root.disabled ? Palette.text-disabled : Palette.text;
-                vertical-alignment: center;
-                enabled: !root.disabled && !root.read-only;
-                input-type: root.password ? InputType.password : InputType.text;
-                accepted => { root.accepted(); }
-                edited => { root.edited(); }
-            }
-
-            if root.clearable && !root.disabled && !root.read-only && root.text != "" : TouchArea {
-                width: clear-glyph.width + Metrics.space-1;
-                clicked => {
-                    root.text = "";
-                    root.cleared();
-                    root.edited();
+                if root.icon-name != "" : AppIcon {
+                    name: root.icon-name;
+                    size: Typography.font-size-md;
+                    accent-color: root.disabled ? Palette.text-disabled : Palette.text-muted;
                 }
-                clear-glyph := AppIcon {
-                    name: "close";
-                    size: Typography.font-size-sm;
-                    color: Palette.text-muted;
+
+                input := TextInput {
+                    text <=> root.text;
+                    font-size: Typography.font-size-md;
+                    font-family: Typography.font-family;
+                    color: root.disabled ? Palette.text-disabled : Palette.text;
+                    vertical-alignment: center;
+                    enabled: !root.disabled && !root.read-only;
+                    input-type: root.password ? InputType.password : InputType.text;
+                    accepted => { root.accepted(); }
+                    edited => { root.edited(); }
+                }
+
+                if root.clearable && !root.disabled && !root.read-only && root.text != "" : TouchArea {
+                    width: clear-glyph.width + Metrics.space-1;
+                    clicked => {
+                        root.text = "";
+                        root.cleared();
+                        root.edited();
+                    }
+                    clear-glyph := AppIcon {
+                        name: "close";
+                        size: Typography.font-size-sm;
+                        accent-color: Palette.text-muted;
+                    }
                 }
             }
         }
-    }
 
-    status-text := Text {
-        y: input-holder.y + input-holder.height + Metrics.space-1;
-        text: root.has-error ? root.error-text : root.helper-text;
-        visible: root.has-error || root.helper-text != "";
-        font-size: Typography.font-size-xs;
-        color: root.has-error ? Palette.danger : Palette.text-muted;
-        overflow: elide;
+        // Helper / error text
+        if root.has-error || root.helper-text != "" : Rectangle { height: Metrics.space-1; }
+        if root.has-error || root.helper-text != "" : Text {
+            text: root.has-error ? root.error-text : root.helper-text;
+            font-size: Typography.font-size-xs;
+            color: root.has-error ? Palette.danger : Palette.text-muted;
+            overflow: elide;
+        }
     }
 }

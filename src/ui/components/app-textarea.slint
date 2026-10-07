@@ -17,59 +17,55 @@ export component AppTextarea inherits Rectangle {
 
     callback edited();
 
-    height: label-row.height + editor-holder.height
-        + (status-row.visible ? status-row.height : 0);
-    width: editor-holder.width;
+    background: transparent;
 
     private property <bool> has-error: root.error-text != "";
 
-    label-row := VerticalLayout {
+    VerticalLayout {
+        // Label
         if root.label != "" : Text {
             text: root.label;
             font-size: Typography.font-size-sm;
             font-weight: Typography.font-weight-medium;
             color: root.has-error ? Palette.danger : Palette.text-muted;
         }
-    }
+        if root.label != "" : Rectangle { height: Metrics.space-1; }
 
-    editor-holder := Rectangle {
-        y: label-row.height;
-        height: editor.preferred-height + 2 * Metrics.space-3;
-        border-radius: Metrics.radius-md;
-        background: root.disabled ? Palette.surface-alt : Palette.surface;
-        border-width: Metrics.border-width;
-        border-color: root.has-error ? Palette.danger
-            : editor.has-focus ? Palette.primary : Palette.border;
+        // Editor
+        Rectangle {
+            height: 84px;
+            border-radius: Metrics.radius-md;
+            background: root.disabled ? Palette.surface-alt : Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: root.has-error ? Palette.danger
+                : editor.has-focus ? Palette.primary : Palette.border;
 
-        editor := TextEdit {
-            x: Metrics.space-3;
-            width: parent.width - 2 * Metrics.space-3;
-            height: parent.height - 2 * Metrics.space-3;
-            text <=> root.text;
-            font-size: Typography.font-size-md;
-            font-family: Typography.font-family;
-            read-only: root.disabled || root.read-only;
-            enabled: !root.disabled;
-            edited => { root.edited(); }
+            editor := TextEdit {
+                x: Metrics.space-3;
+                width: parent.width - 2 * Metrics.space-3;
+                height: parent.height - 2 * Metrics.space-2;
+                y: Metrics.space-2;
+                text <=> root.text;
+                font-size: Typography.font-size-md;
+                font-family: Typography.font-family;
+                read-only: root.disabled || root.read-only;
+                enabled: !root.disabled;
+                edited => { root.edited(); }
+            }
         }
-    }
 
-    status-row := HorizontalLayout {
-        y: editor-holder.y + editor-holder.height + Metrics.space-1;
-        spacing: Metrics.space-2;
-        alignment: end;
-        visible: root.has-error || root.maxlength > 0;
-
+        // Counter / error
+        if root.has-error || root.maxlength > 0 : Rectangle { height: Metrics.space-1; }
         if root.has-error : Text {
             text: root.error-text;
             font-size: Typography.font-size-xs;
             color: Palette.danger;
         }
-
-        if root.maxlength > 0 : Text {
+        if !root.has-error && root.maxlength > 0 : Text {
             text: root.text.character-count + " / " + root.maxlength;
             font-size: Typography.font-size-xs;
-            color: root.text.character-count > root.maxlength ? Palette.danger : Palette.text-muted;
+            color: root.text.character-count > root.maxlength
+                ? Palette.danger : Palette.text-muted;
         }
     }
 }

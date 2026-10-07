@@ -14,15 +14,13 @@ export component AppTooltip inherits Rectangle {
     /// Delay before the tip appears.
     in property <duration> delay: 400ms;
 
-    width: content-holder.width;
-    height: content-holder.height;
+    /// Content to wrap.
+    @children
+
+    background: transparent;
 
     touch := TouchArea {
         mouse-cursor: MouseCursor.help;
-    }
-
-    content-holder := Rectangle {
-        @children
     }
 
     if touch.has-hover : tip := Rectangle {
@@ -42,7 +40,7 @@ export component AppTooltip inherits Rectangle {
         tip-text := Text {
             x: Metrics.space-2;
             width: parent.width - 2 * Metrics.space-2;
-            y: parent.height / 2 - self.height / 2;
+            y: (parent.height - self.preferred-height) / 2;
             text: root.text;
             font-size: Typography.font-size-xs;
             color: Palette.surface;

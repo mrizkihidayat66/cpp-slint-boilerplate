@@ -2,6 +2,8 @@
 
 #include "app/Application.h"
 
+#include <cstdlib>
+
 #include <slint.h>
 
 #include "models/AboutModels.h"
@@ -36,9 +38,18 @@ void Application::bindUiCallbacks()
     auto &window = **m_window;
     auto &state = window.global<::app::AppState>();
 
+    // BOILERPLATE_START_PAGE selects the initial page (screenshot harness,
+    // CI smoke runs). Page indices mirror the sidebar entries.
+    if (const char *startPage = std::getenv("BOILERPLATE_START_PAGE")) {
+        const int page = std::atoi(startPage);
+        if (page >= 0 && page < 4) {
+            state.set_current_page(page);
+        }
+    }
+
     state.on_request_navigation([&state](int page) {
         // Page indices mirror the sidebar entries (see app-window.slint).
-        if (page >= 0 && page < 3) {
+        if (page >= 0 && page < 4) {
             state.set_current_page(page);
         }
     });

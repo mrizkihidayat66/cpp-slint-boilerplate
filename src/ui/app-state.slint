@@ -25,6 +25,8 @@ export struct ActivityItem {
 
 // Shared state between the UI and the C++ side. C++ pushes state via
 // property setters on this global and receives intents via callbacks.
+// The initial page can be overridden via the BOILERPLATE_START_PAGE env
+// var (read in Application) — used by the screenshot harness.
 export global AppState {
     in-out property <int> current-page: 0;
     in-out property <string> status-message: "";

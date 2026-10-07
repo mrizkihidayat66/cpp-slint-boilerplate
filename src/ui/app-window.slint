@@ -7,7 +7,7 @@
 import { Palette, Typography, Metrics } from "theme/theme.slint";
 import { StatCard, ActivityItem, AppState } from "app-state.slint";
 import { AppSidebar } from "components/library.slint";
-import { DashboardPage, SettingsPage, AboutPage } from "pages/pages.slint";
+import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages.slint";
 
 // Re-export so the C++ side can reach it via window->global<AppState>();
 // only exported globals appear in the generated API.
@@ -31,6 +31,7 @@ export component AppWindow inherits Window {
             brand-subtitle: "C++ · Slint";
             items: [
                 { icon-name: "home", label: "Dashboard" },
+                { icon-name: "grid", label: "Components" },
                 { icon-name: "settings", label: "Settings" },
                 { icon-name: "info", label: "About" },
             ];
@@ -52,13 +53,19 @@ export component AppWindow inherits Window {
                 stat-cards: root.stat-cards;
                 recent-activity: root.recent-activity;
             }
-            if AppState.current-page == 1 : SettingsPage {
+            if AppState.current-page == 1 : GalleryPage {
                 x: 0;
                 y: 0;
                 width: parent.width;
                 height: parent.height;
             }
-            if AppState.current-page == 2 : AboutPage {
+            if AppState.current-page == 2 : SettingsPage {
+                x: 0;
+                y: 0;
+                width: parent.width;
+                height: parent.height;
+            }
+            if AppState.current-page == 3 : AboutPage {
                 x: 0;
                 y: 0;
                 width: parent.width;
