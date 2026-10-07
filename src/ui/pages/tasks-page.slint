@@ -1,0 +1,343 @@
+// tasks-page.slint — CRUD demo: sortable + paginated table, dialog forms
+// with per-field validation, delete confirmations, loading state
+// (advanced branch).
+//
+// Data flow: the page holds ONLY view state (which dialog is open, which
+// task is being edited). Rows, sort, and pagination live in the AppState
+// global — C++ owns them and re-pushes after every mutation (see
+// docs/ARCHITECTURE.md).
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppState } from "../app-state.slint";
+import {
+    AppButton,
+    AppButtonVariant,
+    AppButtonSize,
+    AppCard,
+    AppDialog,
+    AppInput,
+    AppTextarea,
+    AppSelect,
+    AppSpinner,
+    AppBadge,
+    AppBadgeVariant,
+    AppAlert,
+    AppAlertVariant,
+    AppTable,
+    AppTableColumn,
+    AppTableRow,
+    AppPagination,
+    AppIcon,
+} from "../components/library.slint";
+
+export component TasksPage inherits Rectangle {
+    background: Palette.background;
+
+    // All dialog state (visibility, the task being edited, form errors) is
+    // owned by C++ through AppState — the page holds no business state.
+    property <bool> form-open <=> AppState.tasks-form-visible;
+    property <bool> confirm-open <=> AppState.tasks-confirm-visible;
+    property <int> delete-target-id <=> AppState.tasks-delete-id;
+    property <string> delete-target-title <=> AppState.tasks-delete-title;
+
+    VerticalLayout {
+        padding: Metrics.space-6;
+        spacing: Metrics.space-5;
+
+        // --- Header -------------------------------------------------------------
+        HorizontalLayout {
+            spacing: Metrics.space-4;
+            alignment: space-between;
+
+            VerticalLayout {
+                alignment: center;
+                spacing: 2px;
+                Text {
+                    text: "Tasks";
+                    font-size: Typography.font-size-xl;
+                    font-weight: Typography.font-weight-bold;
+                    color: Palette.text;
+                }
+                Text {
+                    text: "Repository → Validation → Service chain, sortable and paginated";
+                    font-size: Typography.font-size-md;
+                    color: Palette.text-muted;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: Metrics.space-2;
+                alignment: center;
+                AppButton {
+                    variant: AppButtonVariant.primary;
+                    text: "New task";
+                    icon-name: "plus";
+                    clicked => {
+                        AppState.request-task-create();
+                    }
+                }
+            }
+        }
+
+        // --- Status banner ------------------------------------------------------
+        if AppState.status-message != "" : AppAlert {
+            variant: AppAlertVariant.info;
+            title: "Tasks";
+            text: AppState.status-message;
+        }
+
+        // --- Table card ---------------------------------------------------------
+        AppCard {
+            title: "All tasks";
+            subtitle: AppState.tasks-total == 0 ? "No tasks yet"
+                : AppState.tasks-total + " tasks · page "
+                    + AppState.tasks-page + " of " + AppState.tasks-page-count;
+            header-icon-name: "document";
+
+            VerticalLayout {
+                spacing: Metrics.space-4;
+
+                if AppState.tasks-loading : Rectangle {
+                    height: 160px;
+                    VerticalLayout {
+                        alignment: center;
+                        HorizontalLayout {
+                            alignment: center;
+                            AppSpinner { size: 24px; }
+                        }
+                    }
+                }
+
+                if !AppState.tasks-loading && AppState.tasks-total == 0 : Rectangle {
+                    height: 160px;
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: Metrics.space-3;
+                        Text {
+                            text: "No tasks yet";
+                            horizontal-alignment: center;
+                            font-size: Typography.font-size-lg;
+                            font-weight: Typography.font-weight-semibold;
+                            color: Palette.text;
+                        }
+                        Text {
+                            text: "Create the first one with “New task”.";
+                            horizontal-alignment: center;
+                            font-size: Typography.font-size-md;
+                            color: Palette.text-muted;
+                        }
+                    }
+                }
+
+                if !AppState.tasks-loading && AppState.tasks-total > 0 : Rectangle {
+                    AppTable {
+                        columns: [
+                            { title: "#", weight: 0.5 },
+                            { title: "Title", weight: 3 },
+                            { title: "Assignee", weight: 2 },
+                            { title: "Status", weight: 1.5 },
+                        ];
+                        rows: AppState.tasks-rows;
+                        sort-column: AppState.tasks-sort-column;
+                        sort-ascending: AppState.tasks-sort-ascending;
+                        total-weight: 7;
+                        sort-requested(column, ascending) => {
+                            AppState.request-task-sort(column, ascending);
+                        }
+                        row-activated(index, row) => {
+                            // cells[0] is the id — C++ parses it.
+                            AppState.request-task-edit-by-cell(row.cells[0]);
+                        }
+                    }
+                }
+
+                if !AppState.tasks-loading && AppState.tasks-total > 0 : Rectangle {
+                    height: Metrics.control-height-sm;
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-3;
+                        alignment: center;
+
+                        Text {
+                            text: "Click a row to edit · click headers to sort";
+                            font-size: Typography.font-size-sm;
+                            color: Palette.text-faint;
+                            vertical-alignment: center;
+                        }
+                        Rectangle { horizontal-stretch: 1; }
+
+                        AppPagination {
+                            page: AppState.tasks-page;
+                            page-count: AppState.tasks-page-count;
+                            page-changed(p) => {
+                                AppState.request-task-page(p);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Edit/Create dialog -----------------------------------------------------
+    AppDialog {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+
+        open: root.form-open;
+        title: AppState.task-form-id == 0 ? "New task" : "Edit task #" + AppState.task-form-id;
+        dismiss-on-overlay: false;
+
+        VerticalLayout {
+            spacing: Metrics.space-4;
+
+            if AppState.task-form-error != "" : AppAlert {
+                variant: AppAlertVariant.danger;
+                title: "Cannot save";
+                text: AppState.task-form-error;
+            }
+
+            AppInput {
+                label: "Title";
+                placeholder: "What needs to be done?";
+                text <=> AppState.task-form-title;
+                error-text: AppState.task-form-title-error;
+                helper-text: "3–64 characters, must be unique";
+                icon-name: "document";
+                accepted => { AppState.request-task-submit(); }
+            }
+
+            AppTextarea {
+                label: "Description";
+                placeholder: "Optional details";
+                text <=> AppState.task-form-description;
+                maxlength: 280;
+            }
+
+            AppInput {
+                label: "Assignee";
+                placeholder: "Who owns this task?";
+                text <=> AppState.task-form-assignee;
+                error-text: AppState.task-form-assignee-error;
+                icon-name: "user";
+                helper-text: "Required, up to 32 characters";
+            }
+
+            VerticalLayout {
+                spacing: Metrics.space-1;
+                Text {
+                    text: "Status";
+                    font-size: Typography.font-size-sm;
+                    font-weight: Typography.font-weight-medium;
+                    color: Palette.text-muted;
+                }
+                AppSelect {
+                    width: 100%;
+                    model: ["To do", "In progress", "Done"];
+                    selected-index <=> AppState.task-form-status-index;
+                }
+            }
+
+            Rectangle { height: 0; }
+
+            HorizontalLayout {
+                spacing: Metrics.space-2;
+                alignment: end;
+
+                if AppState.task-form-id != 0 : AppButton {
+                    variant: AppButtonVariant.danger;
+                    text: "Delete";
+                    icon-name: "trash";
+                    clicked => {
+                        // Ask C++ to load the task's title, then show the
+                        // confirmation dialog.
+                        AppState.request-task-confirm-delete();
+                    }
+                }
+                Rectangle { horizontal-stretch: 1; }
+                AppButton {
+                    variant: AppButtonVariant.outline;
+                    text: "Cancel";
+                    clicked => {
+                        root.form-open = false;
+                        AppState.request-task-cancel();
+                    }
+                }
+                AppButton {
+                    variant: AppButtonVariant.primary;
+                    text: AppState.task-form-id == 0 ? "Create task" : "Save changes";
+                    icon-name: "check";
+                    clicked => { AppState.request-task-submit(); }
+                }
+            }
+        }
+    }
+
+    // --- Delete confirmation dialog ---------------------------------------------
+    AppDialog {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+
+        open: root.confirm-open;
+        title: "Delete task";
+
+        VerticalLayout {
+            spacing: Metrics.space-4;
+
+            HorizontalLayout {
+                spacing: Metrics.space-3;
+                alignment: start;
+
+                Rectangle {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: Metrics.radius-md;
+                    background: Palette.danger-surface;
+                    HorizontalLayout {
+                        alignment: center;
+                        VerticalLayout {
+                            alignment: center;
+                            AppIcon {
+                                name: "warning";
+                                size: 20px;
+                                color: Palette.danger;
+                            }
+                        }
+                    }
+                }
+
+                Text {
+                    text: "Delete “" + root.delete-target-title + "”?\nThis cannot be undone.";
+                    wrap: word-wrap;
+                    font-size: Typography.font-size-md;
+                    color: Palette.text;
+                    vertical-alignment: center;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: Metrics.space-2;
+                alignment: end;
+
+                AppButton {
+                    variant: AppButtonVariant.outline;
+                    text: "Keep task";
+                    clicked => { root.confirm-open = false; }
+                }
+                AppButton {
+                    variant: AppButtonVariant.danger;
+                    text: "Delete";
+                    icon-name: "trash";
+                    clicked => {
+                        root.confirm-open = false;
+                        AppState.request-task-delete(root.delete-target-id);
+                    }
+                }
+            }
+        }
+    }
+}

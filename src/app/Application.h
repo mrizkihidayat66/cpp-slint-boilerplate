@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "app/ServiceLocator.h"
+#include "models/TaskModels.h"
 #include "app-window.h"
 
 namespace cpp_slint_boilerplate::app {
@@ -36,7 +37,20 @@ private:
     void bindUiCallbacks();
     void loadInitialData();
 
+    /// Push the current sort/page slice of tasks into the AppState global.
+    /// AppState is taken by const-ref: generated globals are handed out as
+    /// const&, but their setters are const methods.
+    void pushTasks(const ::app::AppState &state);
+
+    /// Clear the form-dialog error properties.
+    void clearFormErrors(const ::app::AppState &state);
+
     ServiceLocator m_services;
+
+    // Tasks view state (mirrors the AppState properties the UI last set).
+    models::TaskSortColumn m_sortColumn = models::TaskSortColumn::Id;
+    bool m_sortAscending = true;
+    int m_taskPage = 1;
 
     /// ComponentHandle has no default constructor; the window is created in
     /// the constructor body and stored here afterwards.

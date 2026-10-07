@@ -4,6 +4,10 @@
 // a circular dependency on the window itself. The generated C++ lands in the
 // namespace given by slint_target_sources(... NAMESPACE app).
 
+import { AppTableRow } from "components/app-table.slint";
+
+export { AppTableRow } from "components/app-table.slint";
+
 // Data structs shared with C++. POCOs mirror these in src/models/.
 export struct StatCard {
     title: string,
@@ -31,6 +35,42 @@ export global AppState {
     in-out property <int> current-page: 0;
     in-out property <string> status-message: "";
     in-out property <string> about-text: "";
+
+    // --- Tasks (advanced branch) ---------------------------------------------
+    // Rows + pagination state are pushed from C++ after every mutation;
+    // intents flow back via request-task-* callbacks.
+    in-out property <[AppTableRow]> tasks-rows: [];
+    in-out property <int> tasks-total: 0;
+    in-out property <int> tasks-page: 1;
+    in-out property <int> tasks-page-count: 1;
+    in-out property <int> tasks-sort-column: -1;
+    in-out property <bool> tasks-sort-ascending: true;
+    in-out property <bool> tasks-loading: false;
+
+    // Form dialog state (0 = create mode).
+    in-out property <int> task-form-id: 0;
+    in-out property <string> task-form-title: "";
+    in-out property <string> task-form-description: "";
+    in-out property <string> task-form-assignee: "";
+    in-out property <int> task-form-status-index: 0;
+    in-out property <string> task-form-title-error: "";
+    in-out property <string> task-form-assignee-error: "";
+    in-out property <string> task-form-error: "";
+    in-out property <bool> tasks-form-visible: false;
+
+    // Delete-confirmation dialog state.
+    in-out property <bool> tasks-confirm-visible: false;
+    in-out property <int> tasks-delete-id: 0;
+    in-out property <string> tasks-delete-title: "";
+
     callback request-navigation(int);
     callback request-quit();
+    callback request-task-sort(int, bool);
+    callback request-task-page(int);
+    callback request-task-create();
+    callback request-task-edit-by-cell(string);
+    callback request-task-submit();
+    callback request-task-cancel();
+    callback request-task-confirm-delete();
+    callback request-task-delete(int);
 }

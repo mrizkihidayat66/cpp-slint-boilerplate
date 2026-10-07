@@ -16,7 +16,8 @@ FetchContent_MakeAvailable(catch2)
 
 add_executable(slint-boilerplate-tests
     unit/TestModels.cpp
-    unit/TestServices.cpp)
+    unit/TestServices.cpp
+    unit/TestTasks.cpp)
 
 target_link_libraries(slint-boilerplate-tests
     PRIVATE

@@ -4,6 +4,11 @@
 // `open` from state, and put ALL content — body and action buttons — in the
 // single @children slot (Slint allows one per component). Call accepted() /
 // rejected() from the buttons.
+//
+// Implementation note: the overlay is hidden via `visible`/`enabled`
+// instead of a conditional `if` — the @children placeholder cannot appear
+// inside a conditional element, and keeping the layer always instantiated
+// also preserves the children's state (input text, focus) across toggles.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 
@@ -14,13 +19,12 @@ export component AppDialog inherits Rectangle {
     /// Modal overlay blocks interaction with everything below.
     in property <bool> dismiss-on-overlay: true;
 
-    /// Body + footer content.
-    @children
-
     callback accepted();
     callback rejected();
 
-    if root.open : overlay := TouchArea {
+    overlay := TouchArea {
+        visible: root.open;
+        enabled: root.open;
         x: 0;
         y: 0;
         width: root.width;
@@ -68,6 +72,9 @@ export component AppDialog inherits Rectangle {
                     height: 1px;
                     background: Palette.border;
                 }
+
+                // Body + footer content.
+                @children
             }
         }
     }

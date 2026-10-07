@@ -454,6 +454,11 @@ export component GalleryPage inherits Rectangle {
 
     // Dialog instantiated at page level so its overlay covers everything.
     AppDialog {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+
         open: root.dialog-open;
         title: "Confirm action";
         accepted => { root.dialog-open = false; }

@@ -1,82 +1,77 @@
-# cpp-slint-boilerplate
+# cpp-slint-boilerplate — examples/advanced
 
-A professional C++20 + [Slint](https://slint.dev) boilerplate for desktop
-applications on Windows — x64 **and** x86 (32-bit).
+CRUD the professional way: a sortable, paginated task table backed by a
+three-layer service chain, with dialog forms that validate per-field and
+confirm destructive actions.
 
-## What you get
+This branch is the third stop of the progressive tour (see
+[docs/BRANCHES.md](docs/BRANCHES.md)):
 
-- **A layered C++ scaffold** — `app/` (composition root + service locator DI),
-  `services/` (business logic behind `IService`), `models/` (pure-C++ POCOs
-  with `toSlint()` adapters), `ui/` (Slint markup). See
-  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-- **A Bootstrap-like component library** — 25 `App*` components (buttons,
-  inputs, selects, tables, dialogs, navigation, …) with enum variants,
-  loading/disabled states, and full theming through design-token globals
-  (`Palette`, `Typography`, `Metrics`). See
-  [docs/COMPONENTS.md](docs/COMPONENTS.md).
-- **x64 + x86 builds from one setup** — CMake presets for both architectures;
-  Slint is built from source via `FetchContent`, the only integration that
-  supports 32-bit targets. See [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md).
-- **Progressive examples** — from a ~30-line app to full CRUD with service
-  chains, on separate branches. See [docs/BRANCHES.md](docs/BRANCHES.md).
-- **CI** — Windows matrix (x64 + x86 × Debug/Release), formatting check,
-  unit tests, GPU-less smoke run.
-- **Docs** — coding style, contribution guide, architecture deep-dive,
-  component catalog, build instructions.
+| Branch | Demonstrates |
+| ------ | ------------ |
+| `examples/simple` | Ship a Slint app with ~30 lines of C++ |
+| `examples/intermediate` | State + a real service: settings persisted to `%APPDATA%`, live theme |
+| **`examples/advanced`** | **Full CRUD: `TaskRepository → TaskValidationService → TaskService`** |
 
-## Prerequisites
+## The demo
 
-- Visual Studio 2022 (C++20-capable MSVC)
-- CMake 3.21+ with Ninja (both ship with VS)
-- Rust stable ≥ 1.92 ([rustup](https://rustup.rs)) — Slint is built from source
+Open **Tasks** in the sidebar:
 
-For 32-bit builds:
+- **Sortable table** — click a column header to sort ascending, click again
+  to flip. The reorder happens in C++ (the view never sorts).
+- **Pagination** — 10 rows per page over a 22-row seed set; the bar
+  recalculates after every mutation.
+- **Create / edit** — “New task” or click a row. The dialog validates the
+  draft through `TaskValidationService` and shows per-field errors under
+  the inputs; duplicate titles are rejected with a summary message.
+- **Delete confirmation** — a danger dialog before anything is removed.
+- **Status feedback** — every mutation reports back through the status
+  banner.
 
-```bash
-rustup target add i686-pc-windows-msvc
+## The chain
+
+```
+TaskRepository        owns the data (in-memory, seeded demo set)
+        ↓
+TaskValidationService stateless field rules (title/assignee/description)
+        ↓
+TaskService           orchestrates: validate → reject duplicates →
+                      mutate → sort → paginate
 ```
 
-## Quickstart
+The chain is wired in `Application::registerServices()`: dependencies are
+registered first (initialization order), then the orchestrating service is
+constructed with them explicitly — no service locator look-ups inside the
+chain itself. `TaskService` returns a `TaskMutationResult` carrying either
+the stored task or per-field error messages; the UI decides what to do with
+them (keep the dialog open, light up the inputs).
 
-From a VS developer prompt:
+## Verification
 
 ```bash
 cmake --preset x64-debug
 cmake --build --preset x64-debug
+ctest --preset x64-debug
 ./build/x64-debug/slint-boilerplate.exe
 ```
 
-The first configure clones Slint (~200 MB) and the first build compiles its
-Rust core — expect 10–20 minutes once; the shared cache in `.deps-cache/`
-makes every later build fast.
+The task chain has its own test suite (`tests/unit/TestTasks.cpp`): seed /
+insert / update / remove, validation rules, duplicate rejection, sort
+invariants, pagination clamping, and post-delete ordering.
 
-| Preset         | Purpose                    |
-| -------------- | -------------------------- |
-| `x64-debug`    | Day-to-day development     |
-| `x64-release`  | Optimized builds           |
-| `x86-debug`    | 32-bit development         |
-| `x86-release`  | 32-bit optimized builds    |
+## Prerequisites
+
+- CMake 3.21+ and a C++20 compiler (MSVC 2022, GCC 12+, or Clang 15+)
+- Rust 1.92+ (Slint's compiler is built from source via Corrosion)
+- First configure downloads dependencies (Slint 1.18.1, Catch2 3.7.1) —
+  cached per architecture under `.deps-cache/`
 
 ## Documentation
 
-| Document                                          | Contents                                        |
-| ------------------------------------------------- | ----------------------------------------------- |
-| [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md) | Building Slint from source, x64 + x86, renderers/backends |
-| [docs/CODING_STYLE.md](docs/CODING_STYLE.md)     | C++ and Slint style rules                       |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)     | Layering, state flow, model adapters            |
-| [docs/COMPONENTS.md](docs/COMPONENTS.md)         | Component library catalog + theming             |
-| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)     | Setup, workflow, PR checklist                   |
-| [docs/BRANCHES.md](docs/BRANCHES.md)             | Branch-per-level example scheme                 |
-
-## Roadmap
-
-- [ ] Dark palette + runtime theme switching (examples/intermediate)
-- [ ] Skia renderer preset
-- [ ] Richer icon set (bundled vector assets)
-- [ ] Linux/macOS CI legs
-- [ ] Release artifact workflow (packaged zip/installer)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — layering and data-flow rules
+- [docs/COMPONENTS.md](docs/COMPONENTS.md) — the component library API
+- [docs/BRANCHES.md](docs/BRANCHES.md) — the progressive example tour
 
 ## License
 
-No license is applied to this repository — see [NOTICE.md](NOTICE.md) for the
-Slint licensing options you must choose between when shipping an app.
+MIT — see [LICENSE](LICENSE).
