@@ -54,10 +54,23 @@ The **first configure** clones the Slint repository (~200 MB) and the first
 **build** compiles its Rust core via cargo — expect 10–20 minutes. Every later
 configure/build reuses `.deps-cache/`.
 
-> `cmake --preset` must run inside a matching MSVC environment ("x64 Native
-> Tools Command Prompt" or the VS Developer PowerShell). The presets'
-> `architecture.strategy: external` handles the switch when your shell is
-> already in the VS developer environment.
+> `cmake --preset` must run inside a **matching MSVC environment**. The
+> presets' `architecture.strategy: external` only *declares* the target to
+> CMake — it does not switch the toolchain. From a plain shell, call the
+> matching vcvars first:
+>
+> - **x64 presets**: `vcvars64.bat` → `Hostx64\x64\cl.exe`
+> - **x86 presets**: `vcvars32.bat` → `Hostx86\x86\cl.exe`
+>
+> Configuring an x86 preset inside a vcvars64 shell silently compiles with the
+> x64 compiler and then fails at link time (the Slint DLL is i686, the app is
+> x86-64). Verify with `cl` reporting `x86` after vcvars32, or check
+> `CMAKE_CXX_COMPILER` in the build's `CMakeCache.txt`.
+>
+> The dependency cache is also split per target architecture
+> (`.deps-cache/<platform>/`), derived from `CMAKE_VS_PLATFORM_NAME` —
+> `CMAKE_SYSTEM_PROCESSOR` always reports the *host* (AMD64) and must not be
+> used for this.
 
 ## Pinning a Slint version
 

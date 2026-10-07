@@ -12,13 +12,23 @@
 
 include(FetchContent)
 
-# Shared dependency cache across presets/build directories. The Slint checkout
-# is ~200 MB and the cargo build is expensive; keeping both in a shared cache
-# means presets only pay it once per architecture. Point SLINT_CACHE_DIR at a
-# drive-local path on constrained machines.
+# Dependency cache, split per target architecture. The Slint checkout is
+# ~200 MB and the cargo build is expensive, but the produced binaries are
+# arch-specific: a shared cache would let an x86 build overwrite the x64
+# slint_cpp.dll/lib pair and break the other preset's link step.
+#
+# CMAKE_SYSTEM_PROCESSOR reports the HOST (always AMD64 here), so derive the
+# target arch from the preset's generator platform / CMAKE_VS_PLATFORM_NAME
+# (set by the "architecture" field in CMakePresets.json), falling back to
+# CMAKE_SYSTEM_PROCESSOR for non-MSVC generators.
+if(DEFINED CMAKE_VS_PLATFORM_NAME)
+    set(_arch_suffix "${CMAKE_VS_PLATFORM_NAME}")
+else()
+    set(_arch_suffix "${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 set(SLINT_CACHE_DIR "${CMAKE_SOURCE_DIR}/.deps-cache" CACHE PATH
-    "Shared FetchContent cache directory for Slint and friends")
-set(FETCHCONTENT_BASE_DIR "${SLINT_CACHE_DIR}")
+    "Base cache directory for Slint and friends")
+set(FETCHCONTENT_BASE_DIR "${SLINT_CACHE_DIR}/${_arch_suffix}")
 
 # --- Slint build configuration ---------------------------------------------
 # Defaults follow Slint's own recommendations; every flag can be overridden on
