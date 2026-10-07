@@ -1,0 +1,124 @@
+// dashboard-page.slint — KPI cards + recent activity feed.
+//
+// All data arrives via the window's models (set from C++); the page itself
+// contains no business logic.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { StatCard, ActivityItem } from "../app-state.slint";
+import {
+    AppCard,
+    AppIcon,
+    AppBadge,
+    AppAvatar,
+} from "../components/library.slint";
+
+export component DashboardPage inherits Rectangle {
+    background: Palette.background;
+
+    // Fed from the window, which is fed from C++.
+    in property <[StatCard]> stat-cards: [];
+    in property <[ActivityItem]> recent-activity: [];
+
+    VerticalLayout {
+        padding: Metrics.space-5;
+
+        // KPI grid: 4 columns on wide windows, 2 on narrow ones.
+        HorizontalLayout {
+            spacing: Metrics.space-4;
+
+            for card[i] in stat-cards : AppCard {
+                title: "";
+                elevation: AppCardElevation.raised;
+                horizontal-stretch: 1;
+
+                VerticalLayout {
+                    spacing: Metrics.space-1;
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
+                        alignment: start;
+
+                        AppIcon {
+                            name: card.icon-name;
+                            size: Typography.font-size-lg;
+                            color: Palette.primary;
+                        }
+
+                        Text {
+                            text: card.title;
+                            font-size: Typography.font-size-sm;
+                            color: Palette.text-muted;
+                            vertical-alignment: center;
+                        }
+                    }
+
+                    Text {
+                        text: card.value;
+                        font-size: Typography.font-size-2xl;
+                        font-weight: Typography.font-weight-bold;
+                        color: Palette.text;
+                    }
+
+                    AppBadge {
+                        text: card.delta;
+                        variant: card.trend-positive
+                            ? AppBadgeVariant.success
+                            : AppBadgeVariant.danger;
+                    }
+                }
+            }
+        }
+
+        // Recent activity feed.
+        AppCard {
+            title: "Recent activity";
+            subtitle: "Latest events across the workspace";
+            vertical-stretch: 1;
+
+            VerticalLayout {
+                spacing: 0;
+
+                for activity[i] in recent-activity : Rectangle {
+                    height: 52px;
+                    background: i % 2 == 0 ? transparent : Palette.background;
+
+                    HorizontalLayout {
+                        padding-left: Metrics.space-2;
+                        padding-right: Metrics.space-2;
+                        spacing: Metrics.space-3;
+
+                        AppAvatar {
+                            name: activity.actor;
+                            width: 32px;
+                        }
+
+                        VerticalLayout {
+                            alignment: center;
+                            Text {
+                                text: activity.actor;
+                                font-size: Typography.font-size-md;
+                                font-weight: Typography.font-weight-medium;
+                                color: Palette.text;
+                                overflow: elide;
+                            }
+                            Text {
+                                text: activity.action;
+                                font-size: Typography.font-size-sm;
+                                color: Palette.text-muted;
+                                overflow: elide;
+                            }
+                        }
+
+                        Text {
+                            text: activity.timestamp;
+                            font-size: Typography.font-size-xs;
+                            color: Palette.text-muted;
+                            vertical-alignment: center;
+                            horizontal-alignment: right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

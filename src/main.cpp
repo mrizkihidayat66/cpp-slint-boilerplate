@@ -1,13 +1,9 @@
-// main.cpp — phase-1 skeleton entry point.
-//
-// Replaced by the Application composition root in phase 3; kept trivial so the
-// first buildable milestone stays minimal.
+// main.cpp — entry point. All wiring lives in Application.
 
-#include <app-window.h>
+#include "app/Application.h"
 
 int main()
 {
-    auto window = app::AppWindow::create();
-    window->run();
-    return 0;
+    cpp_slint_boilerplate::app::Application application;
+    return application.run();
 }

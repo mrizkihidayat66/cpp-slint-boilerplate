@@ -25,6 +25,7 @@ add_executable(slint-boilerplate
     src/main.cpp
     src/app/Application.cpp
     src/app/ServiceLocator.cpp
+    src/models/DashboardModels.cpp
     src/services/DashboardService.cpp
     src/services/AboutService.cpp)
 

@@ -1,50 +1,63 @@
-// app-window.slint — root window: namespace, shared structs, app state.
+// app-window.slint — root window: layout shell + model properties.
 //
-// Phase-1 skeleton: an empty window proving the toolchain. The shell (sidebar
-// + page switching) arrives with the C++ architecture phase.
+// The C++ side reaches the UI only through: AppWindow properties (models),
+// and the AppState global (state + callback intents). Types and state live
+// in app-state.slint; see docs/ARCHITECTURE.md for the data-flow rules.
 
 import { Palette, Typography, Metrics } from "theme/theme.slint";
-import { AppButton, AppCard } from "components/library.slint";
-
-export namespace app {
-    // Shared state between the UI and the C++ side. C++ pushes state via
-    // property setters on this global and receives intents via callbacks.
-    export global AppState {
-        in-out property <int> current-page: 0;
-        in-out property <string> status-message: "";
-        callback request-navigation(int);
-        callback request-quit();
-    }
-}
+import { app, StatCard, ActivityItem } from "app-state.slint";
+import { AppSidebar } from "components/library.slint";
+import { DashboardPage, SettingsPage, AboutPage } from "pages/pages.slint";
 
 export component AppWindow inherits Window {
     title: "cpp-slint-boilerplate";
+    preferred-width: 1024px;
+    preferred-height: 680px;
     min-width: Metrics.window-min-width;
     min-height: Metrics.window-min-height;
     background: Palette.background;
 
-    AppCard {
-        title: "Boilerplate skeleton";
-        subtitle: "Phase 1 — toolchain check";
-        x: (parent.width - self.width) / 2;
-        y: (parent.height - self.height) / 2;
-        width: min(420px, parent.width - 2 * Metrics.space-4);
+    // Models owned by the C++ side; the pages consume them.
+    in-out property <[StatCard]> stat-cards: [];
+    in-out property <[ActivityItem]> recent-activity: [];
 
-        AppButton {
-            text: "Click me";
-            clicked => {
-                app::AppState.status-message = "Toolchain works!";
+    HorizontalLayout {
+        AppSidebar {
+            items: [
+                { icon-name: "home", label: "Dashboard" },
+                { icon-name: "settings", label: "Settings" },
+                { icon-name: "info", label: "About" },
+            ];
+            current-index <=> app::AppState.current-page;
+            collapsed: root.width < 600px;
+            navigate(index) => {
+                app::AppState.request-navigation(index);
             }
         }
-    }
 
-    if app::AppState.status-message != "" : Text {
-        x: 0;
-        width: parent.width;
-        y: parent.height - self.height - Metrics.space-4;
-        text: app::AppState.status-message;
-        color: Palette.text-muted;
-        font-size: Typography.font-size-sm;
-        horizontal-alignment: center;
+        Rectangle {
+            background: Palette.background;
+
+            if app::AppState.current-page == 0 : DashboardPage {
+                x: 0;
+                y: 0;
+                width: parent.width;
+                height: parent.height;
+                stat-cards: root.stat-cards;
+                recent-activity: root.recent-activity;
+            }
+            if app::AppState.current-page == 1 : SettingsPage {
+                x: 0;
+                y: 0;
+                width: parent.width;
+                height: parent.height;
+            }
+            if app::AppState.current-page == 2 : AboutPage {
+                x: 0;
+                y: 0;
+                width: parent.width;
+                height: parent.height;
+            }
+        }
     }
 }

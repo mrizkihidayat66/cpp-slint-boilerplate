@@ -1,0 +1,32 @@
+// app-state.slint — shared types and app-wide state.
+//
+// Kept separate from app-window.slint so pages can import the structs without
+// a circular dependency on the window itself.
+
+export namespace app {
+    // Data structs shared with C++. POCOs mirror these in src/models/.
+    export struct StatCard {
+        title: string,
+        value: string,
+        delta: string,
+        trend-positive: bool,
+        icon-name: string,
+    }
+
+    export struct ActivityItem {
+        actor: string,
+        action: string,
+        timestamp: string,
+        icon-name: string,
+    }
+
+    // Shared state between the UI and the C++ side. C++ pushes state via
+    // property setters on this global and receives intents via callbacks.
+    export global AppState {
+        in-out property <int> current-page: 0;
+        in-out property <string> status-message: "";
+        in-out property <string> about-text: "";
+        callback request-navigation(int);
+        callback request-quit();
+    }
+}

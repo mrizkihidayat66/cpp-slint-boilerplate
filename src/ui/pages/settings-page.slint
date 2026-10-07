@@ -1,0 +1,29 @@
+// settings-page.slint — stub on the main branch.
+//
+// The full settings implementation (persisted SettingsService, theme toggle,
+// form controls showcase) lands on the examples/intermediate branch.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppCard, AppIcon } from "../components/library.slint";
+
+export component SettingsPage inherits Rectangle {
+    background: Palette.background;
+
+    AppCard {
+        x: Metrics.space-5;
+        y: Metrics.space-5;
+        width: parent.width - 2 * Metrics.space-5;
+        title: "Settings";
+        subtitle: "Placeholder — see the examples/intermediate branch";
+        header-icon: "⚙";
+
+        Text {
+            text: "This page is a stub on the main branch. The intermediate example\n"
+                + "branch implements a real settings form (inputs, switches, selects)\n"
+                + "backed by a persisted SettingsService.";
+            font-size: Typography.font-size-md;
+            color: Palette.text-muted;
+            wrap: word-wrap;
+        }
+    }
+}
