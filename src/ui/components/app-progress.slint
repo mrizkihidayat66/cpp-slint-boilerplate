@@ -1,0 +1,59 @@
+// AppProgress — determinate/indeterminate progress bar.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export component AppProgress inherits Rectangle {
+    /// Progress in [0, 1]. Negative means indeterminate.
+    in property <float> value: 0;
+    /// Bar thickness.
+    in property <length> thickness: 8px;
+    /// Render the percentage label on the right when the value is known.
+    in property <bool> show-percentage: false;
+
+    height: root.show-percentage
+        ? max(root.thickness, percentage-text.preferred-height)
+        : root.thickness;
+    width: 100%;
+
+    private property <bool> indeterminate: root.value < 0;
+    private property <float> clamped: min(1, max(0, root.value));
+
+    bar := Rectangle {
+        y: root.show-percentage
+            ? (parent.height - root.thickness) / 2
+            : 0;
+        width: root.show-percentage ? parent.width - percentage-text.preferred-width - Metrics.space-2 : 100%;
+        height: root.thickness;
+        border-radius: root.thickness / 2;
+        background: Palette.surface-alt;
+
+        fill := Rectangle {
+            width: root.indeterminate
+                ? parent.width * 0.3
+                : parent.width * root.clamped;
+            height: parent.height;
+            border-radius: root.thickness / 2;
+            background: Palette.primary;
+
+            if root.indeterminate : Rectangle {
+                x: parent.width * mod(animation-tick(), 1.2s) / 1.2s - parent.width / 2;
+                width: parent.width;
+                height: parent.height;
+                border-radius: root.thickness / 2;
+                background: Palette.primary;
+            }
+        }
+
+        // Indeterminate slide animation.
+        animate fill.width { duration: 300ms; easing: ease-out; }
+    }
+
+    percentage-text := Text {
+        visible: root.show-percentage;
+        x: parent.width - self.preferred-width;
+        vertical-center: root.thickness / 2;
+        text: round(root.clamped * 100) + "%";
+        font-size: Typography.font-size-xs;
+        color: Palette.text-muted;
+    }
+}

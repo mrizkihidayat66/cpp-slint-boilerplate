@@ -1,0 +1,39 @@
+// metrics.slint — spacing, radius, sizing, and elevation tokens.
+
+export global Metrics {
+    // Spacing scale (4px base)
+    out property <length> space-1: 4px;
+    out property <length> space-2: 8px;
+    out property <length> space-3: 12px;
+    out property <length> space-4: 16px;
+    out property <length> space-5: 24px;
+    out property <length> space-6: 32px;
+
+    // Border radius
+    out property <length> radius-sm: 4px;
+    out property <length> radius-md: 8px;
+    out property <length> radius-lg: 16px;
+    out property <length> radius-pill: 32767px; // fully rounded
+
+    // Control heights (sm/md/lg apply to buttons, inputs, selects, ...)
+    out property <length> control-height-sm: 28px;
+    out property <length> control-height-md: 36px;
+    out property <length> control-height-lg: 44px;
+
+    // Borders
+    out property <length> border-width: 1px;
+    out property <length> border-width-strong: 2px;
+
+    // Layout
+    out property <length> sidebar-width: 240px;
+    out property <length> sidebar-width-collapsed: 64px;
+    out property <length> navbar-height: 56px;
+    out property <length> page-max-width: 1200px;
+    out property <length> window-min-width: 480px;
+    out property <length> window-min-height: 360px;
+
+    // Elevation: drop-shadow blur radii (pair with Palette.shadow)
+    out property <length> elevation-1: 2px;
+    out property <length> elevation-2: 8px;
+    out property <length> elevation-3: 24px;
+}

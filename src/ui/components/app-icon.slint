@@ -1,0 +1,82 @@
+// AppIcon — glyph icon component with a small embedded set.
+//
+// Icons are text glyphs (Segoe UI Symbol / Segoe Fluent Icons ranges work on
+// Windows without shipping assets). Extend the `glyphs` map with the names
+// your app needs; missing names render as a "question" fallback so usage
+// errors are visible in the gallery.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export global AppIcons {
+    // Fluent System Icons glyphs (Segoe Fluent Icons / Segoe MDL2 Assets).
+    out property <string> home: "";
+    out property <string> settings: "";
+    out property <string> info: "";
+    out property <string> user: "";
+    out property <string> users: "";
+    out property <string> search: "";
+    out property <string> plus: "";
+    out property <string> minus: "";
+    out property <string> close: "";
+    out property <string> check: "";
+    out property <string> warning: "";
+    out property <string> error: "";
+    out property <string> trash: "";
+    out property <string> edit: "";
+    out property <string> refresh: "";
+    out property <string> chevron-up: "";
+    out property <string> chevron-down: "";
+    out property <string> chevron-left: "";
+    out property <string> chevron-right: "";
+    out property <string> calendar: "";
+    out property <string> chart: "";
+    out property <string> document: "";
+    out property <string> folder: "";
+    out property <string> filter: "";
+    out property <string> sort: "";
+    out property <string> loading: "";
+    out property <string> placeholder: ""; // fallback glyph
+}
+
+export component AppIcon inherits Text {
+    /// Icon name from AppIcons (e.g. "home"). Unknown names fall back.
+    in property <string> name;
+    /// Glyph size (square).
+    in property <length> size: 16px;
+    /// Glyph color. Defaults to current-text.
+    in property <color> color: Palette.text;
+
+    text: name == "home" ? AppIcons.home
+        : name == "settings" ? AppIcons.settings
+        : name == "info" ? AppIcons.info
+        : name == "user" ? AppIcons.user
+        : name == "users" ? AppIcons.users
+        : name == "search" ? AppIcons.search
+        : name == "plus" ? AppIcons.plus
+        : name == "minus" ? AppIcons.minus
+        : name == "close" ? AppIcons.close
+        : name == "check" ? AppIcons.check
+        : name == "warning" ? AppIcons.warning
+        : name == "error" ? AppIcons.error
+        : name == "trash" ? AppIcons.trash
+        : name == "edit" ? AppIcons.edit
+        : name == "refresh" ? AppIcons.refresh
+        : name == "chevron-up" ? AppIcons.chevron-up
+        : name == "chevron-down" ? AppIcons.chevron-down
+        : name == "chevron-left" ? AppIcons.chevron-left
+        : name == "chevron-right" ? AppIcons.chevron-right
+        : name == "calendar" ? AppIcons.calendar
+        : name == "chart" ? AppIcons.chart
+        : name == "document" ? AppIcons.document
+        : name == "folder" ? AppIcons.folder
+        : name == "filter" ? AppIcons.filter
+        : name == "sort" ? AppIcons.sort
+        : AppIcons.placeholder;
+    font-size: root.size;
+    color: root.color;
+    font-family: "Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Symbol";
+    vertical-alignment: center;
+    horizontal-alignment: center;
+    width: root.size;
+    height: root.size;
+}

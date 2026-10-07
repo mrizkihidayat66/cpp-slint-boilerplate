@@ -1,0 +1,60 @@
+// AppCheckbox — selection control with optional tri-state.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppCheckbox inherits Rectangle {
+    in-out property <bool> checked: false;
+    /// Third state: when true, `checked=false` renders as "indeterminate"
+    /// (a dash) rather than empty.
+    in property <bool> indeterminate: false;
+    in property <string> label;
+    in property <bool> disabled: false;
+
+    callback toggled();
+
+    height: max(box-size, label-text.preferred-height);
+    width: box-size + (label != "" ? Metrics.space-2 + label-text.preferred-width : 0);
+
+    private property <length> box-size: Typography.font-size-lg;
+
+    touch := TouchArea {
+        enabled: !root.disabled;
+        mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+        clicked => {
+            root.checked = !root.checked;
+            root.toggled();
+        }
+    }
+
+    box := Rectangle {
+        width: root.box-size;
+        height: root.box-size;
+        border-radius: Metrics.radius-sm;
+        background: root.checked || (root.indeterminate && !root.checked)
+            ? (root.disabled ? Palette.primary-disabled : Palette.primary)
+            : Palette.surface;
+        border-width: root.checked ? 0 : Metrics.border-width;
+        border-color: root.disabled ? Palette.border : Palette.border-strong;
+
+        if root.checked : AppIcon {
+            name: "check";
+            size: root.box-size - 4px;
+            color: Palette.text-on-primary;
+        }
+        if !root.checked && root.indeterminate : Rectangle {
+            width: root.box-size / 2;
+            height: 2px;
+            border-radius: 1px;
+            background: Palette.text-on-primary;
+        }
+    }
+
+    label-text := Text {
+        x: root.box-size + Metrics.space-2;
+        vertical-center: root.box-size / 2;
+        text: root.label;
+        font-size: Typography.font-size-md;
+        color: root.disabled ? Palette.text-disabled : Palette.text;
+    }
+}

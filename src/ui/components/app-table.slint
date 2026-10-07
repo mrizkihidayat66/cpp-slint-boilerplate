@@ -1,0 +1,133 @@
+// AppTable — virtualized tabular data on top of ListView.
+//
+// Row model: [{ cells: [string] }]. Sorting: clicking a header emits
+// `sort-requested(column, ascending-toggle)`; the owner reorders the model —
+// keeping business logic out of the view (see docs/ARCHITECTURE.md).
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppTable inherits Rectangle {
+    /// Column definitions.
+    in property <[AppTableColumn]> columns;
+    /// Row data.
+    in property <[AppTableRow]> rows;
+    /// Clickable headers with sort indicators.
+    in property <bool> sortable: true;
+    /// Currently sorted column (-1 = none).
+    in property <int> sort-column: -1;
+    in property <bool> sort-ascending: true;
+    /// Row height.
+    in property <length> row-height: Metrics.control-height-md;
+    in property <bool> striped: true;
+    in property <bool> bordered: true;
+
+    callback row-activated(int, AppTableRow);
+    callback sort-requested(int, bool);
+
+    width: 100%;
+    height: min(header.preferred-height + rows-view.preferred-height, 480px);
+
+    border-radius: Metrics.radius-md;
+    background: Palette.surface;
+    border-width: root.bordered ? Metrics.border-width : 0;
+    border-color: Palette.border;
+    clip: true;
+
+    header := HorizontalLayout {
+        y: 0;
+        height: Metrics.control-height-sm;
+        width: parent.width;
+        background: Palette.surface-alt;
+
+        for col[c] in root.columns : Rectangle {
+            width: root.width * (col.weight > 0 ? col.weight : 1) / root.column-weight-sum;
+
+            if root.sortable : sort-area := TouchArea {
+                mouse-cursor: MouseCursor.pointer;
+                clicked => {
+                    root.sort-requested(c, !(root.sort-column == c && root.sort-ascending));
+                }
+            }
+
+            HorizontalLayout {
+                padding-left: Metrics.space-3;
+                padding-right: Metrics.space-2;
+                spacing: Metrics.space-1;
+
+                Text {
+                    text: col.title;
+                    font-size: Typography.font-size-xs;
+                    font-weight: Typography.font-weight-bold;
+                    color: Palette.text-muted;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+
+                if root.sort-column == c : AppIcon {
+                    name: root.sort-ascending ? "chevron-up" : "chevron-down";
+                    size: Typography.font-size-xs;
+                    color: Palette.primary;
+                }
+            }
+        }
+    }
+
+    rows-view := ListView {
+        y: header.height;
+        width: parent.width;
+        height: parent.height - header.height;
+
+        for row[r] in root.rows : Rectangle {
+            height: root.row-height;
+            background: row-area.has-hover ? Palette.surface-alt
+                : root.striped && mod(r, 2) == 1 ? Palette.background
+                : transparent;
+
+            row-area := TouchArea {
+                clicked => {
+                    root.row-activated(r, row);
+                }
+            }
+
+            HorizontalLayout {
+                padding: 0;
+
+                for cell[i] in row.cells : Text {
+                    width: root.width * (root.columns[i].weight > 0 ? root.columns[i].weight : 1)
+                        / root.column-weight-sum;
+                    text: cell;
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                width: parent.width;
+                background: Palette.border;
+            }
+        }
+    }
+
+    public pure property <float> column-weight-sum: {
+        let sum = 0;
+        for col in root.columns : {
+            sum += col.weight > 0 ? col.weight : 1;
+        }
+        return sum > 0 ? sum : 1;
+    }
+}
+
+export struct AppTableColumn {
+    title: string,
+    /// Relative column width weight (all columns share 100%).
+    weight: float,
+}
+
+export struct AppTableRow {
+    cells: [string],
+}

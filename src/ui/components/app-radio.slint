@@ -1,0 +1,63 @@
+// AppRadio — single radio option.
+//
+// Radio *grouping*: Slint has no native radio-group coupling, so a group is
+// any layout whose AppRadio instances share one `group-value` (in-out, set by
+// the parent) and each contributes its own `value`. The parent flips
+// group-value on `selected`. A worked example lives in docs/COMPONENTS.md.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export component AppRadio inherits Rectangle {
+    /// The value this option represents.
+    in property <string> value;
+    /// Shared selection state owned by the parent layout.
+    in-out property <string> group-value;
+    /// Label next to the circle.
+    in property <string> label;
+    in property <bool> disabled: false;
+
+    callback selected(string);
+
+    public pure function is-checked() -> bool {
+        return root.group-value == root.value;
+    }
+
+    height: max(circle-size, label-text.preferred-height);
+    width: circle-size + (label != "" ? Metrics.space-2 + label-text.preferred-width : 0);
+
+    private property <length> circle-size: Typography.font-size-lg;
+
+    touch := TouchArea {
+        enabled: !root.disabled;
+        mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+        clicked => {
+            root.group-value = root.value;
+            root.selected(root.value);
+        }
+    }
+
+    circle := Rectangle {
+        width: root.circle-size;
+        height: root.circle-size;
+        border-radius: root.circle-size / 2;
+        background: Palette.surface;
+        border-width: root.is-checked() ? Metrics.border-width-strong : Metrics.border-width;
+        border-color: root.disabled ? Palette.border
+            : root.is-checked() ? Palette.primary : Palette.border-strong;
+
+        if root.is-checked() : Rectangle {
+            width: root.circle-size / 2;
+            height: root.circle-size / 2;
+            border-radius: self.width / 2;
+            background: root.disabled ? Palette.primary-disabled : Palette.primary;
+        }
+    }
+
+    label-text := Text {
+        x: root.circle-size + Metrics.space-2;
+        vertical-center: root.circle-size / 2;
+        text: root.label;
+        font-size: Typography.font-size-md;
+        color: root.disabled ? Palette.text-disabled : Palette.text;
+    }
+}

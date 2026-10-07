@@ -1,0 +1,58 @@
+// AppBadge — compact status label.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export enum AppBadgeVariant { primary, success, warning, danger, info, neutral }
+
+export component AppBadge inherits Rectangle {
+    in property <string> text;
+    in property <AppBadgeVariant> variant: AppBadgeVariant.primary;
+    /// Fully-rounded ends.
+    in property <bool> pill: false;
+    /// Leading dot in the variant color.
+    in property <bool> dot: false;
+
+    height: Typography.font-size-md + 2 * Metrics.space-1;
+    border-radius: root.pill ? Metrics.radius-pill : Metrics.radius-sm;
+
+    private property <color> fg-color:
+        root.variant == AppBadgeVariant.primary ? Palette.primary
+        : root.variant == AppBadgeVariant.success ? Palette.success
+        : root.variant == AppBadgeVariant.warning ? Palette.warning
+        : root.variant == AppBadgeVariant.danger ? Palette.danger
+        : root.variant == AppBadgeVariant.info ? Palette.info
+        : Palette.text-muted;
+    private property <color> bg-color:
+        root.variant == AppBadgeVariant.primary ? Palette.info-surface
+        : root.variant == AppBadgeVariant.success ? Palette.success-surface
+        : root.variant == AppBadgeVariant.warning ? Palette.warning-surface
+        : root.variant == AppBadgeVariant.danger ? Palette.danger-surface
+        : root.variant == AppBadgeVariant.info ? Palette.info-surface
+        : Palette.surface-alt;
+
+    background: root.bg-color;
+
+    HorizontalLayout {
+        padding-left: Metrics.space-2 + (root.dot ? 0 : 0);
+        padding-right: Metrics.space-2;
+        padding-top: 0;
+        padding-bottom: 0;
+        spacing: Metrics.space-1;
+        alignment: center;
+
+        if root.dot : Rectangle {
+            width: 6px;
+            height: 6px;
+            border-radius: 3px;
+            background: root.fg-color;
+        }
+
+        Text {
+            text: root.text;
+            font-size: Typography.font-size-xs;
+            font-weight: Typography.font-weight-medium;
+            color: root.fg-color;
+            vertical-alignment: center;
+        }
+    }
+}

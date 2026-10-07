@@ -1,0 +1,108 @@
+// AppMenu — anchored dropdown menu.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export struct AppMenuItem {
+    icon-name: string,
+    label: string,
+    /// "-" renders a separator.
+    is-separator: bool,
+    /// Disabled entries are muted and not clickable.
+    disabled: bool,
+}
+
+export component AppMenu inherits Rectangle {
+    in property <[AppMenuItem]> items;
+    in-out property <bool> open: false;
+    /// Minimum popup width.
+    in property <length> menu-width: 180px;
+
+    callback selected(int, AppMenuItem);
+
+    /// Trigger content (e.g. an AppButton with `clicked => menu.open = true`).
+    @children;
+
+    width: trigger-area.width;
+    height: trigger-area.height;
+
+    trigger-area := Rectangle {
+        @children;
+    }
+
+    if root.open : TouchArea {
+        // Catch clicks anywhere in the window to close.
+        x: 0;
+        y: 0;
+        width: root.parent.width;
+        height: root.parent.height;
+        clicked => {
+            root.open = false;
+        }
+    }
+
+    if root.open : popup := Rectangle {
+        y: root.height + Metrics.space-1;
+        width: max(root.menu-width, list-view.preferred-width);
+        height: min(list-view.preferred-height + 2 * Metrics.space-1, 320px);
+        border-radius: Metrics.radius-md;
+        background: Palette.surface;
+        border-width: Metrics.border-width;
+        border-color: Palette.border;
+        drop-shadow-blur: Metrics.elevation-2;
+        drop-shadow-color: Palette.shadow;
+
+        list-view := ListView {
+            x: Metrics.space-1;
+            width: parent.width - 2 * Metrics.space-1;
+            height: parent.height - 2 * Metrics.space-1;
+
+            for item[i] in root.items : Rectangle {
+                height: item.is-separator ? Metrics.space-2 : Metrics.control-height-sm;
+
+                if item.is-separator : Rectangle {
+                    y: parent.height / 2;
+                    height: 1px;
+                    width: parent.width;
+                    background: Palette.border;
+                }
+
+                if !item.is-separator : Rectangle {
+                    height: 100%;
+                    border-radius: Metrics.radius-sm;
+                    background: item-area.has-hover && !item.disabled
+                        ? Palette.surface-alt : transparent;
+
+                    item-area := TouchArea {
+                        enabled: !item.disabled;
+                        mouse-cursor: item.disabled ? MouseCursor.default : MouseCursor.pointer;
+                        clicked => {
+                            root.selected(i, item);
+                            root.open = false;
+                        }
+                    }
+
+                    HorizontalLayout {
+                        padding-left: Metrics.space-3;
+                        padding-right: Metrics.space-3;
+                        spacing: Metrics.space-2;
+
+                        if item.icon-name != "" : AppIcon {
+                            name: item.icon-name;
+                            size: Typography.font-size-sm;
+                            color: item.disabled ? Palette.text-disabled : Palette.text-muted;
+                        }
+
+                        Text {
+                            text: item.label;
+                            font-size: Typography.font-size-md;
+                            color: item.disabled ? Palette.text-disabled : Palette.text;
+                            vertical-alignment: center;
+                            overflow: elide;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+// theme.slint — the single import point for design tokens.
+//
+// Every component imports { Palette, Typography, Metrics } from this file
+// (never from the individual token files), so token layout stays an
+// implementation detail of the theme.
+
+export * from "colors.slint";
+export * from "typography.slint";
+export * from "metrics.slint";

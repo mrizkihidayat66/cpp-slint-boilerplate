@@ -1,0 +1,50 @@
+// AppBreadcrumb — hierarchical path indicator.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppBreadcrumb inherits Rectangle {
+    in property <[string]> model;
+    /// Index of the current (last) crumb; -1 = last is current.
+    in property <int> current-index: -1;
+
+    callback navigate(int);
+
+    height: Typography.font-size-lg;
+    width: content.preferred-width;
+
+    content := HorizontalLayout {
+        spacing: Metrics.space-2;
+        alignment: start;
+
+        for crumb[i] in root.model : HorizontalLayout {
+            spacing: Metrics.space-2;
+
+            if i > 0 : AppIcon {
+                name: "chevron-right";
+                size: Typography.font-size-xs;
+                color: Palette.text-disabled;
+            }
+
+            crumb-area := TouchArea {
+                mouse-cursor: MouseCursor.pointer;
+                clicked => {
+                    root.navigate(i);
+                }
+            }
+
+            Text {
+                text: crumb;
+                font-size: Typography.font-size-md;
+                vertical-alignment: center;
+                color: i == (root.current-index >= 0 ? root.current-index : root.model.length - 1)
+                    ? Palette.text
+                    : Palette.text-muted;
+                font-weight: i == (root.current-index >= 0 ? root.current-index : root.model.length - 1)
+                    ? Typography.font-weight-medium
+                    : Typography.font-weight-regular;
+                overflow: elide;
+            }
+        }
+    }
+}

@@ -1,0 +1,25 @@
+// typography.slint — type scale and font tokens.
+
+export global Typography {
+    // Font stack: Segoe UI Variable is the Windows 11 default; the fallbacks
+    // keep Linux/macOS builds (and the Slint LSP preview) reasonable.
+    out property <string> font-family: "Segoe UI Variable Text, Segoe UI, Ubuntu, sans-serif";
+    out property <string> font-family-mono: "Cascadia Mono, Consolas, monospace";
+
+    // Scale (based on a 14px body size)
+    out property <length> font-size-xs: 11px;   // captions, badges
+    out property <length> font-size-sm: 12px;   // dense labels, table cells
+    out property <length> font-size-md: 14px;   // body
+    out property <length> font-size-lg: 16px;   // section titles
+    out property <length> font-size-xl: 20px;   // page titles
+    out property <length> font-size-2xl: 28px;  // display numbers
+
+    // Weights
+    out property <float> font-weight-regular: 400;
+    out property <float> font-weight-medium: 500;
+    out property <float> font-weight-bold: 700;
+
+    // Line heights (multipliers)
+    out property <float> line-height-tight: 1.2;
+    out property <float> line-height-normal: 1.4;
+}

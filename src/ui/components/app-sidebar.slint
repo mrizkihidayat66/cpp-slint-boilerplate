@@ -1,0 +1,84 @@
+// AppSidebar — vertical navigation rail.
+//
+// Responsive behavior: the parent sets `collapsed` (typically when the window
+// width drops below a threshold, e.g. `root.width < 600px`) and the bar
+// shrinks to an icon rail.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export struct AppSidebarItem {
+    icon-name: string,
+    label: string,
+}
+
+export component AppSidebar inherits Rectangle {
+    in property <[AppSidebarItem]> items;
+    in-out property <int> current-index: 0;
+    /// Icon-only mode (narrow windows).
+    in property <bool> collapsed: false;
+    /// Hide labels but keep full width (animated transitions).
+    in-out property <bool> hover-expanded: false;
+
+    callback navigate(int);
+
+    private property <bool> expanded: !root.collapsed || root.hover-expanded;
+
+    width: root.expanded ? Metrics.sidebar-width : Metrics.sidebar-width-collapsed;
+    animate width { duration: 200ms; easing: ease-out; }
+
+    height: 100%;
+    background: Palette.surface;
+
+    Rectangle {
+        y: 0;
+        x: parent.width - 1px;
+        width: 1px;
+        height: parent.height;
+        background: Palette.border;
+    }
+
+    VerticalLayout {
+        padding: Metrics.space-2;
+        spacing: Metrics.space-1;
+
+        for item[i] in root.items : entry := Rectangle {
+            height: Metrics.control-height-md;
+            border-radius: Metrics.radius-md;
+            background: i == root.current-index ? Palette.info-surface
+                : entry-area.has-hover ? Palette.surface-alt
+                : transparent;
+
+            entry-area := TouchArea {
+                mouse-cursor: MouseCursor.pointer;
+                clicked => {
+                    root.current-index = i;
+                    root.navigate(i);
+                }
+            }
+
+            HorizontalLayout {
+                padding-left: Metrics.space-3;
+                padding-right: Metrics.space-3;
+                spacing: Metrics.space-3;
+                alignment: root.expanded ? start : center;
+
+                AppIcon {
+                    name: item.icon-name;
+                    size: Typography.font-size-md;
+                    color: i == root.current-index ? Palette.primary : Palette.text-muted;
+                }
+
+                if root.expanded : Text {
+                    text: item.label;
+                    font-size: Typography.font-size-md;
+                    font-weight: i == root.current-index
+                        ? Typography.font-weight-medium : Typography.font-weight-regular;
+                    color: i == root.current-index ? Palette.primary : Palette.text;
+                    vertical-alignment: center;
+                    overflow: elide;
+                }
+            }
+        }
+    }
+}

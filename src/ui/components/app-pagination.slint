@@ -1,0 +1,90 @@
+// AppPagination — page navigation composed of AppButtons.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppButton, AppButtonVariant } from "app-button.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppPagination inherits Rectangle {
+    /// 1-based current page.
+    in-out property <int> page: 1;
+    in property <int> page-count: 1;
+    /// How many numbered buttons surround the current page.
+    in property <int> window-size: 2;
+    in property <bool> disabled: false;
+
+    callback page-changed(int);
+
+    height: Metrics.control-height-sm;
+    width: row.preferred-width;
+
+    row := HorizontalLayout {
+        spacing: Metrics.space-1;
+        alignment: center;
+
+        if root.page > 1 : AppButton {
+            variant: AppButtonVariant.outline;
+            size: AppButtonSize.sm;
+            text: "‹";
+            disabled: root.disabled;
+            clicked => {
+                if (root.page > 1) {
+                    root.page -= 1;
+                    root.page-changed(root.page);
+                }
+            }
+        }
+
+        if root.first-visible > 1 : Text {
+            text: "…";
+            vertical-alignment: center;
+            color: Palette.text-muted;
+        }
+
+        // Numbered buttons for the visible window.
+        for p in root.visible-pages : AppButton {
+            variant: p == root.page ? AppButtonVariant.primary : AppButtonVariant.outline;
+            size: AppButtonSize.sm;
+            text: p;
+            disabled: root.disabled;
+            clicked => {
+                if (p != root.page) {
+                    root.page = p;
+                    root.page-changed(p);
+                }
+            }
+        }
+
+        if root.last-visible < root.page-count : Text {
+            text: "…";
+            vertical-alignment: center;
+            color: Palette.text-muted;
+        }
+
+        if root.page < root.page-count : AppButton {
+            variant: AppButtonVariant.outline;
+            size: AppButtonSize.sm;
+            text: "›";
+            disabled: root.disabled;
+            clicked => {
+                if (root.page < root.page-count) {
+                    root.page += 1;
+                    root.page-changed(root.page);
+                }
+            }
+        }
+    }
+
+    public pure property <int> first-visible:
+        max(1, min(root.page - root.window-size, root.page-count - 2 * root.window-size));
+    public pure property <int> last-visible:
+        min(root.page-count, max(root.page + root.window-size, 1 + 2 * root.window-size));
+
+    // Window of page numbers to render as buttons.
+    public pure property <[int]> visible-pages: {
+        let pages = [];
+        for p in root.first-visible ..= root.last-visible : {
+            pages += [p];
+        }
+        return pages;
+    }
+}

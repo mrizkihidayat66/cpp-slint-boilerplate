@@ -1,0 +1,112 @@
+// AppButton — the exemplar component of the library's API contract.
+//
+// Variants and sizes are enums (not bool matrices); states are `disabled` /
+// `loading`; every property has a default so the component works with zero
+// configuration. See docs/COMPONENTS.md.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppSpinner } from "app-spinner.slint";
+
+export enum AppButtonVariant { primary, secondary, outline, ghost, danger }
+export enum AppButtonSize { sm, md, lg }
+
+export component AppButton inherits Rectangle {
+    /// Button label. Empty string renders an icon-only button.
+    in property <string> text;
+    /// Visual variant. Defaults to primary.
+    in property <AppButtonVariant> variant: AppButtonVariant.primary;
+    /// Control size (affects height, padding, and font size).
+    in property <AppButtonSize> size: AppButtonSize.md;
+    /// Optional leading icon (pair with AppIcon).
+    in property <image> icon;
+    /// When true, shows a spinner and swallows clicks.
+    in property <bool> loading: false;
+    /// Disables interaction and mutes the visuals.
+    in property <bool> disabled: false;
+    /// Stretch to the full width of the parent.
+    in property <bool> block: false;
+
+    /// Fired on click (pointer or keyboard) unless disabled or loading.
+    callback clicked <=> touch.clicked;
+
+    width: root.block ? 100% : label-holder.preferred-width + horizontal-padding * 2;
+    height: root.size == AppButtonSize.sm ? Metrics.control-height-sm
+          : root.size == AppButtonSize.lg ? Metrics.control-height-lg
+          : Metrics.control-height-md;
+    border-radius: Metrics.radius-md;
+
+    private property <length> horizontal-padding:
+        root.size == AppButtonSize.sm ? Metrics.space-2 : Metrics.space-4;
+    private property <length> font-size:
+        root.size == AppButtonSize.sm ? Typography.font-size-sm : Typography.font-size-md;
+    private property <length> icon-size: root.size == AppButtonSize.sm ? 14px : 16px;
+
+    // --- Visual state resolution -------------------------------------------
+    private property <bool> effective-disabled: root.disabled || root.loading;
+    private property <color> rest-color:
+        root.variant == AppButtonVariant.primary ? Palette.primary
+        : root.variant == AppButtonVariant.danger ? Palette.danger
+        : root.variant == AppButtonVariant.secondary ? Palette.surface-alt
+        : Palette.surface; // outline & ghost
+    private property <color> hover-color:
+        root.variant == AppButtonVariant.primary ? Palette.primary-hover
+        : root.variant == AppButtonVariant.danger ? Palette.danger-hover
+        : root.variant == AppButtonVariant.secondary ? Palette.border
+        : Palette.surface-alt;
+    private property <bool> filled:
+        root.variant == AppButtonVariant.primary || root.variant == AppButtonVariant.danger
+        || root.variant == AppButtonVariant.secondary;
+
+    background: root.effective-disabled
+        ? (root.filled ? Palette.primary-disabled : Palette.surface-alt)
+        : touch.has-hover ? root.hover-color : root.rest-color;
+    border-width: root.variant == AppButtonVariant.outline ? Metrics.border-width : 0;
+    border-color: root.effective-disabled ? Palette.border : Palette.border-strong;
+
+    touch := TouchArea {
+        mouse-cursor: root.effective-disabled ? MouseCursor.default : MouseCursor.pointer;
+        enabled: !root.effective-disabled;
+        clicked: {
+            // Guarded by `enabled` above, but kept explicit for readers.
+            if (!root.effective-disabled) {
+                root.clicked();
+            }
+        }
+    }
+
+    // --- Content -------------------------------------------------------------
+    label-holder := HorizontalLayout {
+        padding-left: root.horizontal-padding;
+        padding-right: root.horizontal-padding;
+        spacing: Metrics.space-2;
+        alignment: center;
+
+        if root.loading : AppSpinner {
+            size: root.icon-size;
+            color: root.filled ? Palette.text-on-primary : Palette.primary;
+        }
+
+        if !root.loading && root.icon.width > 0 : Image {
+            source: root.icon;
+            width: root.icon-size;
+            height: root.icon-size;
+            image-fit: contain;
+            colorize: root.effective-disabled ? Palette.text-disabled
+                : root.filled ? Palette.text-on-primary : Palette.text;
+        }
+
+        if root.text != "" : Text {
+            text: root.text;
+            font-size: root.font-size;
+            font-family: Typography.font-family;
+            font-weight: root.variant == AppButtonVariant.primary
+                || root.variant == AppButtonVariant.danger
+                ? Typography.font-weight-medium : Typography.font-weight-regular;
+            color: root.effective-disabled ? Palette.text-disabled
+                : root.filled ? Palette.text-on-primary
+                : Palette.text;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+}

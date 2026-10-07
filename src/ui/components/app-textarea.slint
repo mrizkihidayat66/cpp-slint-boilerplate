@@ -1,0 +1,71 @@
+// AppTextarea — multi-line text editor with label and counter.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export component AppTextarea inherits Rectangle {
+    in-out property <string> text;
+    in property <string> label;
+    in property <string> placeholder;
+    /// Hard character cap; the counter only appears when set (> 0).
+    in property <int> maxlength: 0;
+    in property <bool> disabled: false;
+    in property <bool> read-only: false;
+    in property <string> error-text;
+
+    callback edited <=> editor.edited;
+    callback accepted <=> editor.accepted;
+
+    height: label-row.height + editor-holder.height
+        + (status-row.visible ? status-row.height : 0);
+    width: editor-holder.width;
+
+    private property <bool> has-error: root.error-text != "";
+
+    label-row := VerticalLayout {
+        if root.label != "" : Text {
+            text: root.label;
+            font-size: Typography.font-size-sm;
+            font-weight: Typography.font-weight-medium;
+            color: root.has-error ? Palette.danger : Palette.text-muted;
+        }
+    }
+
+    editor-holder := Rectangle {
+        y: label-row.height;
+        height: editor.preferred-height + 2 * Metrics.space-3;
+        border-radius: Metrics.radius-md;
+        background: root.disabled ? Palette.surface-alt : Palette.surface;
+        border-width: Metrics.border-width;
+        border-color: root.has-error ? Palette.danger
+            : editor.has-focus ? Palette.primary : Palette.border;
+
+        editor := TextEdit {
+            x: Metrics.space-3;
+            width: parent.width - 2 * Metrics.space-3;
+            text <=> root.text;
+            font-size: Typography.font-size-md;
+            font-family: Typography.font-family;
+            color: root.disabled ? Palette.text-disabled : Palette.text;
+            enabled: !root.disabled && !root.read-only;
+        }
+    }
+
+    status-row := HorizontalLayout {
+        y: editor-holder.y + editor-holder.height + Metrics.space-1;
+        spacing: Metrics.space-2;
+        alignment: end;
+        visible: root.has-error || root.maxlength > 0;
+
+        if root.has-error : Text {
+            text: root.error-text;
+            font-size: Typography.font-size-xs;
+            color: Palette.danger;
+        }
+
+        if root.maxlength > 0 : Text {
+            text: root.text.length + " / " + root.maxlength;
+            font-size: Typography.font-size-xs;
+            color: root.text.length > root.maxlength ? Palette.danger : Palette.text-muted;
+        }
+    }
+}

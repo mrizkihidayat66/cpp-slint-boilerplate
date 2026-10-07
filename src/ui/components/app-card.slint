@@ -1,0 +1,69 @@
+// AppCard — surface container with optional header and footer slot.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export enum AppCardElevation { flat, raised, floating }
+
+export component AppCard inherits Rectangle {
+    /// Bold header title. Empty hides the header row.
+    in property <string> title;
+    /// Muted subtitle under the title.
+    in property <string> subtitle;
+    /// Leading header glyph (emoji/unicode icon works without assets).
+    in property <string> header-icon;
+    /// Elevation preset (shadow depth).
+    in property <AppCardElevation> elevation: AppCardElevation.raised;
+    /// Body padding.
+    in property <length> padding: Metrics.space-4;
+    /// Show the built-in border (kept when flat).
+    in property <bool> bordered: true;
+
+    /// Body content.
+    @children;
+
+    height: content.preferred-height + (header.visible ? header.preferred-height : 0);
+    border-radius: Metrics.radius-md;
+    background: Palette.surface;
+    border-width: root.bordered || root.elevation == AppCardElevation.flat ? Metrics.border-width : 0;
+    border-color: Palette.border;
+    drop-shadow-blur: root.elevation == AppCardElevation.floating ? Metrics.elevation-3
+        : root.elevation == AppCardElevation.raised ? Metrics.elevation-1 : 0;
+    drop-shadow-color: Palette.shadow;
+
+    content := VerticalLayout {
+        if root.title != "" : header := HorizontalLayout {
+            padding: root.padding;
+            padding-bottom: root.subtitle == "" ? Metrics.space-3 : 0;
+            spacing: Metrics.space-3;
+
+            if root.header-icon != "" : Text {
+                text: root.header-icon;
+                font-size: Typography.font-size-xl;
+            }
+
+            VerticalLayout {
+                alignment: center;
+                Text {
+                    text: root.title;
+                    font-size: Typography.font-size-lg;
+                    font-weight: Typography.font-weight-medium;
+                    color: Palette.text;
+                }
+                if root.subtitle != "" : Text {
+                    text: root.subtitle;
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text-muted;
+                    overflow: elide;
+                }
+            }
+        }
+
+        body := VerticalLayout {
+            padding-top: root.title == "" ? root.padding : Metrics.space-2;
+            padding-bottom: root.padding;
+            padding-left: root.padding;
+            padding-right: root.padding;
+            @children;
+        }
+    }
+}

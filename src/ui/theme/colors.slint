@@ -1,0 +1,40 @@
+// colors.slint — semantic color tokens (light theme).
+//
+// Components must never hardcode colors: they read from this global so a fork
+// can restyle the entire application by editing theme/ only.
+
+export global Palette {
+    // Brand
+    out property <color> primary: #2563eb;
+    out property <color> primary-hover: #1d4ed8;
+    out property <color> primary-active: #1e40af;
+    out property <color> primary-disabled: #93b4f8;
+
+    // State / feedback
+    out property <color> success: #16a34a;
+    out property <color> success-surface: #dcfce7;
+    out property <color> warning: #d97706;
+    out property <color> warning-surface: #fef3c7;
+    out property <color> danger: #dc2626;
+    out property <color> danger-hover: #b91c1c;
+    out property <color> danger-surface: #fee2e2;
+    out property <color> info: #0284c7;
+    out property <color> info-surface: #e0f2fe;
+
+    // Neutrals
+    out property <color> background: #f8fafc;
+    out property <color> surface: #ffffff;
+    out property <color> surface-alt: #f1f5f9;
+    out property <color> border: #e2e8f0;
+    out property <color> border-strong: #cbd5e1;
+
+    // Text
+    out property <color> text: #0f172a;
+    out property <color> text-muted: #64748b;
+    out property <color> text-disabled: #94a3b8;
+    out property <color> text-on-primary: #ffffff;
+
+    // Shadows (used as drop-shadow colors)
+    out property <color> shadow: #0f172a14;
+    out property <color> overlay: #0f172a66;
+}

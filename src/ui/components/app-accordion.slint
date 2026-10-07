@@ -1,0 +1,97 @@
+// AppAccordion — collapsible sections list.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export struct AppAccordionItem {
+    title: string,
+    icon-name: string,
+}
+
+export component AppAccordion inherits Rectangle {
+    in property <[AppAccordionItem]> items;
+    /// Which item is expanded; -1 = all collapsed.
+    in-out property <int> expanded-index: -1;
+    /// Allow multiple sections open at once (expanded-index is ignored).
+    in property <bool> multiple: false;
+    /// Track open state when `multiple` is on.
+    in-out property <[bool]> open-flags;
+
+    callback expanded(int);
+    callback collapsed(int);
+
+    width: 100%;
+    height: sections.preferred-height;
+
+    sections := VerticalLayout {
+        spacing: 1px;
+
+        for item[i] in root.items : VerticalLayout {
+            property <bool> is-open:
+                root.multiple
+                    ? (i < root.open-flags.length && root.open-flags[i])
+                    : root.expanded-index == i;
+
+            header := Rectangle {
+                height: Metrics.control-height-md;
+                background: header-area.has-hover ? Palette.surface-alt : Palette.surface;
+
+                header-area := TouchArea {
+                    mouse-cursor: MouseCursor.pointer;
+                    clicked => {
+                        if (self.is-open) {
+                            root.collapsed(i);
+                            if (root.multiple) {
+                                // Owner mutates open-flags; see docs note on
+                                // updating models from C++.
+                            } else {
+                                root.expanded-index = -1;
+                            }
+                        } else {
+                            root.expanded(i);
+                            if (root.multiple) {
+                                // dito — owner updates open-flags.
+                            } else {
+                                root.expanded-index = i;
+                            }
+                        }
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: Metrics.space-3;
+                    padding-right: Metrics.space-3;
+                    spacing: Metrics.space-2;
+
+                    if item.icon-name != "" : AppIcon {
+                        name: item.icon-name;
+                        size: Typography.font-size-md;
+                        color: Palette.text-muted;
+                    }
+
+                    Text {
+                        text: item.title;
+                        font-size: Typography.font-size-md;
+                        font-weight: Typography.font-weight-medium;
+                        color: Palette.text;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+
+                    AppIcon {
+                        name: "chevron-down";
+                        size: Typography.font-size-sm;
+                        color: Palette.text-muted;
+                    }
+                }
+            }
+
+            if self.is-open : Rectangle {
+                background: Palette.background;
+                height: Metrics.space-5;
+                // Section body: host content in a page-level layout keyed to
+                // the accordion's expanded state (documented pattern).
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+// AppDialog — modal overlay dialog.
+//
+// Usage: instantiate inside the window's root (it covers everything), drive
+// `open` from state, and put actions in the `footer` slot.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export component AppDialog inherits Rectangle {
+    /// Dialog visibility.
+    in-out property <bool> open: false;
+    in property <string> title;
+    /// Modal overlay blocks interaction with everything below.
+    in property <bool> dismiss-on-overlay: true;
+
+    /// Body content.
+    @children;
+
+    /// Footer slot (buttons, typically AppButton).
+    // (a second @children is not allowed; host a `footer` via a public
+    //  property on the page instead — see docs/COMPONENTS.md)
+    callback accepted();
+    callback rejected();
+
+    if root.open : overlay := TouchArea {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        clicked => {
+            if (root.dismiss-on-overlay) {
+                root.open = false;
+                root.rejected();
+            }
+        }
+
+        Rectangle {
+            x: 0;
+            y: 0;
+            width: root.width;
+            height: root.height;
+            background: Palette.overlay;
+        }
+
+        panel := Rectangle {
+            x: (root.width - self.width) / 2;
+            y: (root.height - self.height) / 2;
+            width: min(440px, root.width - 2 * Metrics.space-4);
+            height: min(content.preferred-height + 2 * Metrics.space-4, root.height - 2 * Metrics.space-4);
+            border-radius: Metrics.radius-lg;
+            background: Palette.surface;
+            drop-shadow-blur: Metrics.elevation-3;
+            drop-shadow-color: Palette.shadow;
+
+            content := VerticalLayout {
+                padding: Metrics.space-4;
+                spacing: Metrics.space-3;
+
+                Text {
+                    text: root.title;
+                    visible: root.title != "";
+                    font-size: Typography.font-size-lg;
+                    font-weight: Typography.font-weight-bold;
+                    color: Palette.text;
+                    overflow: elide;
+                }
+
+                @children;
+            }
+        }
+    }
+}

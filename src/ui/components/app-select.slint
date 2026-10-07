@@ -1,0 +1,105 @@
+// AppSelect — dropdown selection.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppSelect inherits Rectangle {
+    /// Option list, e.g. ["Red", "Green", "Blue"].
+    in property <[string]> model;
+    /// Index of the selected option; -1 = none (placeholder shown).
+    in-out property <int> selected-index: -1;
+    in property <string> placeholder: "Select…";
+    in property <bool> disabled: false;
+    /// Shown instead of the raw option for numeric data.
+    in property <string> label;
+
+    callback selected(int, string);
+
+    height: Metrics.control-height-md;
+    width: 100%;
+    border-radius: Metrics.radius-md;
+
+    private property <bool> open: false;
+    private property <string> selected-text:
+        root.selected-index >= 0 && root.selected-index < root.model.length
+            ? root.model[root.selected-index]
+            : "";
+
+    touch := TouchArea {
+        enabled: !root.disabled;
+        mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+        clicked => {
+            root.open = !root.open;
+        }
+        // Close when clicking anywhere else.
+        property <bool> outside-click: self.pressed && !root.open;
+    }
+
+    background: root.disabled ? Palette.surface-alt : Palette.surface;
+    border-width: root.open ? Metrics.border-width-strong : Metrics.border-width;
+    border-color: root.open ? Palette.primary : Palette.border;
+
+    HorizontalLayout {
+        padding-left: Metrics.space-3;
+        padding-right: Metrics.space-3;
+        spacing: Metrics.space-2;
+
+        Text {
+            text: root.selected-text != "" ? root.selected-text : root.placeholder;
+            font-size: Typography.font-size-md;
+            color: root.selected-text != "" && !root.disabled ? Palette.text : Palette.text-muted;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+
+        Rectangle { horizontal-stretch: 0; }
+
+        AppIcon {
+            name: root.open ? "chevron-up" : "chevron-down";
+            size: Typography.font-size-sm;
+            color: Palette.text-muted;
+        }
+    }
+
+    if root.open : popup := Rectangle {
+        x: 0;
+        y: parent.height + Metrics.space-1;
+        width: root.width;
+        border-radius: Metrics.radius-md;
+        background: Palette.surface;
+        border-width: Metrics.border-width;
+        border-color: Palette.border;
+        drop-shadow-blur: Metrics.elevation-2;
+        drop-shadow-color: Palette.shadow;
+        height: min(list-view.preferred-height, 240px);
+
+        list-view := ListView {
+            x: Metrics.space-1;
+            width: parent.width - 2 * Metrics.space-1;
+            height: parent.height;
+            for option[i] in root.model : Rectangle {
+                height: Metrics.control-height-sm;
+                border-radius: Metrics.radius-sm;
+                background: i == root.selected-index ? Palette.info-surface : transparent;
+
+                area := TouchArea {
+                    clicked => {
+                        root.selected-index = i;
+                        root.selected(i, option);
+                        root.open = false;
+                    }
+                }
+
+                Text {
+                    x: Metrics.space-2;
+                    vertical-center: parent.height / 2;
+                    text: option;
+                    font-size: Typography.font-size-md;
+                    color: i == root.selected-index ? Palette.primary : Palette.text;
+                    overflow: elide;
+                    width: parent.width - 2 * Metrics.space-2;
+                }
+            }
+        }
+    }
+}

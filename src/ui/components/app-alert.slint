@@ -1,0 +1,90 @@
+// AppAlert — inline callout for feedback messages.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export enum AppAlertVariant { info, success, warning, danger }
+
+export component AppAlert inherits Rectangle {
+    /// Message body (single line, elided; wrap by hosting in a wide layout).
+    in property <string> text;
+    in property <AppAlertVariant> variant: AppAlertVariant.info;
+    /// Optional bold prefix, e.g. "Heads up".
+    in property <string> title;
+    /// Show the dismiss (×) button.
+    in property <bool> dismissible: false;
+    in property <bool> visible: true;
+
+    callback dismissed();
+
+    height: content.preferred-height + 2 * Metrics.space-3;
+    border-radius: Metrics.radius-md;
+
+    private property <color> accent:
+        root.variant == AppAlertVariant.success ? Palette.success
+        : root.variant == AppAlertVariant.warning ? Palette.warning
+        : root.variant == AppAlertVariant.danger ? Palette.danger
+        : Palette.info;
+    private property <color> surface:
+        root.variant == AppAlertVariant.success ? Palette.success-surface
+        : root.variant == AppAlertVariant.warning ? Palette.warning-surface
+        : root.variant == AppAlertVariant.danger ? Palette.danger-surface
+        : Palette.info-surface;
+
+    background: root.surface;
+
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 4px;
+        height: parent.height;
+        border-radius: 2px;
+        background: root.accent;
+    }
+
+    content := HorizontalLayout {
+        x: Metrics.space-4;
+        width: parent.width - Metrics.space-4 - (root.dismissible ? Metrics.space-4 : Metrics.space-3);
+        y: 0;
+        height: parent.height;
+        spacing: Metrics.space-2;
+        alignment: start;
+
+        AppIcon {
+            name: root.variant == AppAlertVariant.success ? "check"
+                : root.variant == AppAlertVariant.warning ? "warning"
+                : root.variant == AppAlertVariant.danger ? "error"
+                : "info";
+            size: Typography.font-size-md;
+            color: root.accent;
+        }
+
+        VerticalLayout {
+            alignment: center;
+            Text {
+                text: root.title;
+                visible: root.title != "";
+                font-size: Typography.font-size-md;
+                font-weight: Typography.font-weight-bold;
+                color: root.accent;
+                overflow: elide;
+            }
+            Text {
+                text: root.text;
+                font-size: Typography.font-size-md;
+                color: Palette.text;
+                overflow: elide;
+            }
+        }
+
+        if root.dismissible : TouchArea {
+            width: close-icon.size + Metrics.space-2;
+            clicked => { root.dismissed(); }
+            close-icon := AppIcon {
+                name: "close";
+                size: Typography.font-size-sm;
+                color: Palette.text-muted;
+            }
+        }
+    }
+}

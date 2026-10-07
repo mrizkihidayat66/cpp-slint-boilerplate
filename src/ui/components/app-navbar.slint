@@ -1,0 +1,56 @@
+// AppNavbar — top application bar.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppNavbar inherits Rectangle {
+    in property <string> title;
+    in property <string> subtitle;
+    /// Name of a leading icon (AppIcons).
+    in property <string> icon-name;
+
+    /// Leading slot (navigation menu button, etc.).
+    @children;
+
+    height: Metrics.navbar-height;
+    width: 100%;
+    background: Palette.surface;
+    border-width: 0;
+    Rectangle {
+        y: parent.height - 1px;
+        height: 1px;
+        width: parent.width;
+        background: Palette.border;
+    }
+
+    HorizontalLayout {
+        padding-left: Metrics.space-4;
+        padding-right: Metrics.space-4;
+        spacing: Metrics.space-3;
+        alignment: start;
+
+        @children;
+
+        if root.icon-name != "" : AppIcon {
+            name: root.icon-name;
+            size: Typography.font-size-lg;
+        }
+
+        VerticalLayout {
+            alignment: center;
+            Text {
+                text: root.title;
+                font-size: Typography.font-size-lg;
+                font-weight: Typography.font-weight-bold;
+                color: Palette.text;
+                overflow: elide;
+            }
+            if root.subtitle != "" : Text {
+                text: root.subtitle;
+                font-size: Typography.font-size-xs;
+                color: Palette.text-muted;
+                overflow: elide;
+            }
+        }
+    }
+}

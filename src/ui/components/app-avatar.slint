@@ -1,0 +1,67 @@
+// AppAvatar — user/entity representation with initials fallback.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export enum AppAvatarSize { sm, md, lg }
+
+export component AppAvatar inherits Rectangle {
+    /// Full name; the first character (uppercased) becomes the fallback glyph.
+    in property <string> name;
+    /// Explicit initials; overrides the derived first letter.
+    in property <string> initials-override;
+    /// Second initial (e.g. surname initial); Slint has no string split, so
+    /// multi-word initials are assembled by the caller.
+    in property <string> second-initial;
+    /// Optional image (overrides initials).
+    in property <image> source;
+    in property <AppAvatarSize> size: AppAvatarSize.md;
+    /// Colored status dot (color set via status-color).
+    in property <bool> show-status: false;
+    in property <color> status-color: Palette.success;
+
+    private property <length> dimension:
+        root.size == AppAvatarSize.sm ? 24px
+        : root.size == AppAvatarSize.lg ? 48px
+        : 32px;
+    private property <length> initials-size:
+        root.size == AppAvatarSize.sm ? Typography.font-size-xs
+        : root.size == AppAvatarSize.lg ? Typography.font-size-lg
+        : Typography.font-size-sm;
+
+    width: root.dimension;
+    height: root.dimension;
+    border-radius: root.dimension / 2;
+    background: Palette.primary-disabled;
+    clip: true;
+
+    if root.source.width > 0 : Image {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        source: root.source;
+        image-fit: cover;
+    }
+
+    if root.source.width == 0 : Text {
+        text: root.initials-override != ""
+            ? root.initials-override
+            : root.name != ""
+                ? root.name[0].to-uppercase() + (root.second-initial != "" ? root.second-initial : "")
+                : "?";
+        font-size: root.initials-size;
+        font-weight: Typography.font-weight-medium;
+        color: Palette.text-on-primary;
+    }
+
+    if root.show-status : Rectangle {
+        x: root.dimension - self.width;
+        y: root.dimension - self.height;
+        width: root.dimension / 4;
+        height: root.dimension / 4;
+        border-radius: self.width / 2;
+        background: root.status-color;
+        border-width: Metrics.border-width;
+        border-color: Palette.surface;
+    }
+}

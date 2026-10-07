@@ -1,0 +1,71 @@
+// AppTabs — tab strip with a current-index selection.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export enum AppTabsVariant { underline, pills }
+
+export component AppTabs inherits Rectangle {
+    in property <[string]> model;
+    in-out property <int> current-index: 0;
+    in property <AppTabsVariant> variant: AppTabsVariant.underline;
+    in property <bool> disabled: false;
+
+    callback current-index-changed(int);
+
+    height: root.variant == AppTabsVariant.pills
+        ? Metrics.control-height-md
+        : Metrics.control-height-sm + Metrics.border-width-strong;
+    width: 100%;
+
+    HorizontalLayout {
+        spacing: root.variant == AppTabsVariant.pills ? Metrics.space-2 : Metrics.space-4;
+        alignment: start;
+
+        for tab-label[i] in root.model : tab := Rectangle {
+            height: 100%;
+            width: tab-text.preferred-width + 2 * Metrics.space-4;
+            border-radius: root.variant == AppTabsVariant.pills ? Metrics.radius-pill : 0;
+            background: root.variant == AppTabsVariant.pills && i == root.current-index
+                ? Palette.primary
+                : tab-area.has-hover && !root.disabled ? Palette.surface-alt
+                : transparent;
+
+            tab-area := TouchArea {
+                enabled: !root.disabled;
+                mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+                clicked => {
+                    if (i != root.current-index) {
+                        root.current-index = i;
+                        root.current-index-changed(i);
+                    }
+                }
+            }
+
+            tab-text := Text {
+                x: Metrics.space-4;
+                width: parent.width - 2 * Metrics.space-4;
+                vertical-center: parent.height / 2;
+                text: tab-label;
+                font-size: Typography.font-size-md;
+                font-weight: i == root.current-index
+                    ? Typography.font-weight-medium
+                    : Typography.font-weight-regular;
+                color: root.disabled ? Palette.text-disabled
+                    : i == root.current-index
+                        ? (root.variant == AppTabsVariant.pills ? Palette.text-on-primary : Palette.primary)
+                    : Palette.text-muted;
+                horizontal-alignment: center;
+                overflow: elide;
+            }
+
+            // Underline indicator (underline variant only).
+            if root.variant == AppTabsVariant.underline : Rectangle {
+                y: parent.height - Metrics.border-width-strong;
+                height: Metrics.border-width-strong;
+                width: parent.width;
+                border-radius: Metrics.border-width-strong / 2;
+                background: i == root.current-index ? Palette.primary : transparent;
+            }
+        }
+    }
+}

@@ -1,0 +1,71 @@
+// AppSlider — numeric range input.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+
+export component AppSlider inherits Rectangle {
+    in-out property <float> value: 0;
+    in property <float> minimum: 0;
+    in property <float> maximum: 100;
+    in property <float> step: 1;
+    in property <bool> disabled: false;
+    /// Snap the thumb to `step` increments.
+    in property <bool> snap: true;
+
+    callback changed(float);
+
+    height: 24px; // touch-friendly track band
+    width: 100%;
+
+    private property <float> range: max(0.0001, root.maximum - root.minimum);
+    private property <float> fraction: min(1, max(0, (root.value - root.minimum) / root.range));
+
+    public pure function apply-step(raw: float) -> float {
+        if (root.snap && root.step > 0) {
+            return root.minimum
+                + round((raw - root.minimum) / root.step) * root.step;
+        }
+        return raw;
+    }
+
+    touch := TouchArea {
+        enabled: !root.disabled;
+        mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+        changed => {
+            if self.pressed && !root.disabled {
+                const raw = root.minimum + (self.position-x - track.x)
+                    / max(1px, track.width) * root.range;
+                const snapped = min(root.maximum, max(root.minimum, root.apply-step(raw)));
+                if (snapped != root.value) {
+                    root.value = snapped;
+                    root.changed(snapped);
+                }
+            }
+        }
+    }
+
+    track := Rectangle {
+        y: (parent.height - 6px) / 2;
+        height: 6px;
+        width: parent.width;
+        border-radius: 3px;
+        background: Palette.surface-alt;
+
+        fill := Rectangle {
+            width: parent.width * root.fraction;
+            height: parent.height;
+            border-radius: 3px;
+            background: root.disabled ? Palette.primary-disabled : Palette.primary;
+        }
+
+        thumb := Rectangle {
+            x: parent.width * root.fraction - self.width / 2;
+            y: (parent.height - self.height) / 2;
+            width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            background: white;
+            border-width: Metrics.border-width;
+            border-color: root.disabled ? Palette.border : Palette.primary;
+        }
+    }
+}
