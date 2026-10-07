@@ -1,54 +1,60 @@
-// colors.slint — semantic color tokens (light theme, dark sidebar).
+// colors.slint — semantic color tokens (light + dark theme).
 //
 // Components must never hardcode colors: they read from this global so a fork
-// can restyle the entire application by editing theme/ only.
+// can restyle the entire application by editing theme/ only. The `dark`
+// property switches every token between the two palettes; it is bound to
+// AppState.theme on this branch, so persisting settings changes the theme
+// live (no restart).
 
 export global Palette {
+    // Switched by the settings page / SettingsService ("light" | "dark").
+    in-out property <bool> dark: false;
+
     // Brand (indigo)
-    out property <color> primary: #4f46e5;
-    out property <color> primary-hover: #4338ca;
-    out property <color> primary-active: #3730a3;
-    out property <color> primary-disabled: #c7d2fe;
-    out property <color> primary-tint: #eef2ff;
+    out property <color> primary: dark ? #6366f1 : #4f46e5;
+    out property <color> primary-hover: dark ? #4f46e5 : #4338ca;
+    out property <color> primary-active: dark ? #4338ca : #3730a3;
+    out property <color> primary-disabled: dark ? #3730a399 : #c7d2fe;
+    out property <color> primary-tint: dark ? #312e8166 : #eef2ff;
 
     // State / feedback (+ tinted surfaces for chips and badges)
-    out property <color> success: #059669;
-    out property <color> success-surface: #ecfdf5;
-    out property <color> warning: #d97706;
-    out property <color> warning-surface: #fffbeb;
-    out property <color> danger: #dc2626;
-    out property <color> danger-hover: #b91c1c;
-    out property <color> danger-surface: #fef2f2;
-    out property <color> info: #0284c7;
-    out property <color> info-surface: #f0f9ff;
+    out property <color> success: dark ? #34d399 : #059669;
+    out property <color> success-surface: dark ? #064e3b66 : #ecfdf5;
+    out property <color> warning: dark ? #fbbf24 : #d97706;
+    out property <color> warning-surface: dark ? #78350f66 : #fffbeb;
+    out property <color> danger: dark ? #f87171 : #dc2626;
+    out property <color> danger-hover: dark ? #ef4444 : #b91c1c;
+    out property <color> danger-surface: dark ? #7f1d1d66 : #fef2f2;
+    out property <color> info: dark ? #38bdf8 : #0284c7;
+    out property <color> info-surface: dark ? #0c4a6e66 : #f0f9ff;
 
     // Neutrals (slate)
-    out property <color> background: #f6f7f9;
-    out property <color> surface: #ffffff;
-    out property <color> surface-alt: #f1f3f6;
-    out property <color> surface-sunken: #e9edf2;
-    out property <color> border: #e4e8ee;
-    out property <color> border-strong: #cbd5e1;
+    out property <color> background: dark ? #0b1120 : #f6f7f9;
+    out property <color> surface: dark ? #111a2e : #ffffff;
+    out property <color> surface-alt: dark ? #1a2439 : #f1f3f6;
+    out property <color> surface-sunken: dark ? #0d1526 : #e9edf2;
+    out property <color> border: dark ? #243146 : #e4e8ee;
+    out property <color> border-strong: dark ? #33415c : #cbd5e1;
 
     // Text
-    out property <color> text: #0f172a;
-    out property <color> text-muted: #64748b;
-    out property <color> text-faint: #94a3b8;
-    out property <color> text-disabled: #b6bfc9;
+    out property <color> text: dark ? #e2e8f0 : #0f172a;
+    out property <color> text-muted: dark ? #94a3b8 : #64748b;
+    out property <color> text-faint: dark ? #64748b : #94a3b8;
+    out property <color> text-disabled: dark ? #475569 : #b6bfc9;
     out property <color> text-on-primary: #ffffff;
 
-    // Dark sidebar rail
-    out property <color> sidebar: #0f172a;
-    out property <color> sidebar-hover: #1e293b;
-    out property <color> sidebar-active: #4f46e5;
+    // Sidebar rail (dark in both themes; slightly lifted in dark theme)
+    out property <color> sidebar: dark ? #060b16 : #0f172a;
+    out property <color> sidebar-hover: dark ? #101a2e : #1e293b;
+    out property <color> sidebar-active: dark ? #6366f1 : #4f46e5;
     out property <color> sidebar-text: #94a3b8;
     out property <color> sidebar-text-active: #ffffff;
     out property <color> sidebar-brand: #e2e8f0;
-    out property <color> sidebar-border: #1e293b;
+    out property <color> sidebar-border: dark ? #101a2e : #1e293b;
 
     // Effects (8-digit hex = #RRGGBBAA)
-    out property <color> shadow: #0f172a14;
-    out property <color> shadow-strong: #0f172a24;
-    out property <color> overlay: #0f172a99;
-    out property <color> hairline: #eef1f5;
+    out property <color> shadow: dark ? #00000040 : #0f172a14;
+    out property <color> shadow-strong: dark ? #00000066 : #0f172a24;
+    out property <color> overlay: dark ? #000000b3 : #0f172a99;
+    out property <color> hairline: dark ? #1c2740 : #eef1f5;
 }

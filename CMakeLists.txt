@@ -26,7 +26,8 @@ add_library(boilerplate-core STATIC
     src/app/ServiceLocator.cpp
     src/models/DashboardModels.cpp
     src/services/DashboardService.cpp
-    src/services/AboutService.cpp)
+    src/services/AboutService.cpp
+    src/services/SettingsService.cpp)
 
 target_include_directories(boilerplate-core
     PUBLIC

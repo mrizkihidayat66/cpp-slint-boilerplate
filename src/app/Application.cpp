@@ -8,8 +8,10 @@
 
 #include "models/AboutModels.h"
 #include "models/DashboardModels.h"
+#include "models/SettingsModels.h"
 #include "services/AboutService.h"
 #include "services/DashboardService.h"
+#include "services/SettingsService.h"
 
 namespace cpp_slint_boilerplate::app {
 
@@ -31,6 +33,7 @@ void Application::registerServices()
 {
     m_services.registerConstructed<services::DashboardService>();
     m_services.registerConstructed<services::AboutService>();
+    m_services.registerConstructed<services::SettingsService>();
 }
 
 void Application::bindUiCallbacks()
@@ -55,6 +58,30 @@ void Application::bindUiCallbacks()
     });
 
     state.on_request_quit([] { slint::quit_event_loop(); });
+
+    // Settings: persist the values the settings page committed to AppState.
+    // `this` is captured for pushSettings (it touches m_window for the
+    // Palette theme switch).
+    state.on_request_save_settings([this, &state]() {
+        const auto settings = m_services.get<services::SettingsService>();
+
+        models::AppSettings updated;
+        updated.displayName = std::string(state.get_display_name());
+        updated.theme = state.get_dark() ? "dark" : "light";
+        updated.language = state.get_language_index() == 1 ? "id" : "en";
+        updated.notifications = state.get_notifications();
+        updated.autoStart = state.get_auto_start();
+        settings->save(updated);
+
+        // Confirm with the normalized values the service now owns.
+        pushSettings(state, settings->settings());
+    });
+
+    // Settings: discard unsaved edits — re-push what the service owns.
+    state.on_request_reload_settings([this, &state]() {
+        const auto settings = m_services.get<services::SettingsService>();
+        pushSettings(state, settings->settings());
+    });
 }
 
 void Application::loadInitialData()
@@ -82,6 +109,23 @@ void Application::loadInitialData()
             about.applicationName + " v" + about.version + "\n" + about.description + "\n\n"
             + "Slint: " + about.slintVersion + "\nCompiler: " + about.compiler + "\nBuild: "
             + about.buildType));
+
+    // Settings: push the loaded values (triggers the theme via changed
+    // callbacks on the settings page; Palette.dark is also set directly so
+    // the theme applies even before the settings page is instantiated).
+    pushSettings(state, m_services.get<services::SettingsService>()->settings());
+}
+
+void Application::pushSettings(const ::app::AppState &state, const models::AppSettings &settings)
+{
+    state.set_display_name(slint::SharedString(settings.displayName));
+    state.set_dark(settings.theme == "dark");
+    state.set_language_index(settings.language == "id" ? 1 : 0);
+    state.set_notifications(settings.notifications);
+    state.set_auto_start(settings.autoStart);
+
+    // Live theme switch: every Palette token reacts immediately.
+    (**m_window).global<::app::Palette>().set_dark(settings.theme == "dark");
 }
 
 int Application::run()

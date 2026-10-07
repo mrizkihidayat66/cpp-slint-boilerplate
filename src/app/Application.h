@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "app/ServiceLocator.h"
+#include "models/SettingsModels.h"
 #include "app-window.h"
 
 namespace cpp_slint_boilerplate::app {
@@ -35,6 +36,11 @@ private:
     void registerServices();
     void bindUiCallbacks();
     void loadInitialData();
+
+    /// Push settings values into the AppState global (and mirror the theme).
+    /// AppState is taken by const-ref: generated globals are handed out as
+    /// const&, but their setters are const methods.
+    void pushSettings(const ::app::AppState &state, const models::AppSettings &settings);
 
     ServiceLocator m_services;
 

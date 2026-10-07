@@ -9,9 +9,12 @@ import { StatCard, ActivityItem, AppState } from "app-state.slint";
 import { AppSidebar } from "components/library.slint";
 import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages.slint";
 
-// Re-export so the C++ side can reach it via window->global<AppState>();
-// only exported globals appear in the generated API.
+// Re-export so the C++ side can reach them via window->global<...>();
+// only exported globals appear in the generated API. Palette is exported
+// so Application can flip the live theme switch (Palette.dark) when the
+// settings load or save.
 export { AppState } from "app-state.slint";
+export { Palette } from "theme/theme.slint";
 
 export component AppWindow inherits Window {
     title: "cpp-slint-boilerplate";
