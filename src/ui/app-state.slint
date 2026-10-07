@@ -15,6 +15,9 @@ export struct StatCard {
 
 export struct ActivityItem {
     actor: string,
+    /// Pre-built initials (e.g. "AL") — Slint cannot split strings, so the
+    /// C++ side assembles them.
+    initials: string,
     action: string,
     timestamp: string,
     icon-name: string,

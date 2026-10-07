@@ -56,6 +56,7 @@ void Application::loadInitialData()
     for (const auto &item : dashboard->recentActivity()) {
         ::app::ActivityItem converted;
         converted.actor = slint::SharedString(item.actor);
+        converted.initials = slint::SharedString(models::initialsOf(item.actor));
         converted.action = slint::SharedString(item.action);
         converted.timestamp = slint::SharedString(item.timestamp);
         converted.icon_name = slint::SharedString(item.iconName);

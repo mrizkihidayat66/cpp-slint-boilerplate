@@ -15,7 +15,7 @@ export component AppTextarea inherits Rectangle {
     in property <bool> read-only: false;
     in property <string> error-text;
 
-    callback edited <=> editor.edited;
+    callback edited();
 
     height: label-row.height + editor-holder.height
         + (status-row.visible ? status-row.height : 0);
@@ -50,6 +50,7 @@ export component AppTextarea inherits Rectangle {
             font-family: Typography.font-family;
             read-only: root.disabled || root.read-only;
             enabled: !root.disabled;
+            edited => { root.edited(); }
         }
     }
 

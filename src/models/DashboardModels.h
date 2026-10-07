@@ -36,6 +36,11 @@ struct ActivityItem
     std::string iconName;
 };
 
+/// Build display initials from a full name: up to the first letter of the
+/// first two words, uppercased ("Ada Lovelace" → "AL", "Plato" → "P").
+/// Slint markup cannot split strings, so the adapter does it here.
+[[nodiscard]] std::string initialsOf(const std::string &name);
+
 /// Convert a StatCard POCO into the generated `app::StatCard` struct.
 ::app::StatCard toSlint(const StatCard &card);
 

@@ -1,40 +1,54 @@
-// colors.slint — semantic color tokens (light theme).
+// colors.slint — semantic color tokens (light theme, dark sidebar).
 //
 // Components must never hardcode colors: they read from this global so a fork
 // can restyle the entire application by editing theme/ only.
 
 export global Palette {
-    // Brand
-    out property <color> primary: #2563eb;
-    out property <color> primary-hover: #1d4ed8;
-    out property <color> primary-active: #1e40af;
-    out property <color> primary-disabled: #93b4f8;
+    // Brand (indigo)
+    out property <color> primary: #4f46e5;
+    out property <color> primary-hover: #4338ca;
+    out property <color> primary-active: #3730a3;
+    out property <color> primary-disabled: #c7d2fe;
+    out property <color> primary-tint: #eef2ff;
 
-    // State / feedback
-    out property <color> success: #16a34a;
-    out property <color> success-surface: #dcfce7;
+    // State / feedback (+ tinted surfaces for chips and badges)
+    out property <color> success: #059669;
+    out property <color> success-surface: #ecfdf5;
     out property <color> warning: #d97706;
-    out property <color> warning-surface: #fef3c7;
+    out property <color> warning-surface: #fffbeb;
     out property <color> danger: #dc2626;
     out property <color> danger-hover: #b91c1c;
-    out property <color> danger-surface: #fee2e2;
+    out property <color> danger-surface: #fef2f2;
     out property <color> info: #0284c7;
-    out property <color> info-surface: #e0f2fe;
+    out property <color> info-surface: #f0f9ff;
 
-    // Neutrals
-    out property <color> background: #f8fafc;
+    // Neutrals (slate)
+    out property <color> background: #f6f7f9;
     out property <color> surface: #ffffff;
-    out property <color> surface-alt: #f1f5f9;
-    out property <color> border: #e2e8f0;
+    out property <color> surface-alt: #f1f3f6;
+    out property <color> surface-sunken: #e9edf2;
+    out property <color> border: #e4e8ee;
     out property <color> border-strong: #cbd5e1;
 
     // Text
     out property <color> text: #0f172a;
     out property <color> text-muted: #64748b;
-    out property <color> text-disabled: #94a3b8;
+    out property <color> text-faint: #94a3b8;
+    out property <color> text-disabled: #b6bfc9;
     out property <color> text-on-primary: #ffffff;
 
-    // Shadows (used as drop-shadow colors)
+    // Dark sidebar rail
+    out property <color> sidebar: #0f172a;
+    out property <color> sidebar-hover: #1e293b;
+    out property <color> sidebar-active: #4f46e5;
+    out property <color> sidebar-text: #94a3b8;
+    out property <color> sidebar-text-active: #ffffff;
+    out property <color> sidebar-brand: #e2e8f0;
+    out property <color> sidebar-border: #1e293b;
+
+    // Effects (8-digit hex = #RRGGBBAA)
     out property <color> shadow: #0f172a14;
-    out property <color> overlay: #0f172a66;
+    out property <color> shadow-strong: #0f172a24;
+    out property <color> overlay: #0f172a99;
+    out property <color> hairline: #eef1f5;
 }

@@ -1,8 +1,8 @@
-// AppSidebar — vertical navigation rail.
+// AppSidebar — dark vertical navigation rail with brand header.
 //
 // Responsive behavior: the parent sets `collapsed` (typically when the window
-// width drops below a threshold, e.g. `root.width < 600px`) and the bar
-// shrinks to an icon rail.
+// width drops below a threshold, e.g. `root.width < 600px`) and the rail
+// shrinks to icons only.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
@@ -15,68 +15,161 @@ export struct AppSidebarItem {
 export component AppSidebar inherits Rectangle {
     in property <[AppSidebarItem]> items;
     in-out property <int> current-index: 0;
+    /// Product name shown in the header (hidden when collapsed).
+    in property <string> brand-title;
+    /// Short badge next to the title, e.g. a version chip.
+    in property <string> brand-subtitle;
     /// Icon-only mode (narrow windows).
     in property <bool> collapsed: false;
-    /// Hide labels but keep full width (animated transitions).
-    in-out property <bool> hover-expanded: false;
 
     callback navigate(int);
 
-    private property <bool> expanded: !root.collapsed || root.hover-expanded;
+    private property <bool> expanded: !root.collapsed;
 
     width: root.expanded ? Metrics.sidebar-width : Metrics.sidebar-width-collapsed;
-    animate width { duration: 200ms; easing: ease-out; }
+    animate width { duration: 200ms; easing: cubic-bezier(0.4, 0, 0.2, 1); }
 
     height: 100%;
-    background: Palette.surface;
+    background: Palette.sidebar;
 
+    // Right hairline separating rail from content.
     Rectangle {
-        y: 0;
         x: parent.width - 1px;
+        y: 0;
         width: 1px;
         height: parent.height;
-        background: Palette.border;
+        background: Palette.sidebar-border;
     }
 
     VerticalLayout {
-        padding: Metrics.space-2;
-        spacing: Metrics.space-1;
+        padding: 0;
 
-        for item[i] in root.items : entry := Rectangle {
-            height: Metrics.control-height-md;
-            border-radius: Metrics.radius-md;
-            background: i == root.current-index ? Palette.info-surface
-                : entry-area.has-hover ? Palette.surface-alt
-                : transparent;
-
-            entry-area := TouchArea {
-                mouse-cursor: MouseCursor.pointer;
-                clicked => {
-                    root.current-index = i;
-                    root.navigate(i);
-                }
-            }
+        // Brand header
+        Rectangle {
+            height: 60px;
 
             HorizontalLayout {
-                padding-left: Metrics.space-3;
-                padding-right: Metrics.space-3;
+                padding-left: Metrics.space-4;
+                padding-right: Metrics.space-4;
                 spacing: Metrics.space-3;
                 alignment: root.expanded ? start : center;
 
-                AppIcon {
-                    name: item.icon-name;
-                    size: Typography.font-size-md;
-                    accent-color: i == root.current-index ? Palette.primary : Palette.text-muted;
+                // Indigo logo mark
+                Rectangle {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 9px;
+                    background: Palette.primary;
+
+                    Text {
+                        text: "B";
+                        color: Palette.text-on-primary;
+                        font-size: 14px;
+                        font-weight: Typography.font-weight-bold;
+                        x: (parent.width - self.preferred-width) / 2;
+                        y: (parent.height - self.preferred-height) / 2;
+                    }
                 }
 
-                if root.expanded : Text {
-                    text: item.label;
-                    font-size: Typography.font-size-md;
-                    font-weight: i == root.current-index
-                        ? Typography.font-weight-medium : Typography.font-weight-regular;
-                    color: i == root.current-index ? Palette.primary : Palette.text;
+                if root.expanded && root.brand-title != "" : VerticalLayout {
+                    alignment: center;
+                    Text {
+                        text: root.brand-title;
+                        font-size: Typography.font-size-md;
+                        font-weight: Typography.font-weight-semibold;
+                        color: Palette.sidebar-brand;
+                    }
+                    if root.brand-subtitle != "" : Text {
+                        text: root.brand-subtitle;
+                        font-size: Typography.font-size-xs;
+                        color: Palette.sidebar-text;
+                    }
+                }
+            }
+        }
+
+        Rectangle { height: 1px; background: Palette.sidebar-border; }
+
+        // Nav entries
+        VerticalLayout {
+            padding: Metrics.space-3;
+            padding-top: Metrics.space-4;
+            spacing: Metrics.space-1;
+
+            for item[i] in root.items : entry := Rectangle {
+                height: 38px;
+                border-radius: Metrics.radius-md;
+
+                background: i == root.current-index ? Palette.sidebar-active
+                    : entry-area.has-hover ? Palette.sidebar-hover
+                    : transparent;
+
+                entry-area := TouchArea {
+                    mouse-cursor: MouseCursor.pointer;
+                    clicked => {
+                        root.current-index = i;
+                        root.navigate(i);
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: root.expanded ? Metrics.space-3 + 2px : 0;
+                    padding-right: Metrics.space-3;
+                    spacing: Metrics.space-3;
+                    alignment: root.expanded ? start : center;
+
+                    AppIcon {
+                        name: item.icon-name;
+                        size: 17px;
+                        stroke-weight: i == root.current-index ? 1.15 : 1;
+                        accent-color: i == root.current-index
+                            ? Palette.sidebar-text-active
+                            : Palette.sidebar-text;
+                    }
+
+                    if root.expanded : Text {
+                        text: item.label;
+                        font-size: Typography.font-size-md;
+                        font-weight: i == root.current-index
+                            ? Typography.font-weight-medium : Typography.font-weight-regular;
+                        color: i == root.current-index
+                            ? Palette.sidebar-text-active
+                            : Palette.sidebar-text;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
+                }
+            }
+        }
+
+        // Spacer pushes footer to the bottom
+        Rectangle { vertical-stretch: 1; }
+
+        // Footer
+        if root.expanded : Rectangle {
+            height: 48px;
+            HorizontalLayout {
+                padding-left: Metrics.space-4;
+                padding-right: Metrics.space-4;
+                alignment: start;
+                spacing: Metrics.space-3;
+
+                Rectangle {
+                    width: 22px;
+                    height: 22px;
+                    border-radius: Metrics.radius-pill;
+                    background: Palette.sidebar-hover;
+                    Text {
+                        text: "v0.1";
+                        font-size: 9px;
+                        color: Palette.sidebar-text;
+                    }
+                }
+                Text {
+                    text: "cpp-slint-boilerplate";
+                    font-size: Typography.font-size-xs;
+                    color: Palette.sidebar-text;
                     vertical-alignment: center;
-                    overflow: elide;
                 }
             }
         }

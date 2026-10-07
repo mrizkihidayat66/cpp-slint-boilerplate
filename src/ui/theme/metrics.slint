@@ -9,31 +9,32 @@ export global Metrics {
     out property <length> space-5: 24px;
     out property <length> space-6: 32px;
 
-    // Border radius
-    out property <length> radius-sm: 4px;
-    out property <length> radius-md: 8px;
-    out property <length> radius-lg: 16px;
+    // Border radius — card 14 / control 10 / chip 8 / pill full
+    out property <length> radius-sm: 8px;
+    out property <length> radius-md: 10px;
+    out property <length> radius-lg: 14px;
     out property <length> radius-pill: 32767px; // fully rounded
 
     // Control heights (sm/md/lg apply to buttons, inputs, selects, ...)
     out property <length> control-height-sm: 28px;
-    out property <length> control-height-md: 36px;
-    out property <length> control-height-lg: 44px;
+    out property <length> control-height-md: 34px;
+    out property <length> control-height-lg: 42px;
 
     // Borders
     out property <length> border-width: 1px;
     out property <length> border-width-strong: 2px;
 
     // Layout
-    out property <length> sidebar-width: 240px;
+    out property <length> sidebar-width: 232px;
     out property <length> sidebar-width-collapsed: 64px;
     out property <length> navbar-height: 56px;
     out property <length> page-max-width: 1200px;
     out property <length> window-min-width: 480px;
     out property <length> window-min-height: 360px;
 
-    // Elevation: drop-shadow blur radii (pair with Palette.shadow)
-    out property <length> elevation-1: 2px;
-    out property <length> elevation-2: 8px;
-    out property <length> elevation-3: 24px;
+    // Elevation: two-layer soft shadows (blur, offset-y, color).
+    // Layers pair as drop-shadow-blur / drop-shadow-offset-y on the element.
+    out property <length> elevation-1: 3px;   // resting cards — also set offset 1px
+    out property <length> elevation-2: 10px;  // popups, dropdowns — offset 4px
+    out property <length> elevation-3: 28px;  // dialogs — offset 12px
 }

@@ -4,26 +4,57 @@
 // form controls showcase) lands on the examples/intermediate branch.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
-import { AppCard, AppIcon } from "../components/library.slint";
+import { AppCard, AppIcon, AppButton, AppButtonVariant } from "../components/library.slint";
 
 export component SettingsPage inherits Rectangle {
     background: Palette.background;
 
-    AppCard {
-        x: Metrics.space-5;
-        y: Metrics.space-5;
-        width: parent.width - 2 * Metrics.space-5;
-        title: "Settings";
-        subtitle: "Placeholder — see the examples/intermediate branch";
-        header-icon: "⚙";
+    Flickable {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
 
-        Text {
-            text: "This page is a stub on the main branch. The intermediate example\n"
-                + "branch implements a real settings form (inputs, switches, selects)\n"
-                + "backed by a persisted SettingsService.";
-            font-size: Typography.font-size-md;
-            color: Palette.text-muted;
-            wrap: word-wrap;
+        Rectangle {
+            width: 100%;
+            height: content-column.preferred-height + 2 * Metrics.space-6;
+
+            content-column := VerticalLayout {
+                x: Metrics.space-6;
+                width: parent.width - 2 * Metrics.space-6;
+                y: Metrics.space-6;
+                spacing: Metrics.space-5;
+
+                VerticalLayout {
+                    spacing: 2px;
+                    Text {
+                        text: "Settings";
+                        font-size: Typography.font-size-xl;
+                        font-weight: Typography.font-weight-bold;
+                        color: Palette.text;
+                    }
+                    Text {
+                        text: "Configure the application";
+                        font-size: Typography.font-size-md;
+                        color: Palette.text-muted;
+                    }
+                }
+
+                AppCard {
+                    title: "Coming in examples/intermediate";
+                    subtitle: "This page is a stub on the main branch";
+                    header-icon-name: "settings";
+
+                    Text {
+                        text: "The intermediate example branch implements a real settings form —\n"
+                            + "inputs, switches, and selects — backed by a persisted\n"
+                            + "SettingsService (%APPDATA% JSON).";
+                        font-size: Typography.font-size-md;
+                        color: Palette.text-muted;
+                        wrap: word-wrap;
+                    }
+                }
+            }
         }
     }
 }

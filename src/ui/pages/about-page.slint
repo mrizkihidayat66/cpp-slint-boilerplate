@@ -2,23 +2,61 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
-import { AppCard, AppIcon, AppButton, AppButtonVariant } from "../components/library.slint";
+import { AppCard, AppButton, AppButtonVariant } from "../components/library.slint";
 
 export component AboutPage inherits Rectangle {
     background: Palette.background;
 
-    AppCard {
-        x: (parent.width - self.width) / 2;
-        y: (parent.height - self.height) / 2;
-        width: min(480px, parent.width - 2 * Metrics.space-5);
-        title: "About";
-        header-icon: "ⓘ";
+    Flickable {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
 
-        Text {
-            text: AppState.about-text;
-            font-size: Typography.font-size-md;
-            color: Palette.text;
-            wrap: word-wrap;
+        Rectangle {
+            width: 100%;
+            height: content-column.preferred-height + 2 * Metrics.space-6;
+            clip: false;
+
+            content-column := VerticalLayout {
+                x: Metrics.space-6;
+                width: parent.width - 2 * Metrics.space-6;
+                y: Metrics.space-6;
+                spacing: Metrics.space-5;
+
+                VerticalLayout {
+                    spacing: 2px;
+                    Text {
+                        text: "About";
+                        font-size: Typography.font-size-xl;
+                        font-weight: Typography.font-weight-bold;
+                        color: Palette.text;
+                    }
+                    Text {
+                        text: "Version and build information";
+                        font-size: Typography.font-size-md;
+                        color: Palette.text-muted;
+                    }
+                }
+
+                AppCard {
+                    title: "cpp-slint-boilerplate";
+                    subtitle: "A professional C++20 + Slint desktop application boilerplate";
+
+                    VerticalLayout {
+                        spacing: Metrics.space-3;
+
+                        Text {
+                            text: AppState.about-text;
+                            font-size: Typography.font-size-md;
+                            color: Palette.text;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+
+                Rectangle { height: 8px; }
+            }
         }
     }
 }

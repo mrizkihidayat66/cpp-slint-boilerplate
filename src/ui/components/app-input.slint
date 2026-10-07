@@ -23,9 +23,9 @@ export component AppInput inherits Rectangle {
     in property <bool> password: false;
 
     /// Emitted on Enter/Return.
-    callback accepted <=> input.accepted;
+    callback accepted();
     /// Emitted on every keystroke.
-    callback edited <=> input.edited;
+    callback edited();
     /// Emitted when the clear button is used.
     callback cleared();
 
@@ -62,7 +62,7 @@ export component AppInput inherits Rectangle {
             if root.icon-name != "" : AppIcon {
                 name: root.icon-name;
                 size: Typography.font-size-md;
-                color: root.disabled ? Palette.text-disabled : Palette.text-muted;
+                accent-color: root.disabled ? Palette.text-disabled : Palette.text-muted;
             }
 
             input := TextInput {
@@ -73,6 +73,8 @@ export component AppInput inherits Rectangle {
                 vertical-alignment: center;
                 enabled: !root.disabled && !root.read-only;
                 input-type: root.password ? InputType.password : InputType.text;
+                accepted => { root.accepted(); }
+                edited => { root.edited(); }
             }
 
             if root.clearable && !root.disabled && !root.read-only && root.text != "" : TouchArea {

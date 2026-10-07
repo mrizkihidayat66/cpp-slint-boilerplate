@@ -2,9 +2,33 @@
 
 #include "models/DashboardModels.h"
 
-#include <slint.h>
+#include <cctype>
 
 namespace cpp_slint_boilerplate::models {
+
+std::string initialsOf(const std::string &name)
+{
+    std::string initials;
+    bool takeNext = true;
+    int taken = 0;
+    for (char ch : name) {
+        if (std::isspace(static_cast<unsigned char>(ch))) {
+            if (!initials.empty()) {
+                takeNext = true; // a second word begins
+            }
+            continue;
+        }
+        if (takeNext && std::isalpha(static_cast<unsigned char>(ch))) {
+            initials += static_cast<char>(std::toupper(static_cast<unsigned char>(ch)));
+            ++taken;
+            takeNext = false;
+            if (taken >= 2) {
+                break;
+            }
+        }
+    }
+    return initials;
+}
 
 ::app::StatCard toSlint(const StatCard &card)
 {

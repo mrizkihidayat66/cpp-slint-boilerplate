@@ -12,6 +12,8 @@ import {
     AppBadge,
     AppBadgeVariant,
     AppAvatar,
+    AppButton,
+    AppButtonVariant,
 } from "../components/library.slint";
 
 export component DashboardPage inherits Rectangle {
@@ -21,102 +23,188 @@ export component DashboardPage inherits Rectangle {
     in property <[StatCard]> stat-cards: [];
     in property <[ActivityItem]> recent-activity: [];
 
-    VerticalLayout {
-        padding: Metrics.space-5;
+    Rectangle {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        clip: true;
 
-        // KPI grid: 4 columns on wide windows, 2 on narrow ones.
-        HorizontalLayout {
-            spacing: Metrics.space-4;
+        Flickable {
+            x: 0;
+            y: 0;
+            width: 100%;
+            height: 100%;
 
-            for card[i] in stat-cards : AppCard {
-                title: "";
-                elevation: AppCardElevation.raised;
-                horizontal-stretch: 1;
+            VerticalLayout {
+                padding: Metrics.space-6;
+                spacing: Metrics.space-5;
 
-                VerticalLayout {
-                    spacing: Metrics.space-1;
+                // --- Page header -----------------------------------------------------
+                HorizontalLayout {
+                    spacing: Metrics.space-4;
+                    alignment: space-between;
+
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: 2px;
+                        Text {
+                            text: "Dashboard";
+                            font-size: Typography.font-size-xl;
+                            font-weight: Typography.font-weight-bold;
+                            color: Palette.text;
+                        }
+                        Text {
+                            text: "Overview of your workspace activity";
+                            font-size: Typography.font-size-md;
+                            color: Palette.text-muted;
+                        }
+                    }
 
                     HorizontalLayout {
                         spacing: Metrics.space-2;
-                        alignment: start;
-
-                        AppIcon {
-                            name: card.icon-name;
-                            size: Typography.font-size-lg;
-                            accent-color: Palette.primary;
+                        alignment: center;
+                        AppButton {
+                            variant: AppButtonVariant.outline;
+                            text: "Export";
+                            icon-name: "document";
                         }
-
-                        Text {
-                            text: card.title;
-                            font-size: Typography.font-size-sm;
-                            color: Palette.text-muted;
-                            vertical-alignment: center;
+                        AppButton {
+                            variant: AppButtonVariant.primary;
+                            text: "New report";
+                            icon-name: "plus";
                         }
-                    }
-
-                    Text {
-                        text: card.value;
-                        font-size: Typography.font-size-2xl;
-                        font-weight: Typography.font-weight-bold;
-                        color: Palette.text;
-                    }
-
-                    AppBadge {
-                        text: card.delta;
-                        variant: card.trend-positive
-                            ? AppBadgeVariant.success
-                            : AppBadgeVariant.danger;
                     }
                 }
-            }
-        }
 
-        // Recent activity feed.
-        AppCard {
-            title: "Recent activity";
-            subtitle: "Latest events across the workspace";
-            vertical-stretch: 1;
+                // --- KPI grid --------------------------------------------------------
+                HorizontalLayout {
+                    spacing: Metrics.space-4;
 
-            VerticalLayout {
-                spacing: 0;
-
-                for activity[i] in recent-activity : Rectangle {
-                    height: 52px;
-                    background: Math.mod(i, 2) == 0 ? transparent : Palette.background;
-
-                    HorizontalLayout {
-                        padding-left: Metrics.space-2;
-                        padding-right: Metrics.space-2;
-                        spacing: Metrics.space-3;
-
-                        AppAvatar {
-                            name: activity.actor;
-                            width: 32px;
-                        }
+                    for card[i] in stat-cards : AppCard {
+                        elevation: AppCardElevation.raised;
+                        horizontal-stretch: 1;
 
                         VerticalLayout {
-                            alignment: center;
-                            Text {
-                                text: activity.actor;
-                                font-size: Typography.font-size-md;
-                                font-weight: Typography.font-weight-medium;
-                                color: Palette.text;
-                                overflow: elide;
+                            spacing: Metrics.space-3;
+
+                            HorizontalLayout {
+                                spacing: Metrics.space-3;
+                                alignment: start;
+
+                                // Tinted icon tile
+                                Rectangle {
+                                    width: 34px;
+                                    height: 34px;
+                                    border-radius: Metrics.radius-sm;
+                                    background: Palette.primary-tint;
+                                    AppIcon {
+                                        name: card.icon-name;
+                                        size: 16px;
+                                        accent-color: Palette.primary;
+                                        x: (parent.width - self.width) / 2;
+                                        y: (parent.height - self.height) / 2;
+                                    }
+                                }
+
+                                VerticalLayout {
+                                    alignment: center;
+                                    Text {
+                                        text: card.title;
+                                        font-size: Typography.font-size-md;
+                                        color: Palette.text-muted;
+                                        overflow: elide;
+                                    }
+                                }
                             }
+
                             Text {
-                                text: activity.action;
-                                font-size: Typography.font-size-sm;
-                                color: Palette.text-muted;
-                                overflow: elide;
+                                text: card.value;
+                                font-size: Typography.font-size-2xl;
+                                font-weight: Typography.font-weight-semibold;
+                                color: Palette.text;
+                            }
+
+                            AppBadge {
+                                text: card.delta;
+                                variant: card.trend-positive
+                                    ? AppBadgeVariant.success
+                                    : AppBadgeVariant.danger;
+                                dot: true;
                             }
                         }
+                    }
+                }
 
-                        Text {
-                            text: activity.timestamp;
-                            font-size: Typography.font-size-xs;
-                            color: Palette.text-muted;
-                            vertical-alignment: center;
-                            horizontal-alignment: right;
+                // --- Activity feed ---------------------------------------------------
+                AppCard {
+                    title: "Recent activity";
+                    subtitle: "Latest events across the workspace";
+                    header-icon-name: "activity";
+                    vertical-stretch: 1;
+
+                    VerticalLayout {
+                        padding: 0;
+                        spacing: 0;
+
+                        for activity[i] in recent-activity : Rectangle {
+                            height: 56px;
+                            background: row-hover.has-hover ? Palette.surface-alt : transparent;
+
+                            row-hover := TouchArea { }
+
+                            HorizontalLayout {
+                                padding-left: Metrics.space-2;
+                                padding-right: Metrics.space-2;
+                                spacing: Metrics.space-3;
+                                alignment: start;
+
+                                // Avatar tile
+                                AppAvatar {
+                                    initials: activity.initials;
+                                    width: 34px;
+                                }
+
+                                VerticalLayout {
+                                    alignment: center;
+                                    spacing: 1px;
+                                    Text {
+                                        text: activity.actor;
+                                        font-size: Typography.font-size-md;
+                                        font-weight: Typography.font-weight-medium;
+                                        color: Palette.text;
+                                        overflow: elide;
+                                    }
+                                    Text {
+                                        text: activity.action;
+                                        font-size: Typography.font-size-sm;
+                                        color: Palette.text-muted;
+                                        overflow: elide;
+                                    }
+                                }
+
+                                // Spacer
+                                Rectangle { horizontal-stretch: 1; }
+
+                                HorizontalLayout {
+                                    alignment: center;
+                                    Text {
+                                        text: activity.timestamp;
+                                        font-size: Typography.font-size-xs;
+                                        color: Palette.text-faint;
+                                        vertical-alignment: center;
+                                    }
+                                }
+                            }
+
+                            // Row divider (not after the last item)
+                            if i < root.recent-activity.length - 1 : Rectangle {
+                                y: parent.height - 1px;
+                                height: 1px;
+                                x: Metrics.space-2 + 34px + Metrics.space-3;
+                                width: parent.width - self.x - Metrics.space-2;
+                                background: Palette.hairline;
+                            }
                         }
                     }
                 }

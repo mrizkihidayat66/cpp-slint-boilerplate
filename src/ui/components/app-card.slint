@@ -1,10 +1,11 @@
-// AppCard — surface container with optional header and body slot.
+// AppCard — elevated surface container with optional header and body slot.
 //
 // Note: the body slot is the single @children placeholder; the header is
 // built from properties (title/subtitle/header-icon), which keeps the
 // component composable without a second slot.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
 
 export enum AppCardElevation { flat, raised, floating }
 
@@ -13,34 +14,51 @@ export component AppCard inherits Rectangle {
     in property <string> title;
     /// Muted subtitle under the title.
     in property <string> subtitle;
-    /// Leading header glyph (emoji/unicode icon works without assets).
-    in property <string> header-icon;
+    /// Leading header icon name (AppIcon).
+    in property <string> header-icon-name;
     /// Elevation preset (shadow depth).
     in property <AppCardElevation> elevation: AppCardElevation.raised;
     /// Body padding (named body-padding: `padding` clashes with the
     /// inherited element property).
-    in property <length> body-padding: Metrics.space-4;
+    in property <length> body-padding: Metrics.space-5;
     /// Show the built-in border (kept when flat).
     in property <bool> bordered: true;
 
     height: content.preferred-height;
-    border-radius: Metrics.radius-md;
+    border-radius: Metrics.radius-lg;
     background: Palette.surface;
-    border-width: root.bordered || root.elevation == AppCardElevation.flat ? Metrics.border-width : 0;
+    border-width: root.bordered || root.elevation == AppCardElevation.flat
+        ? Metrics.border-width : 0;
     border-color: Palette.border;
+
+    // Two-layer elevation: soft ambient blur + tight contact shadow.
     drop-shadow-blur: root.elevation == AppCardElevation.floating ? Metrics.elevation-3
         : root.elevation == AppCardElevation.raised ? Metrics.elevation-1 : 0;
-    drop-shadow-color: Palette.shadow;
+    drop-shadow-offset-y: root.elevation == AppCardElevation.floating ? 12px
+        : root.elevation == AppCardElevation.raised ? 1px : 0;
+    drop-shadow-color: root.elevation == AppCardElevation.flat
+        ? transparent : Palette.shadow;
 
     content := VerticalLayout {
         if root.title != "" : header := HorizontalLayout {
-            padding: root.body-padding;
-            padding-bottom: root.subtitle == "" ? Metrics.space-3 : 0;
+            padding-top: Metrics.space-4;
+            padding-left: root.body-padding;
+            padding-right: root.body-padding;
+            padding-bottom: Metrics.space-3;
             spacing: Metrics.space-3;
 
-            if root.header-icon != "" : Text {
-                text: root.header-icon;
-                font-size: Typography.font-size-xl;
+            if root.header-icon-name != "" : Rectangle {
+                width: 30px;
+                height: 30px;
+                border-radius: Metrics.radius-sm;
+                background: Palette.primary-tint;
+                AppIcon {
+                    name: root.header-icon-name;
+                    size: 15px;
+                    accent-color: Palette.primary;
+                    x: (parent.width - self.width) / 2;
+                    y: (parent.height - self.height) / 2;
+                }
             }
 
             VerticalLayout {
@@ -48,7 +66,7 @@ export component AppCard inherits Rectangle {
                 Text {
                     text: root.title;
                     font-size: Typography.font-size-lg;
-                    font-weight: Typography.font-weight-medium;
+                    font-weight: Typography.font-weight-semibold;
                     color: Palette.text;
                 }
                 if root.subtitle != "" : Text {
@@ -60,15 +78,12 @@ export component AppCard inherits Rectangle {
             }
         }
 
-        body := Flickable {
-            height: self.preferred-height;
-            VerticalLayout {
-                padding-top: root.title == "" ? root.body-padding : Metrics.space-2;
-                padding-bottom: root.body-padding;
-                padding-left: root.body-padding;
-                padding-right: root.body-padding;
-                @children
-            }
+        body := VerticalLayout {
+            padding-top: root.title == "" ? root.body-padding : 0;
+            padding-bottom: root.body-padding;
+            padding-left: root.body-padding;
+            padding-right: root.body-padding;
+            @children
         }
     }
 }

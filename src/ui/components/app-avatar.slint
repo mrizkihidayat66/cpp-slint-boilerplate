@@ -1,14 +1,17 @@
 // AppAvatar — user/entity representation with initials fallback.
+//
+// Slint strings cannot be split or indexed, so initials are pre-built on the
+// C++ side ("Ada Lovelace" → "AL") and passed via the `initials` property.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 
 export enum AppAvatarSize { sm, md, lg }
 
 export component AppAvatar inherits Rectangle {
-    /// Full name; the first character (uppercased) becomes the fallback glyph.
+    /// Pre-built initials shown when no image is set (e.g. "AL").
+    in property <string> initials;
+    /// Full name; used as fallback text when initials are empty.
     in property <string> name;
-    /// Explicit initials; overrides the name fallback.
-    in property <string> initials-override;
     /// Optional image (overrides initials).
     in property <image> source;
     in property <AppAvatarSize> size: AppAvatarSize.md;
@@ -28,7 +31,7 @@ export component AppAvatar inherits Rectangle {
     width: root.dimension;
     height: root.dimension;
     border-radius: root.dimension / 2;
-    background: Palette.primary-disabled;
+    background: Palette.primary-tint;
     clip: true;
 
     if root.source.width > 0 : Image {
@@ -41,25 +44,21 @@ export component AppAvatar inherits Rectangle {
     }
 
     if root.source.width == 0 : Text {
-        // Slint strings cannot be indexed or split, so the glyph is either
-        // the caller-provided initials or the raw name (callers pass a
-        // short string such as a first name or pre-built initials).
-        text: root.initials-override != ""
-            ? root.initials-override
+        text: root.initials != "" ? root.initials
             : root.name != "" ? root.name : "?";
         font-size: root.initials-size;
-        font-weight: Typography.font-weight-medium;
-        color: Palette.text-on-primary;
+        font-weight: Typography.font-weight-semibold;
+        color: Palette.primary;
     }
 
     if root.show-status : Rectangle {
         x: root.dimension - self.width;
         y: root.dimension - self.height;
-        width: root.dimension / 4;
-        height: root.dimension / 4;
+        width: root.dimension / 4 + 2px;
+        height: root.dimension / 4 + 2px;
         border-radius: self.width / 2;
         background: root.status-color;
-        border-width: Metrics.border-width;
+        border-width: 2px;
         border-color: Palette.surface;
     }
 }
