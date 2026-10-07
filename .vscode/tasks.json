@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Configure (x64 Debug)",
+      "type": "shell",
+      "command": "cmake --preset x64-debug",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build (x64 Debug)",
+      "type": "shell",
+      "command": "cmake --build --preset x64-debug",
+      "group": { "kind": "build", "isDefault": true },
+      "dependsOn": "Configure (x64 Debug)",
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "Test (x64 Debug)",
+      "type": "shell",
+      "command": "ctest --preset x64-debug",
+      "group": "test",
+      "dependsOn": "Build (x64 Debug)",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: clang-format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check formatting
+        run: |
+          find src tests -name '*.h' -o -name '*.cpp' \
+            | xargs clang-format --dry-run --Werror
+
+  build:
+    name: ${{ matrix.arch }}-${{ matrix.build_type }}
+    runs-on: windows-latest
+    needs: format
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+        build_type: [debug, release]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.arch == 'x86' && 'i686-pc-windows-msvc' || 'x86_64-pc-windows-msvc' }}
+
+      - name: Cache dependencies (Slint source + cargo)
+        uses: actions/cache@v4
+        with:
+          path: |
+            .deps-cache
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: slint-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-${{ github.sha }}
+          restore-keys: |
+            slint-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-
+            slint-${{ matrix.arch }}-
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.arch }}-${{ matrix.build_type }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.arch }}-${{ matrix.build_type }} --parallel
+
+      - name: Test
+        if: matrix.arch == 'x64'
+        run: ctest --preset ${{ matrix.arch }}-${{ matrix.build_type }} --output-on-failure
+
+      - name: Smoke run (software renderer, GPU-less runner)
+        if: matrix.arch == 'x64'
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "build/${{ matrix.arch }}-${{ matrix.build_type }}/slint-boilerplate.exe" `
+            -Environment @{ SLINT_BACKEND = "winit-software" } -PassThru
+          Start-Sleep -Seconds 5
+          if ($proc.HasExited) {
+            throw "App exited prematurely with code $($proc.ExitCode)"
+          }
+          Stop-Process -Id $proc.Id -Force

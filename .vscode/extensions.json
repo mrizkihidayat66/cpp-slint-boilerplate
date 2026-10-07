@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "slint.slint-vscode",
+    "ms-vscode.cmake-tools",
+    "llvm-vs-code-extensions.vscode-clangd",
+    "xaver.clang-format"
+  ]
+}
