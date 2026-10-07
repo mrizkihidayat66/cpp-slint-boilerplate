@@ -1,7 +1,7 @@
-// dashboard-page.slint — KPI cards + recent activity feed.
+// dashboard-page.slint — KPI cards + recent activity feed (simple example).
 //
-// All data arrives via the window's models (set from C++); the page itself
-// contains no business logic.
+// The data lives right here as array literals — that is the point of this
+// branch: no models, no services, no adapters, just markup.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { StatCard, ActivityItem } from "../app-state.slint";
@@ -19,9 +19,20 @@ import {
 export component DashboardPage inherits Rectangle {
     background: Palette.background;
 
-    // Fed from the window, which is fed from C++.
-    in property <[StatCard]> stat-cards: [];
-    in property <[ActivityItem]> recent-activity: [];
+    // Demo data inline — on this branch there is no C++ side feeding models.
+    property <[StatCard]> stat-cards: [
+        { title: "Active users", value: "1,248", delta: "+12% this week", trend-positive: true, icon-name: "users" },
+        { title: "Revenue", value: "$48.2k", delta: "+8.4% this month", trend-positive: true, icon-name: "chart" },
+        { title: "Open issues", value: "17", delta: "-3 since yesterday", trend-positive: true, icon-name: "warning" },
+        { title: "Uptime", value: "99.98%", delta: "30-day average", trend-positive: true, icon-name: "check" },
+    ];
+    property <[ActivityItem]> recent-activity: [
+        { actor: "Ada Lovelace", initials: "AL", action: "created project “Analytical Engine”", timestamp: "2 min ago", icon-name: "folder" },
+        { actor: "Grace Hopper", initials: "GH", action: "closed issue “Compiler crash on COBOL”", timestamp: "18 min ago", icon-name: "check" },
+        { actor: "Alan Turing", initials: "AT", action: "commented on “Decryption milestone”", timestamp: "1 h ago", icon-name: "document" },
+        { actor: "Margaret Hamilton", initials: "MH", action: "deployed release v0.4.1", timestamp: "3 h ago", icon-name: "refresh" },
+        { actor: "Katherine Johnson", initials: "KJ", action: "updated trajectory calculations", timestamp: "yesterday", icon-name: "chart" },
+    ];
 
     Rectangle {
         x: 0;
@@ -198,7 +209,7 @@ export component DashboardPage inherits Rectangle {
                             }
 
                             // Row divider (not after the last item)
-                            if i < root.recent-activity.length - 1 : Rectangle {
+                            if i < recent-activity.length - 1 : Rectangle {
                                 y: parent.height - 1px;
                                 height: 1px;
                                 x: Metrics.space-2 + 34px + Metrics.space-3;

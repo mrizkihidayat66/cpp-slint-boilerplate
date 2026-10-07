@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, examples/simple]
   pull_request:
   workflow_dispatch:
 
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check formatting
         run: |
-          find src tests -name '*.h' -o -name '*.cpp' \
+          find src -name '*.h' -o -name '*.cpp' \
             | xargs clang-format --dry-run --Werror
 
   build:
@@ -57,10 +57,6 @@ jobs:
 
       - name: Build
         run: cmake --build --preset ${{ matrix.arch }}-${{ matrix.build_type }} --parallel
-
-      - name: Test
-        if: matrix.arch == 'x64'
-        run: ctest --preset ${{ matrix.arch }}-${{ matrix.build_type }} --output-on-failure
 
       - name: Smoke run (software renderer, GPU-less runner)
         if: matrix.arch == 'x64'

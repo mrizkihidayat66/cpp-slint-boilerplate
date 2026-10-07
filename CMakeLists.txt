@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 project(
     cpp_slint_boilerplate
     VERSION 0.1.0
-    DESCRIPTION "Professional C++20 + Slint desktop application boilerplate"
+    DESCRIPTION "C++20 + Slint desktop application — simple example"
     LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -18,36 +18,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CMake/FetchSlint.cmake)
 
 # ---------------------------------------------------------------------------
-# Core library (everything except main.cpp) — linked by the app and the tests
-# ---------------------------------------------------------------------------
-
-add_library(boilerplate-core STATIC
-    src/app/Application.cpp
-    src/app/ServiceLocator.cpp
-    src/models/DashboardModels.cpp
-    src/services/DashboardService.cpp
-    src/services/AboutService.cpp)
-
-target_include_directories(boilerplate-core
-    PUBLIC
-        src
-        ${CMAKE_CURRENT_BINARY_DIR})
-
-target_link_libraries(boilerplate-core PUBLIC Slint::Slint)
-
-# Compiles every .slint file reachable from app-window.slint (theme,
-# components, pages are imported transitively) into generated C++.
-slint_target_sources(boilerplate-core src/ui/app-window.slint NAMESPACE app)
-
-include(CMake/CompilerWarnings.cmake)
-target_apply_warnings(boilerplate-core)
-
-# ---------------------------------------------------------------------------
-# Application executable
+# Application executable — the whole app is main.cpp + generated UI code
 # ---------------------------------------------------------------------------
 
 add_executable(slint-boilerplate src/main.cpp)
-target_link_libraries(slint-boilerplate PRIVATE boilerplate-core)
+target_include_directories(slint-boilerplate PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(slint-boilerplate PRIVATE Slint::Slint)
+
+# Compiles every .slint file reachable from app-window.slint (theme,
+# components, pages are imported transitively) into generated C++.
+slint_target_sources(slint-boilerplate src/ui/app-window.slint NAMESPACE app)
+
+include(CMake/CompilerWarnings.cmake)
+target_apply_warnings(slint-boilerplate)
 
 # Copy the Slint runtime DLL next to the exe so it runs from the build dir
 # without a custom PATH.
@@ -56,15 +39,3 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         $<TARGET_FILE:slint_cpp-shared>
         $<TARGET_FILE_DIR:slint-boilerplate>)
-
-
-# ---------------------------------------------------------------------------
-# Unit tests (models/services only — UI correctness is enforced by
-# slint_target_sources compiling the markup at build time)
-# ---------------------------------------------------------------------------
-
-option(BOILERPLATE_BUILD_TESTS "Build unit tests" ON)
-if(BOILERPLATE_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()

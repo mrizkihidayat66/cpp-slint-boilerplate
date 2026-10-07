@@ -1,29 +1,23 @@
-// app-window.slint — root window: layout shell + model properties.
+// app-window.slint — root window for the simple example.
 //
-// The C++ side reaches the UI only through: AppWindow properties (models),
-// and the AppState global (state + callback intents). Types and state live
-// in app-state.slint; see docs/ARCHITECTURE.md for the data-flow rules.
+// Everything a Slint app needs in one markup file tree: data lives directly
+// in the markup (in-out properties), navigation is pure UI state. The C++
+// side only creates this window and runs the event loop — see main.cpp.
 
 import { Palette, Typography, Metrics } from "theme/theme.slint";
-import { StatCard, ActivityItem, AppState } from "app-state.slint";
 import { AppSidebar } from "components/library.slint";
-import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages.slint";
-
-// Re-export so the C++ side can reach it via window->global<AppState>();
-// only exported globals appear in the generated API.
-export { AppState } from "app-state.slint";
+import { DashboardPage, AboutPage } from "pages/pages.slint";
 
 export component AppWindow inherits Window {
-    title: "cpp-slint-boilerplate";
+    title: "cpp-slint-boilerplate — simple";
     preferred-width: 1024px;
     preferred-height: 680px;
     min-width: Metrics.window-min-width;
     min-height: Metrics.window-min-height;
     background: Palette.background;
 
-    // Models owned by the C++ side; the pages consume them.
-    in-out property <[StatCard]> stat-cards: [];
-    in-out property <[ActivityItem]> recent-activity: [];
+    // Pure UI state: which sidebar entry is selected.
+    in-out property <int> current-page: 0;
 
     HorizontalLayout {
         AppSidebar {
@@ -31,41 +25,22 @@ export component AppWindow inherits Window {
             brand-subtitle: "C++ · Slint";
             items: [
                 { icon-name: "home", label: "Dashboard" },
-                { icon-name: "grid", label: "Components" },
-                { icon-name: "settings", label: "Settings" },
                 { icon-name: "info", label: "About" },
             ];
-            current-index <=> AppState.current-page;
+            current-index <=> root.current-page;
             collapsed: root.width < 600px;
-            navigate(index) => {
-                AppState.request-navigation(index);
-            }
         }
 
         Rectangle {
             background: Palette.background;
 
-            if AppState.current-page == 0 : DashboardPage {
-                x: 0;
-                y: 0;
-                width: parent.width;
-                height: parent.height;
-                stat-cards: root.stat-cards;
-                recent-activity: root.recent-activity;
-            }
-            if AppState.current-page == 1 : GalleryPage {
+            if root.current-page == 0 : DashboardPage {
                 x: 0;
                 y: 0;
                 width: parent.width;
                 height: parent.height;
             }
-            if AppState.current-page == 2 : SettingsPage {
-                x: 0;
-                y: 0;
-                width: parent.width;
-                height: parent.height;
-            }
-            if AppState.current-page == 3 : AboutPage {
+            if root.current-page == 1 : AboutPage {
                 x: 0;
                 y: 0;
                 width: parent.width;

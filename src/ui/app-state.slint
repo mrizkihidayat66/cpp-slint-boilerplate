@@ -1,10 +1,12 @@
-// app-state.slint — shared types and app-wide state.
+// app-state.slint — shared types and app-wide state (simple example).
 //
-// Kept separate from app-window.slint so pages can import the structs without
-// a circular dependency on the window itself. The generated C++ lands in the
-// namespace given by slint_target_sources(... NAMESPACE app).
+// Same file as on main, minus the service-oriented fields: the simple
+// example keeps only what the markup itself consumes. The generated C++
+// lands in the namespace given by slint_target_sources(... NAMESPACE app).
 
-// Data structs shared with C++. POCOs mirror these in src/models/.
+// Data structs used directly in the markup. The simple example has no C++
+// POCOs — the dashboard arrays are literals in dashboard-page.slint, so
+// nothing here needs to be shared with C++.
 export struct StatCard {
     title: string,
     value: string,
@@ -15,22 +17,18 @@ export struct StatCard {
 
 export struct ActivityItem {
     actor: string,
-    /// Pre-built initials (e.g. "AL") — Slint cannot split strings, so the
-    /// C++ side assembles them.
     initials: string,
     action: string,
     timestamp: string,
     icon-name: string,
 }
 
-// Shared state between the UI and the C++ side. C++ pushes state via
-// property setters on this global and receives intents via callbacks.
-// The initial page can be overridden via the BOILERPLATE_START_PAGE env
-// var (read in Application) — used by the screenshot harness.
+// Shared state between pages. On this branch it is pure UI state: the
+// current page lives on the window (in-out property), and the about text is
+// a constant — no C++ pushes anything in.
 export global AppState {
-    in-out property <int> current-page: 0;
-    in-out property <string> status-message: "";
-    in-out property <string> about-text: "";
-    callback request-navigation(int);
-    callback request-quit();
+    in-out property <string> about-text: "cpp-slint-boilerplate — simple example\n\n"
+        + "This branch shows how little C++ a Slint application actually needs:\n"
+        + "create the window, run the event loop, done. All data lives in the\n"
+        + ".slint markup itself.";
 }
