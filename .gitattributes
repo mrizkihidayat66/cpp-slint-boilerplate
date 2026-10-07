@@ -1,0 +1,23 @@
+# Normalize line endings: LF in the repository, native on checkout.
+* text=auto
+
+# Source and documentation always use LF in the working tree for consistent
+# tooling (the Slint LSP, clang-format, and shell scripts all expect LF).
+*.cpp   text eol=lf
+*.h     text eol=lf
+*.slint text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.cmake text eol=lf
+*.sh    text eol=lf
+
+# Windows-specific files keep CRLF.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Binary assets.
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.ttf   binary

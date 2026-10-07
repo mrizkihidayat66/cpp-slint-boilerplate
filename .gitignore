@@ -1,0 +1,35 @@
+# Build directories (CMake presets)
+build/
+out/
+
+# Dependency caches (FetchContent / cargo)
+.deps-cache/
+
+# Rust / cargo
+.cargo/
+target/
+
+# Compile commands database (generated per-build, but sometimes copied to root)
+compile_commands.json
+
+# CMake generated files
+CMakeUserPresets.json
+
+# IDE / editor
+.vs/
+.idea/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj*
+*.code-workspace
+
+# OS artifacts
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.log

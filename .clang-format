@@ -1,0 +1,53 @@
+# Formatting rules for C++ sources. This file is normative — run
+# `clang-format -i src/**/*.{h,cpp}` (or save from the editor) before committing.
+# See docs/CODING_STYLE.md for the full style guide.
+
+BasedOnStyle: LLVM
+Standard: c++20
+
+# Layout
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+AccessModifierOffset: -4
+IndentCaseLabels: false
+NamespaceIndentation: None
+PointerAlignment: Right
+DerivePointerAlignment: false
+AlignAfterOpenBracket: Align
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# Braces: Stroustrup-flavored, functions on their own line
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterStruct: false
+  AfterNamespace: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+
+# Keep diffs quiet — no vertical alignment churn
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: false
+AlignEscapedNewlines: Left
+
+# Functions / short forms
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# Includes: own block sorted, main include first is not enforced (flat layout)
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+
+# Misc
+KeepEmptyLinesAtTheStartOfBlock: false
+MaxEmptyLinesToKeep: 1
+InsertNewlineAtEOF: true
