@@ -1,0 +1,85 @@
+@echo off
+REM build-matrix.cmd - build every branch x every preset, collecting the
+REM final binaries into build\bin\<Config>\<arch>\slint-boilerplate-<branch>.exe
+REM plus the Slint runtime DLL (shared: identical Slint version everywhere).
+REM
+REM Intermediate build trees live under build\build-win\<branch>\ and are
+REM intentionally kept (no deletion; remove that folder manually when disk
+REM space matters). Worktrees are reused across runs.
+REM
+REM The per-arch Slint dependency cache (.deps-cache\<arch>) is reused from
+REM the MAIN checkout via -DSLINT_CACHE_DIR so worktrees never re-download.
+REM vcvars is invoked per target arch so CMake's CMAKE_SYSTEM_PROCESSOR
+REM selects the right cache subdirectory (x86 vs AMD64).
+REM
+REM Usage: build-matrix.cmd [branch ...]   (default: main simple intermediate advanced)
+
+setlocal enabledelayedexpansion
+set "ROOT=%~dp0..\.."
+for %%I in ("%ROOT%") do set "ROOT=%%~fI"
+set "CMAKE=C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+set "VCVARS=C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat"
+set "BINOUT=%ROOT%\build\bin"
+set "WORK=%ROOT%\build\build-win"
+
+set BRANCHES=%*
+if "%BRANCHES%"=="" set BRANCHES=main simple intermediate advanced
+
+set FAILURES=0
+for %%B in (%BRANCHES%) do call :build_branch %%B
+echo.
+echo === DONE. Collected binaries: ===
+dir /s /b "%BINOUT%\*.exe" 2>nul
+if %FAILURES% gtr 0 echo(%FAILURES% preset build(s) FAILED - see output above.
+echo Intermediate worktrees kept under %WORK% - delete manually if desired.
+exit /b %FAILURES%
+
+:build_branch
+set "BR=%~1"
+REM Accept both "simple" and "examples/simple"
+git -C "%ROOT%" rev-parse --verify --quiet "examples/%BR%" >nul 2>&1
+if not errorlevel 1 (set "FULL=examples/%BR%") else (set "FULL=%BR%")
+
+echo.
+echo ###########################################################
+echo ### Building branch %FULL%
+echo ###########################################################
+
+set "WT=%WORK%\%BR%"
+git -C "%ROOT%" worktree prune
+if exist "%WT%\CMakeLists.txt" (
+    echo Reusing worktree at %WT%
+) else (
+    git -C "%ROOT%" worktree add --detach "%WT%" "%FULL%"
+    if errorlevel 1 (echo WORKTREE FAILED for %FULL% & set /a FAILURES+=1 & exit /b 0)
+)
+
+for %%P in (x64-debug x64-release x86-debug x86-release) do call :build_preset %BR% %%P
+exit /b 0
+
+:build_preset
+set "BR=%~1"
+set "PRESET=%~2"
+
+REM Substring checks (pure cmd - no find.exe, which may be GNU find via PATH)
+set "CFG=Debug"
+if not "%PRESET:release=%"=="%PRESET%" set "CFG=Release"
+set "ARCH=x64"
+if not "%PRESET:x86=%"=="%PRESET%" set "ARCH=x86"
+
+echo.
+echo --- %BR% / %PRESET% (%CFG% %ARCH%) ---
+call "%VCVARS%" %ARCH% >nul 2>&1
+
+set "BUILD_DIR=%WORK%\%BR%\build\%PRESET%"
+"%CMAKE%" --preset %PRESET% -S "%WT%" -B "%BUILD_DIR%" -DSLINT_CACHE_DIR="%ROOT%\.deps-cache"
+if errorlevel 1 (echo CONFIGURE FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+"%CMAKE%" --build "%BUILD_DIR%" --target slint-boilerplate
+if errorlevel 1 (echo BUILD FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+
+set "DEST=%BINOUT%\%CFG%\%ARCH%"
+if not exist "%DEST%" mkdir "%DEST%"
+copy /y "%BUILD_DIR%\slint-boilerplate.exe" "%DEST%\slint-boilerplate-%BR%.exe" >nul
+copy /y "%BUILD_DIR%\slint_cpp.dll" "%DEST%\slint_cpp.dll" >nul
+echo COLLECTED %DEST%\slint-boilerplate-%BR%.exe
+exit /b 0
