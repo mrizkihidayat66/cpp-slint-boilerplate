@@ -64,7 +64,7 @@ comparable output tree — `build/bin/<Debug|Release>/<x64|x86>/
 slint-boilerplate-<branch>.exe` — run:
 
 ```bash
-build/harness/build-matrix.cmd
+scripts/build-matrix.cmd
 ```
 
 See [docs/BRANCHES.md](docs/BRANCHES.md) for the collected-binary layout.

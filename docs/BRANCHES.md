@@ -32,7 +32,7 @@ describes its specific demo).
 
 ## Comparing all branches side by side
 
-`build/harness/build-matrix.cmd` builds every branch × every preset and
+`scripts/build-matrix.cmd` builds every branch × every preset and
 collects the finished binaries into one place for direct comparison:
 
 ```
