@@ -35,6 +35,9 @@ export global AppState {
     in-out property <int> current-page: 0;
     in-out property <string> status-message: "";
     in-out property <string> about-text: "";
+    /// Gallery scroll position as a 0..1 fraction of the scrollable range
+    /// (screenshot harness hook; UI users scroll with the wheel).
+    in-out property <float> gallery-scroll: 0;
 
     // --- Tasks (advanced branch) ---------------------------------------------
     // Rows + pagination state are pushed from C++ after every mutation;

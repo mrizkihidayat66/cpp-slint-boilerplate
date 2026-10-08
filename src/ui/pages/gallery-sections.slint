@@ -1,0 +1,358 @@
+// gallery-sections.slint — the classic gallery sections, extracted into
+// top-level components so the generated C++ stays within MSVC's block
+// nesting limit. GalleryPage instantiates them in order; interactive state
+// lives in the GalleryDemoState global (see gallery-extras.slint).
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import {
+    AppButton,
+    AppButtonVariant,
+    AppCard,
+    AppCardElevation,
+    AppSpinner,
+    AppInput,
+    AppTextarea,
+    AppCheckbox,
+    AppRadio,
+    AppSwitch,
+    AppSelect,
+    AppSlider,
+    AppProgress,
+    AppAlert,
+    AppAlertVariant,
+    AppTooltip,
+    AppTooltipPlacement,
+    AppTabs,
+    AppTabsVariant,
+    AppAvatar,
+    AppAvatarSize,
+    AppIcon,
+    AppPagination,
+    AppNavbar,
+    AppBreadcrumb,
+} from "../components/library.slint";
+import { GalleryDemoState } from "gallery-extras.slint";
+
+export component FormControlsSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Form controls";
+    subtitle: "Input, textarea, checkbox, radio, switch, select, slider";
+
+    VerticalLayout {
+        spacing: Metrics.space-4;
+
+        HorizontalLayout {
+            spacing: Metrics.space-4;
+
+            VerticalLayout {
+                spacing: Metrics.space-4;
+                horizontal-stretch: 2;
+
+                AppInput {
+                    label: "Name";
+                    placeholder: "Enter your name";
+                    icon-name: "user";
+                    text: GalleryDemoState.input-text;
+                    edited => {
+                        GalleryDemoState.input-error = GalleryDemoState.input-text.character-count > 12
+                            ? "Max 12 characters" : "";
+                    }
+                }
+                AppInput {
+                    label: "With error";
+                    text: "bad";
+                    error-text: GalleryDemoState.input-error;
+                    helper-text: "Helper text appears without an error";
+                }
+                AppInput { label: "Disabled"; text: "read only"; disabled: true; }
+            }
+
+            VerticalLayout {
+                spacing: Metrics.space-4;
+                horizontal-stretch: 1;
+
+                AppTextarea {
+                    label: "Textarea";
+                    placeholder: "Multi-line…";
+                    maxlength: 120;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: Metrics.space-6;
+
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                Text {
+                    text: "Checkbox";
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text-muted;
+                }
+                AppCheckbox { label: "Checked"; checked: GalleryDemoState.check-a; toggled => { GalleryDemoState.check-a = !GalleryDemoState.check-a; } }
+                AppCheckbox { label: "Unchecked"; checked: GalleryDemoState.check-b; }
+                AppCheckbox { label: "Disabled"; disabled: true; checked: true; }
+            }
+
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                Text {
+                    text: "Radio";
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text-muted;
+                }
+                AppRadio { label: "Option A"; value: "a"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
+                AppRadio { label: "Option B"; value: "b"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
+            }
+
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                Text {
+                    text: "Switch";
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text-muted;
+                }
+                AppSwitch { label: "Notifications"; checked: GalleryDemoState.switch-a; toggled => { GalleryDemoState.switch-a = !GalleryDemoState.switch-a; } }
+                AppSwitch { label: "Disabled"; disabled: true; }
+            }
+
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                Text {
+                    text: "Select";
+                    font-size: Typography.font-size-sm;
+                    color: Palette.text-muted;
+                }
+                AppSelect {
+                    model: ["Red", "Green", "Blue"];
+                    selected-index: GalleryDemoState.selected-index;
+                    selected(i, v) => { GalleryDemoState.selected-index = i; }
+                }
+            }
+        }
+
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            Text {
+                text: "Slider — value: " + round(GalleryDemoState.slider-value);
+                font-size: Typography.font-size-sm;
+                color: Palette.text-muted;
+            }
+            AppSlider {
+                value: GalleryDemoState.slider-value;
+                minimum: 0;
+                maximum: 100;
+                step: 1;
+                changed(v) => { GalleryDemoState.slider-value = v; }
+            }
+        }
+    }
+}
+}
+
+export component FeedbackSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Feedback";
+    subtitle: "Alerts, progress, spinner, tooltip";
+
+    VerticalLayout {
+        spacing: Metrics.space-3;
+
+        AppAlert { title: "Heads up"; text: "Info alert with a dismiss button."; variant: AppAlertVariant.info; dismissible: true; }
+        AppAlert { text: "Operation completed successfully."; variant: AppAlertVariant.success; }
+        AppAlert { text: "Something needs attention."; variant: AppAlertVariant.warning; }
+        AppAlert { text: "Something went wrong."; variant: AppAlertVariant.danger; }
+
+        HorizontalLayout {
+            spacing: Metrics.space-4;
+            alignment: start;
+
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                AppProgress { value: 0.72; show-percentage: true; }
+                AppProgress { value: -1; }  // indeterminate
+            }
+
+            Rectangle { width: 1px; background: Palette.border; }
+
+            HorizontalLayout {
+                spacing: Metrics.space-3;
+                alignment: center;
+                AppSpinner { size: 14px; }
+                AppSpinner { size: 20px; }
+                AppSpinner { size: 28px; }
+            }
+
+            Rectangle { width: 1px; background: Palette.border; }
+
+            AppTooltip {
+                text: "Hover me for a tooltip";
+                placement: AppTooltipPlacement.top;
+                Text {
+                    text: "Hover me";
+                    color: Palette.primary;
+                    font-size: Typography.font-size-md;
+                    vertical-alignment: center;
+                }
+            }
+        }
+    }
+}
+}
+
+export component AvatarsIconsSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Avatars & icons";
+    subtitle: "Initials fallback, status dot, icon set";
+
+    HorizontalLayout {
+        spacing: Metrics.space-4;
+
+        AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; }
+        AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; }
+        AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; }
+        AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; }
+
+        Rectangle { width: 1px; background: Palette.border; }
+
+        HorizontalLayout {
+            spacing: Metrics.space-3;
+            AppIcon { name: "home"; size: 18px; }
+            AppIcon { name: "settings"; size: 18px; }
+            AppIcon { name: "search"; size: 18px; }
+            AppIcon { name: "chart"; size: 18px; }
+            AppIcon { name: "calendar"; size: 18px; }
+            AppIcon { name: "document"; size: 18px; }
+            AppIcon { name: "folder"; size: 18px; }
+            AppIcon { name: "edit"; size: 18px; }
+            AppIcon { name: "trash"; size: 18px; }
+            AppIcon { name: "check"; size: 18px; }
+            AppIcon { name: "warning"; size: 18px; }
+            AppIcon { name: "activity"; size: 18px; }
+            AppIcon { name: "clock"; size: 18px; }
+            AppIcon { name: "refresh"; size: 18px; }
+            AppIcon { name: "logout"; size: 18px; }
+        }
+    }
+}
+}
+
+export component TabsPaginationSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Tabs & pagination";
+    subtitle: "Underline and pill tabs, page navigation";
+
+    VerticalLayout {
+        spacing: Metrics.space-4;
+
+        AppTabs {
+            model: ["Overview", "Analytics", "Reports"];
+            current-index: GalleryDemoState.tab-index;
+            current-index-changed(i) => { GalleryDemoState.tab-index = i; }
+        }
+
+        AppTabs {
+            model: ["One", "Two", "Three"];
+            variant: AppTabsVariant.pills;
+            current-index: GalleryDemoState.tab-index;
+        }
+
+        HorizontalLayout {
+            spacing: Metrics.space-3;
+            alignment: start;
+
+            AppPagination {
+                page: GalleryDemoState.current-page;
+                page-count: 12;
+                window-size: 2;
+                page-changed(p) => { GalleryDemoState.current-page = p; }
+            }
+        }
+    }
+}
+}
+
+export component NavigationSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Navigation";
+    subtitle: "Navbar and breadcrumb";
+
+    VerticalLayout {
+        spacing: Metrics.space-3;
+
+        Rectangle {
+            height: 48px;
+            border-radius: Metrics.radius-md;
+            clip: true;
+            AppNavbar {
+                title: "Page title";
+                subtitle: "With subtitle";
+                icon-name: "grid";
+            }
+        }
+
+        AppBreadcrumb {
+            model: ["Home", "Library", "Data"];
+            navigate(i) => { }
+        }
+    }
+}
+}
+
+export component DialogsSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Dialogs";
+    subtitle: "Modal overlay";
+
+    AppButton {
+        text: "Open dialog";
+        icon-name: "document";
+        clicked => { GalleryDemoState.dialog-open = true; }
+    }
+}
+}
+
+export component CardsSection inherits Rectangle {
+    background: transparent;
+
+AppCard {
+    title: "Cards";
+    subtitle: "Elevation presets: flat, raised, floating";
+
+    HorizontalLayout {
+        spacing: Metrics.space-4;
+
+        AppCard {
+            title: "Flat";
+            elevation: AppCardElevation.flat;
+            horizontal-stretch: 1;
+            Text { text: "bordered: true"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+        AppCard {
+            title: "Raised";
+            elevation: AppCardElevation.raised;
+            horizontal-stretch: 1;
+            Text { text: "default elevation"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+        AppCard {
+            title: "Floating";
+            elevation: AppCardElevation.floating;
+            horizontal-stretch: 1;
+            Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+    }
+}
+}
+

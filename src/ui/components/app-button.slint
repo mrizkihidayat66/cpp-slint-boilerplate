@@ -8,8 +8,9 @@ import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
 import { AppSpinner } from "app-spinner.slint";
 
-export enum AppButtonVariant { primary, secondary, outline, ghost, danger }
+export enum AppButtonVariant { primary, secondary, outline, ghost, danger, success }
 export enum AppButtonSize { sm, md, lg }
+export enum AppButtonTextAlign { left, center, right }
 
 export component AppButton inherits Rectangle {
     /// Button label. Empty string renders an icon-only button.
@@ -20,6 +21,13 @@ export component AppButton inherits Rectangle {
     in property <AppButtonSize> size: AppButtonSize.md;
     /// Leading icon name (AppIcon).
     in property <string> icon-name;
+    /// Trailing icon name (AppIcon) — e.g. chevrons for menus/next actions.
+    in property <string> trailing-icon-name;
+    /// Icon-only square button when text is empty.
+    in property <bool> square: false;
+    /// Horizontal placement of the content when the button is stretched
+    /// (block/grid cells); irrelevant otherwise.
+    in property <AppButtonTextAlign> text-align: AppButtonTextAlign.center;
     /// When true, shows a spinner and swallows clicks.
     in property <bool> loading: false;
     /// Disables interaction and mutes the visuals.
@@ -30,7 +38,9 @@ export component AppButton inherits Rectangle {
     /// Fired on click (pointer or keyboard) unless disabled or loading.
     callback clicked();
 
-    width: label-holder.preferred-width + horizontal-padding * 2;
+    width: root.square && root.text == ""
+        ? root.height
+        : label-holder.preferred-width + horizontal-padding * 2;
     height: root.size == AppButtonSize.sm ? Metrics.control-height-sm
           : root.size == AppButtonSize.lg ? Metrics.control-height-lg
           : Metrics.control-height-md;
@@ -46,15 +56,18 @@ export component AppButton inherits Rectangle {
     // --- Visual state resolution -------------------------------------------
     private property <bool> effective-disabled: root.disabled || root.loading;
     private property <bool> filled:
-        root.variant == AppButtonVariant.primary || root.variant == AppButtonVariant.danger;
+        root.variant == AppButtonVariant.primary || root.variant == AppButtonVariant.danger
+        || root.variant == AppButtonVariant.success;
     private property <color> rest-color:
         root.variant == AppButtonVariant.primary ? Palette.primary
         : root.variant == AppButtonVariant.danger ? Palette.danger
+        : root.variant == AppButtonVariant.success ? Palette.success
         : root.variant == AppButtonVariant.secondary ? Palette.surface-alt
         : Palette.surface; // outline & ghost rest on a white base
     private property <color> hover-color:
         root.variant == AppButtonVariant.primary ? Palette.primary-hover
         : root.variant == AppButtonVariant.danger ? Palette.danger-hover
+        : root.variant == AppButtonVariant.success ? Palette.success-hover
         : root.variant == AppButtonVariant.secondary ? Palette.surface-sunken
         : Palette.surface-alt;
 
@@ -86,12 +99,16 @@ export component AppButton inherits Rectangle {
 
     // --- Content -------------------------------------------------------------
     label-holder := HorizontalLayout {
-        padding-left: root.horizontal-padding;
-        padding-right: root.horizontal-padding;
+        padding-left: root.text-align == AppButtonTextAlign.left && root.block
+            ? root.horizontal-padding : 0;
+        padding-right: root.text-align == AppButtonTextAlign.right && root.block
+            ? root.horizontal-padding : 0;
         padding-top: 0;
         padding-bottom: 0;
         spacing: Metrics.space-2;
-        alignment: center;
+        alignment: root.block && root.text-align == AppButtonTextAlign.left ? start
+            : root.block && root.text-align == AppButtonTextAlign.right ? end
+            : center;
 
         if root.loading : AppSpinner {
             size: root.icon-size;
@@ -118,6 +135,16 @@ export component AppButton inherits Rectangle {
                 : Palette.text;
             vertical-alignment: center;
             overflow: elide;
+            horizontal-stretch: 1;
+        }
+
+        if !root.loading && root.trailing-icon-name != "" : AppIcon {
+            name: root.trailing-icon-name;
+            size: root.icon-size;
+            accent-color: root.effective-disabled ? Palette.text-disabled
+                : root.filled ? Palette.text-on-primary
+                : root.variant == AppButtonVariant.primary ? Palette.primary
+                : Palette.text;
         }
     }
 }

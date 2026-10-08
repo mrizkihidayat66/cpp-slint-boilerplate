@@ -1,0 +1,118 @@
+// AppDatePicker — date entry with a native-style calendar popup
+// (WinForms DateTimePicker equivalent), built on Slint's DatePickerPopup.
+//
+// The value is the std-widgets `Date` struct (year/month/day ints) so it
+// maps straight to a C++ struct in the generated API — no string parsing.
+// Two-way: `date` is in-out, so the parent can preset and read the pick.
+// `date.year == 0` means "no date" (placeholder shown).
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+import { DatePickerPopup, Date } from "std-widgets.slint";
+
+export component AppDatePicker inherits Rectangle {
+    /// Selected date. year==0 renders as empty/placeholder.
+    in-out property <Date> date: { year: 0, month: 1, day: 1 };
+    /// Placeholder when empty.
+    in property <string> placeholder: "Pick a date…";
+    in property <bool> disabled: false;
+    /// Optional floating label (matches AppInput's label).
+    in property <string> label;
+
+    /// Fired whenever a date is picked or cleared.
+    callback accepted();
+    /// Fired when the popup is dismissed without a selection.
+    callback canceled();
+
+    background: transparent;
+
+    // Popup state mirrors `date` until the user accepts a pick.
+    private property <Date> popup-date: { year: 2026, month: 10, day: 8 };
+
+    private property <bool> has-date: root.date.year > 0;
+    private property <string> month-name: ["", "Jan", "Feb", "Mar", "Apr",
+        "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        [min(12, max(1, root.date.month))];
+    private property <string> display: root.has-date
+        ? root.month-name + " " + root.date.day + ", " + root.date.year
+        : "";
+
+    function sync-popup() {
+        if (root.has-date) {
+            root.popup-date = root.date;
+        }
+    }
+
+    VerticalLayout {
+        if root.label != "" : Text {
+            text: root.label;
+            font-size: Typography.font-size-sm;
+            font-weight: Typography.font-weight-medium;
+            color: root.disabled ? Palette.text-disabled : Palette.text-muted;
+        }
+        if root.label != "" : Rectangle { height: Metrics.space-1; }
+
+        Rectangle {
+            height: Metrics.control-height-md;
+            border-radius: Metrics.radius-md;
+            background: root.disabled ? Palette.surface-alt : Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: Palette.border;
+
+            touch := TouchArea {
+                enabled: !root.disabled;
+                mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
+                clicked => {
+                    root.sync-popup();
+                    popup.show();
+                }
+            }
+
+            HorizontalLayout {
+                padding-left: Metrics.space-3;
+                padding-right: Metrics.space-2;
+                spacing: Metrics.space-2;
+
+                Text {
+                    text: root.display != "" ? root.display : root.placeholder;
+                    font-size: Typography.font-size-md;
+                    color: root.display != "" && !root.disabled
+                        ? Palette.text : Palette.text-muted;
+                    vertical-alignment: center;
+                    overflow: elide;
+                    horizontal-stretch: 1;
+                }
+
+                if root.has-date && !root.disabled : TouchArea {
+                    width: clear-glyph.width + Metrics.space-1;
+                    clicked => {
+                        root.date = { year: 0, month: 1, day: 1 };
+                        root.accepted();
+                    }
+                    clear-glyph := AppIcon {
+                        name: "close";
+                        size: Typography.font-size-sm;
+                        accent-color: Palette.text-muted;
+                    }
+                }
+
+                AppIcon {
+                    name: "calendar";
+                    size: Typography.font-size-md;
+                    accent-color: Palette.text-muted;
+                }
+            }
+        }
+    }
+
+    popup := DatePickerPopup {
+        date <=> root.popup-date;
+        accepted(d) => {
+            root.date = d;
+            root.accepted();
+        }
+        canceled => {
+            root.canceled();
+        }
+    }
+}

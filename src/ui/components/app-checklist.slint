@@ -1,0 +1,131 @@
+// AppCheckList — multi-select list box with per-item checkboxes
+// (WinForms-style CheckedListBox). The checked set is owned by the parent
+// via `checked-items` (two-way); item clicks mutate it and fire `changed`.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export struct CheckItem {
+    label: string,
+    checked: bool,
+    disabled: bool,
+}
+
+export component AppCheckList inherits Rectangle {
+    /// Items: each row = { label, checked, disabled }.
+    in property <[CheckItem]> items;
+    /// Number of rows visible before the list scrolls (sizes the box).
+    in property <int> visible-rows: 5;
+    in property <bool> disabled: false;
+    /// Optional caption pinned above the list (CheckedListBox's "label").
+    in property <string> label;
+    /// Height of each row.
+    in property <length> row-height: Metrics.control-height-md;
+
+    /// Fired on the row's checked-state toggle. The parent owns the model, so
+    /// it mutates the row and recomputes derived state (e.g. a count).
+    callback item-toggled(int, bool);
+
+    background: transparent;
+
+    VerticalLayout {
+        if root.label != "" : Text {
+            text: root.label;
+            font-size: Typography.font-size-sm;
+            font-weight: Typography.font-weight-medium;
+            color: root.disabled ? Palette.text-disabled : Palette.text-muted;
+        }
+        if root.label != "" : Rectangle { height: Metrics.space-1; }
+
+        box := Rectangle {
+            height: min(root.items.length, root.visible-rows) * root.row-height
+                + 2 * Metrics.space-2;
+            border-radius: Metrics.radius-md;
+            background: root.disabled ? Palette.surface-alt : Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: Palette.border;
+
+            if root.items.length == 0 : Text {
+                x: Metrics.space-3;
+                width: parent.width - 2 * Metrics.space-3;
+                text: "No items";
+                font-size: Typography.font-size-md;
+                color: Palette.text-faint;
+                vertical-alignment: center;
+            }
+
+            if root.items.length > 0 : Flickable {
+                x: Metrics.space-2;
+                y: Metrics.space-2;
+                width: parent.width - 2 * Metrics.space-2;
+                height: parent.height - 2 * Metrics.space-2;
+
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 0;
+
+                    for item[i] in root.items : Rectangle {
+                        height: root.row-height;
+                        width: 100%;
+
+                        row-touch := TouchArea {
+                            enabled: !root.disabled && !item.disabled;
+                            mouse-cursor: root.disabled || item.disabled
+                                ? MouseCursor.default : MouseCursor.pointer;
+                            clicked => {
+                                root.item-toggled(i, !item.checked);
+                            }
+                        }
+
+                        Rectangle {
+                            y: (parent.height - self.height) / 2;
+                            x: Metrics.space-2;
+                            width: parent.width - 2 * Metrics.space-2;
+                            height: root.row-height - Metrics.space-2;
+                            border-radius: Metrics.radius-sm;
+                            background: row-touch.has-hover && !root.disabled && !item.disabled
+                                ? Palette.surface-alt : transparent;
+
+                            HorizontalLayout {
+                                spacing: Metrics.space-2;
+                                alignment: start;
+
+                                // Checkbox square
+                                Rectangle {
+                                    width: Typography.font-size-lg;
+                                    height: Typography.font-size-lg;
+                                    y: (parent.height - self.height) / 2;
+                                    border-radius: Metrics.radius-sm;
+                                    background: item.checked && !item.disabled
+                                        ? Palette.primary
+                                        : item.checked && item.disabled
+                                            ? Palette.primary-disabled : Palette.surface;
+                                    border-width: item.checked ? 0 : Metrics.border-width;
+                                    border-color: root.disabled || item.disabled
+                                        ? Palette.border : Palette.border-strong;
+
+                                    if item.checked : AppIcon {
+                                        name: "check";
+                                        size: Typography.font-size-lg - 4px;
+                                        color: Palette.text-on-primary;
+                                        x: (parent.width - self.width) / 2;
+                                        y: (parent.height - self.height) / 2;
+                                    }
+                                }
+
+                                Text {
+                                    text: item.label;
+                                    font-size: Typography.font-size-md;
+                                    color: root.disabled || item.disabled
+                                        ? Palette.text-disabled : Palette.text;
+                                    vertical-alignment: center;
+                                    overflow: elide;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

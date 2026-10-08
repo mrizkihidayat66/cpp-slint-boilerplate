@@ -3,10 +3,21 @@
 // component with its key properties so the page doubles as documentation.
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppState } from "../app-state.slint";
+import { GalleryDemoState } from "gallery-extras.slint";
+import {
+    FormControlsSection, FeedbackSection, AvatarsIconsSection,
+    TabsPaginationSection, NavigationSection, DialogsSection, CardsSection,
+} from "gallery-sections.slint";
+import {
+    ButtonAlignmentSection, ContainersSection, DatePickerCheckListSection,
+    ImagesSection, ResponsiveGridSection, BindingSection,
+} from "gallery-extras.slint";
 import {
     AppButton,
     AppButtonVariant,
     AppButtonSize,
+    AppButtonTextAlign,
     AppCard,
     AppCardElevation,
     AppSpinner,
@@ -17,6 +28,7 @@ import {
     AppSwitch,
     AppSelect,
     AppSlider,
+    AppDatePicker,
     AppProgress,
     AppBadge,
     AppBadgeVariant,
@@ -33,6 +45,16 @@ import {
     AppPagination,
     AppNavbar,
     AppBreadcrumb,
+    AppCheckList,
+    CheckItem,
+    AppImage,
+    AppImageFit,
+    AppPanel,
+    AppPanelTone,
+    AppGroupBox,
+    AppGrid,
+    AppGridRow,
+    AppGridItem,
 } from "../components/library.slint";
 
 component SectionTitle inherits Rectangle {
@@ -61,24 +83,18 @@ component SectionTitle inherits Rectangle {
 export component GalleryPage inherits Rectangle {
     background: Palette.background;
 
-    // Interactive state
-    property <string> radio-group: "a";
-    property <int> selected-index: 0;
-    property <bool> check-a: true;
-    property <bool> check-b: false;
-    property <bool> switch-a: true;
-    property <float> slider-value: 42;
-    property <bool> dialog-open: false;
-    property <int> current-page: 3;
-    property <int> tab-index: 0;
-    property <string> input-text: "Ada Lovelace";
-    property <string> input-error: "";
-
-    Flickable {
+    flick := Flickable {
         x: 0;
         y: 0;
         width: 100%;
         height: 100%;
+
+        // Harness hook: fraction (0..1) of the scrollable height to show —
+        // set via AppState.gallery-scroll (mouse-wheel automation is flaky).
+        viewport-y: self.viewport-height > self.height
+            ? min(1, max(0, AppState.gallery-scroll))
+                * (self.viewport-height - self.height)
+            : 0;
 
         VerticalLayout {
             padding: Metrics.space-6;
@@ -146,308 +162,21 @@ export component GalleryPage inherits Rectangle {
                 }
             }
 
-            // --- Form controls -----------------------------------------------
-            AppCard {
-                title: "Form controls";
-                subtitle: "Input, textarea, checkbox, radio, switch, select, slider";
-
-                VerticalLayout {
-                    spacing: Metrics.space-4;
-
-                    HorizontalLayout {
-                        spacing: Metrics.space-4;
-
-                        VerticalLayout {
-                            spacing: Metrics.space-4;
-                            horizontal-stretch: 2;
-
-                            AppInput {
-                                label: "Name";
-                                placeholder: "Enter your name";
-                                icon-name: "user";
-                                text: root.input-text;
-                                edited => {
-                                    root.input-error = root.input-text.character-count > 12
-                                        ? "Max 12 characters" : "";
-                                }
-                            }
-                            AppInput {
-                                label: "With error";
-                                text: "bad";
-                                error-text: root.input-error;
-                                helper-text: "Helper text appears without an error";
-                            }
-                            AppInput { label: "Disabled"; text: "read only"; disabled: true; }
-                        }
-
-                        VerticalLayout {
-                            spacing: Metrics.space-4;
-                            horizontal-stretch: 1;
-
-                            AppTextarea {
-                                label: "Textarea";
-                                placeholder: "Multi-line…";
-                                maxlength: 120;
-                            }
-                        }
-                    }
-
-                    HorizontalLayout {
-                        spacing: Metrics.space-6;
-
-                        VerticalLayout {
-                            spacing: Metrics.space-2;
-                            Text {
-                                text: "Checkbox";
-                                font-size: Typography.font-size-sm;
-                                color: Palette.text-muted;
-                            }
-                            AppCheckbox { label: "Checked"; checked: root.check-a; toggled => { root.check-a = !root.check-a; } }
-                            AppCheckbox { label: "Unchecked"; checked: root.check-b; }
-                            AppCheckbox { label: "Disabled"; disabled: true; checked: true; }
-                        }
-
-                        VerticalLayout {
-                            spacing: Metrics.space-2;
-                            Text {
-                                text: "Radio";
-                                font-size: Typography.font-size-sm;
-                                color: Palette.text-muted;
-                            }
-                            AppRadio { label: "Option A"; value: "a"; group-value: root.radio-group; selected(v) => { root.radio-group = v; } }
-                            AppRadio { label: "Option B"; value: "b"; group-value: root.radio-group; selected(v) => { root.radio-group = v; } }
-                        }
-
-                        VerticalLayout {
-                            spacing: Metrics.space-2;
-                            Text {
-                                text: "Switch";
-                                font-size: Typography.font-size-sm;
-                                color: Palette.text-muted;
-                            }
-                            AppSwitch { label: "Notifications"; checked: root.switch-a; toggled => { root.switch-a = !root.switch-a; } }
-                            AppSwitch { label: "Disabled"; disabled: true; }
-                        }
-
-                        VerticalLayout {
-                            spacing: Metrics.space-2;
-                            Text {
-                                text: "Select";
-                                font-size: Typography.font-size-sm;
-                                color: Palette.text-muted;
-                            }
-                            AppSelect {
-                                model: ["Red", "Green", "Blue"];
-                                selected-index: root.selected-index;
-                                selected(i, v) => { root.selected-index = i; }
-                            }
-                        }
-                    }
-
-                    VerticalLayout {
-                        spacing: Metrics.space-2;
-                        Text {
-                            text: "Slider — value: " + round(root.slider-value);
-                            font-size: Typography.font-size-sm;
-                            color: Palette.text-muted;
-                        }
-                        AppSlider {
-                            value: root.slider-value;
-                            minimum: 0;
-                            maximum: 100;
-                            step: 1;
-                            changed(v) => { root.slider-value = v; }
-                        }
-                    }
-                }
-            }
-
-            // --- Feedback ----------------------------------------------------
-            AppCard {
-                title: "Feedback";
-                subtitle: "Alerts, progress, spinner, tooltip";
-
-                VerticalLayout {
-                    spacing: Metrics.space-3;
-
-                    AppAlert { title: "Heads up"; text: "Info alert with a dismiss button."; variant: AppAlertVariant.info; dismissible: true; }
-                    AppAlert { text: "Operation completed successfully."; variant: AppAlertVariant.success; }
-                    AppAlert { text: "Something needs attention."; variant: AppAlertVariant.warning; }
-                    AppAlert { text: "Something went wrong."; variant: AppAlertVariant.danger; }
-
-                    HorizontalLayout {
-                        spacing: Metrics.space-4;
-                        alignment: start;
-
-                        VerticalLayout {
-                            spacing: Metrics.space-2;
-                            AppProgress { value: 0.72; show-percentage: true; }
-                            AppProgress { value: -1; }  // indeterminate
-                        }
-
-                        Rectangle { width: 1px; background: Palette.border; }
-
-                        HorizontalLayout {
-                            spacing: Metrics.space-3;
-                            alignment: center;
-                            AppSpinner { size: 14px; }
-                            AppSpinner { size: 20px; }
-                            AppSpinner { size: 28px; }
-                        }
-
-                        Rectangle { width: 1px; background: Palette.border; }
-
-                        AppTooltip {
-                            text: "Hover me for a tooltip";
-                            placement: AppTooltipPlacement.top;
-                            Text {
-                                text: "Hover me";
-                                color: Palette.primary;
-                                font-size: Typography.font-size-md;
-                                vertical-alignment: center;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // --- Avatars & icons ---------------------------------------------
-            AppCard {
-                title: "Avatars & icons";
-                subtitle: "Initials fallback, status dot, icon set";
-
-                HorizontalLayout {
-                    spacing: Metrics.space-4;
-
-                    AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; }
-                    AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; }
-                    AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; }
-                    AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; }
-
-                    Rectangle { width: 1px; background: Palette.border; }
-
-                    HorizontalLayout {
-                        spacing: Metrics.space-3;
-                        AppIcon { name: "home"; size: 18px; }
-                        AppIcon { name: "settings"; size: 18px; }
-                        AppIcon { name: "search"; size: 18px; }
-                        AppIcon { name: "chart"; size: 18px; }
-                        AppIcon { name: "calendar"; size: 18px; }
-                        AppIcon { name: "document"; size: 18px; }
-                        AppIcon { name: "folder"; size: 18px; }
-                        AppIcon { name: "edit"; size: 18px; }
-                        AppIcon { name: "trash"; size: 18px; }
-                        AppIcon { name: "check"; size: 18px; }
-                        AppIcon { name: "warning"; size: 18px; }
-                        AppIcon { name: "activity"; size: 18px; }
-                        AppIcon { name: "clock"; size: 18px; }
-                        AppIcon { name: "refresh"; size: 18px; }
-                        AppIcon { name: "logout"; size: 18px; }
-                    }
-                }
-            }
-
-            // --- Tabs & pagination -------------------------------------------
-            AppCard {
-                title: "Tabs & pagination";
-                subtitle: "Underline and pill tabs, page navigation";
-
-                VerticalLayout {
-                    spacing: Metrics.space-4;
-
-                    AppTabs {
-                        model: ["Overview", "Analytics", "Reports"];
-                        current-index: root.tab-index;
-                        current-index-changed(i) => { root.tab-index = i; }
-                    }
-
-                    AppTabs {
-                        model: ["One", "Two", "Three"];
-                        variant: AppTabsVariant.pills;
-                        current-index: root.tab-index;
-                    }
-
-                    HorizontalLayout {
-                        spacing: Metrics.space-3;
-                        alignment: start;
-
-                        AppPagination {
-                            page: root.current-page;
-                            page-count: 12;
-                            window-size: 2;
-                            page-changed(p) => { root.current-page = p; }
-                        }
-                    }
-                }
-            }
-
-            // --- Navigation --------------------------------------------------
-            AppCard {
-                title: "Navigation";
-                subtitle: "Navbar and breadcrumb";
-
-                VerticalLayout {
-                    spacing: Metrics.space-3;
-
-                    Rectangle {
-                        height: 48px;
-                        border-radius: Metrics.radius-md;
-                        clip: true;
-                        AppNavbar {
-                            title: "Page title";
-                            subtitle: "With subtitle";
-                            icon-name: "grid";
-                        }
-                    }
-
-                    AppBreadcrumb {
-                        model: ["Home", "Library", "Data"];
-                        navigate(i) => { }
-                    }
-                }
-            }
-
-            // --- Dialogs -----------------------------------------------------
-            AppCard {
-                title: "Dialogs";
-                subtitle: "Modal overlay";
-
-                AppButton {
-                    text: "Open dialog";
-                    icon-name: "document";
-                    clicked => { root.dialog-open = true; }
-                }
-            }
-
-            // --- Cards -------------------------------------------------------
-            AppCard {
-                title: "Cards";
-                subtitle: "Elevation presets: flat, raised, floating";
-
-                HorizontalLayout {
-                    spacing: Metrics.space-4;
-
-                    AppCard {
-                        title: "Flat";
-                        elevation: AppCardElevation.flat;
-                        horizontal-stretch: 1;
-                        Text { text: "bordered: true"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
-                    }
-                    AppCard {
-                        title: "Raised";
-                        elevation: AppCardElevation.raised;
-                        horizontal-stretch: 1;
-                        Text { text: "default elevation"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
-                    }
-                    AppCard {
-                        title: "Floating";
-                        elevation: AppCardElevation.floating;
-                        horizontal-stretch: 1;
-                        Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
-                    }
-                }
-            }
-
+            FormControlsSection { width: 100%; }
+            FeedbackSection { width: 100%; }
+            AvatarsIconsSection { width: 100%; }
+            TabsPaginationSection { width: 100%; }
+            NavigationSection { width: 100%; }
+            DialogsSection { width: 100%; }
+            CardsSection { width: 100%; }
+            // --- Extended sections (separate components to keep
+            // the generated code within MSVC nesting limits) -----
+            ButtonAlignmentSection { width: 100%; }
+            ContainersSection { width: 100%; }
+            DatePickerCheckListSection { width: 100%; }
+            ImagesSection { width: 100%; }
+            ResponsiveGridSection { width: 100%; page-width: root.width; }
+            BindingSection { width: 100%; }
             Rectangle { height: Metrics.space-4; }
         }
     }
@@ -459,10 +188,10 @@ export component GalleryPage inherits Rectangle {
         width: root.width;
         height: root.height;
 
-        open: root.dialog-open;
+        open: GalleryDemoState.dialog-open;
         title: "Confirm action";
-        accepted => { root.dialog-open = false; }
-        rejected => { root.dialog-open = false; }
+        accepted => { GalleryDemoState.dialog-open = false; }
+        rejected => { GalleryDemoState.dialog-open = false; }
 
         VerticalLayout {
             spacing: Metrics.space-4;
@@ -475,8 +204,8 @@ export component GalleryPage inherits Rectangle {
             HorizontalLayout {
                 spacing: Metrics.space-2;
                 alignment: end;
-                AppButton { text: "Cancel"; variant: AppButtonVariant.outline; clicked => { root.dialog-open = false; } }
-                AppButton { text: "Confirm"; clicked => { root.dialog-open = false; } }
+                AppButton { text: "Cancel"; variant: AppButtonVariant.outline; clicked => { GalleryDemoState.dialog-open = false; } }
+                AppButton { text: "Confirm"; clicked => { GalleryDemoState.dialog-open = false; } }
             }
         }
     }

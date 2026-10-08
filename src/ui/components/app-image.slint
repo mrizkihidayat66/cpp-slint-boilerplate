@@ -1,0 +1,74 @@
+// AppImage — image display with fit modes and placeholder/fallback
+// (WinForms PictureBox). The source is the `image` type: set it from C++
+// with slint::Image::load_from_path(...) (or load_from_embedded_data for
+// in-memory bytes). When empty, a themed placeholder with an optional
+// caption is shown so a missing picture stays visible, never blank.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export enum AppImageFit { contain, cover, fill }
+
+export component AppImage inherits Rectangle {
+    /// The image. Empty shows the placeholder.
+    in property <image> source;
+    /// Alt/caption text shown on the placeholder.
+    in property <string> caption;
+    /// Fit mode when the aspect ratio differs (contain/cover/fill).
+    in property <AppImageFit> fit: AppImageFit.contain;
+    /// Corner radius; also used for `cover` clipping.
+    in property <length> corner-radius: Metrics.radius-md;
+    /// Dimmed backdrop behind a transparent PNG/SVG.
+    in property <bool> checkered: false;
+    /// Fallback icon shown when source is empty or fails to load.
+    in property <string> fallback-icon: "image";
+    /// Stretch to fill the parent layout (width and height) instead of the
+    /// natural 120px square.
+    in property <bool> fill: false;
+
+    horizontal-stretch: root.fill ? 1 : 0;
+    vertical-stretch: root.fill ? 1 : 0;
+
+    width: 120px;
+    height: 120px;
+    border-radius: root.corner-radius;
+    clip: true;
+    background: root.checkered ? Palette.surface-alt : Palette.background;
+    border-width: Metrics.border-width;
+    border-color: Palette.border;
+
+    if root.source.width > 0 : Image {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        image-fit: root.fit == AppImageFit.cover ? ImageFit.cover
+            : root.fit == AppImageFit.fill ? ImageFit.fill
+            : ImageFit.contain;
+        source: root.source;
+    }
+
+    if root.source.width == 0 : Rectangle {
+        // Themed placeholder: dim surface + centered glyph + optional caption.
+        background: Palette.surface-alt;
+        AppIcon {
+            name: root.fallback-icon;
+            size: min(parent.width, parent.height) / 3;
+            accent-color: Palette.text-faint;
+            x: (parent.width - self.width) / 2;
+            y: root.caption != ""
+                ? parent.height / 2 - self.height - Metrics.space-1
+                : (parent.height - self.height) / 2;
+        }
+        if root.caption != "" : Text {
+            x: Metrics.space-2;
+            width: parent.width - 2 * Metrics.space-2;
+            y: parent.height / 2 + Metrics.space-1;
+            text: root.caption;
+            font-size: Typography.font-size-xs;
+            color: Palette.text-faint;
+            horizontal-alignment: center;
+            overflow: elide;
+        }
+    }
+}

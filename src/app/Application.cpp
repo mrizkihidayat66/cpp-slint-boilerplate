@@ -106,6 +106,15 @@ void Application::bindUiCallbacks()
         }
     }
 
+    // BOILERPLATE_GALLERY_SCROLL scrolls the gallery to a 0..1 fraction of
+    // its scrollable height (screenshot harness; wheel automation is flaky).
+    if (const char *scroll = std::getenv("BOILERPLATE_GALLERY_SCROLL")) {
+        const float fraction = std::atof(scroll);
+        if (fraction > 0.0f && fraction <= 1.0f) {
+            state.set_gallery_scroll(fraction);
+        }
+    }
+
     state.on_request_navigation([&state](int page) {
         // Page indices mirror the sidebar entries (see app-window.slint).
         if (page >= 0 && page < kPageCount) {

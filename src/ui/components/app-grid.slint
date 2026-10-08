@@ -1,0 +1,62 @@
+// AppGrid — responsive grid helpers (Bootstrap-style 12-column semantics).
+//
+// Slint's GridLayout colspan must be a compile-time constant, so a grid whose
+// column count changes at runtime cannot be expressed with GridLayout alone.
+// Instead AppGrid gives you the responsive *vocabulary*:
+//
+//   • AppGrid        — container that resolves Bootstrap-aligned breakpoints
+//                      from its own width (at-sm/md/lg/xl) and normalizes
+//                      spacing/padding across its rows.
+//   • AppGridRow     — one visual row: a HorizontalLayout that distributes
+//                      width among its children proportionally to each
+//                      child's `span` (1..12), wrapping is done by the caller
+//                      by placing items in multiple AppGridRows, and spans
+//                      may read the grid's breakpoint flags.
+//
+//   grid := AppGrid {
+//       AppGridRow {
+//           AppGridItem { span: grid.at-lg ? 3 : 12; … }   // 4-up → stacked
+//           AppGridItem { span: grid.at-lg ? 3 : 12; … }
+//       }
+//   }
+//
+// Items within a row share height (stretch) so cards align; a row whose
+// spans total 12 fills the width exactly.
+
+import { Metrics } from "../theme/theme.slint";
+
+export component AppGridItem inherits Rectangle {
+    /// Column span (1..12) — relative weight within its AppGridRow.
+    in property <int> span: 12;
+    horizontal-stretch: max(1, min(12, root.span));
+    background: transparent;
+}
+
+export component AppGridRow inherits HorizontalLayout {
+    spacing: root.grid-gap;
+    alignment: start;
+    // Items stretch to the tallest sibling so card rows stay aligned.
+    // (Vertical stretch is GridLayout/HBoxLayout default per cell.)
+
+    /// Gap inherited from the parent AppGrid (set by the container).
+    in property <length> grid-gap: Metrics.space-4;
+}
+
+export component AppGrid inherits VerticalLayout {
+    /// Gutter between cells (both axes).
+    in property <length> gap: Metrics.space-4;
+
+    /// Width the breakpoints resolve against. Bind this to the page's own
+    /// width (NOT something derived from the grid — that would loop):
+    ///
+    ///     grid := AppGrid { viewport-width: root.width; … }
+    in property <length> viewport-width;
+
+    /// Breakpoint flags (Bootstrap-aligned, min-width based).
+    out property <bool> at-sm: root.viewport-width >= 576px;
+    out property <bool> at-md: root.viewport-width >= 768px;
+    out property <bool> at-lg: root.viewport-width >= 992px;
+    out property <bool> at-xl: root.viewport-width >= 1200px;
+
+    spacing: root.gap;
+}

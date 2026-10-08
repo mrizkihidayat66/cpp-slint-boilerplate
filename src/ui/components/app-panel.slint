@@ -1,0 +1,61 @@
+// AppPanel — bordered content surface with an optional title
+// (WinForms Panel). Lighter than AppCard: no shadow, no header slot, just
+// a titled frame for grouping content. Padding is applied to @children.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export enum AppPanelTone { surface, tinted, sunken, transparent }
+
+export component AppPanel inherits Rectangle {
+    /// Panel title. Empty hides the title row.
+    in property <string> title;
+    /// Leading title icon name (AppIcon).
+    in property <string> icon-name;
+    /// Content padding (named to avoid clashing with the element `padding`).
+    in property <length> content-padding: Metrics.space-4;
+    /// Fill the parent layout instead of hugging content.
+    in property <bool> fill: false;
+    /// Show the border. When false the panel is just padding + title.
+    in property <bool> bordered: true;
+    /// Optional tinted background ("" = plain surface color).
+    in property <AppPanelTone> tone: AppPanelTone.surface;
+
+    // Height is driven by the layout: stretch in a Horizontal/VerticalLayout
+    // (fill: true adds stretch weights) or hug the content otherwise.
+    horizontal-stretch: root.fill ? 1 : 0;
+    vertical-stretch: root.fill ? 1 : 0;
+    border-radius: Metrics.radius-lg;
+    background: root.tone == AppPanelTone.surface ? Palette.surface
+        : root.tone == AppPanelTone.tinted ? Palette.primary-tint
+        : root.tone == AppPanelTone.sunken ? Palette.surface-alt
+        : transparent;
+    border-width: root.bordered ? Metrics.border-width : 0;
+    border-color: Palette.border;
+
+    content := VerticalLayout {
+        padding: root.content-padding;
+        spacing: Metrics.space-2;
+
+        if root.title != "" || root.icon-name != "" : HorizontalLayout {
+            spacing: Metrics.space-2;
+            alignment: start;
+
+            if root.icon-name != "" : AppIcon {
+                name: root.icon-name;
+                size: Typography.font-size-md;
+                accent-color: Palette.primary;
+            }
+            if root.title != "" : Text {
+                text: root.title;
+                font-size: Typography.font-size-sm;
+                font-weight: Typography.font-weight-semibold;
+                color: Palette.text;
+                vertical-alignment: center;
+                letter-spacing: 0.4px;
+            }
+        }
+
+        @children
+    }
+}
