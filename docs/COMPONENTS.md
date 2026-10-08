@@ -52,15 +52,18 @@ Every component follows the same rules (see also
 
 #### AppButton
 
-| Property   | Type               | Default                      | Description                        |
-| ---------- | ------------------ | ---------------------------- | ---------------------------------- |
-| `text`     | `string`           | `""`                         | Label (empty → icon-only)          |
-| `variant`  | `AppButtonVariant` | `primary`                    | `primary` `secondary` `outline` `ghost` `danger` |
-| `size`     | `AppButtonSize`    | `md`                         | `sm` `md` `lg`                     |
-| `icon`     | `image`            | —                            | Leading icon                       |
-| `loading`  | `bool`             | `false`                      | Spinner + swallow clicks           |
-| `disabled` | `bool`             | `false`                      | Muted, non-interactive             |
-| `block`    | `bool`             | `false`                      | Full width                         |
+| Property       | Type                 | Default | Description                              |
+| -------------- | -------------------- | ------- | ---------------------------------------- |
+| `text`         | `string`             | `""`    | Label (empty + `square` → icon button)   |
+| `variant`      | `AppButtonVariant`   | `primary` | `primary` `secondary` `outline` `ghost` `danger` `success` |
+| `size`         | `AppButtonSize`      | `md`    | `sm` `md` `lg`                           |
+| `icon-name`    | `string`             | `""`    | Leading icon (AppIcon name)              |
+| `trailing-icon-name` | `string`       | `""`    | Trailing icon (chevrons, next actions)   |
+| `text-align`   | `AppButtonTextAlign` | `center`| `left` `center` `right` (block buttons)  |
+| `square`       | `bool`               | `false` | Square icon-only button (width = height) |
+| `loading`      | `bool`               | `false` | Spinner + swallow clicks                 |
+| `disabled`     | `bool`               | `false` | Muted, non-interactive                   |
+| `block`        | `bool`               | `false` | Full width                               |
 
 Callback: `clicked()`.
 
@@ -222,17 +225,79 @@ Callback `page-changed(int)`.
 Unknown names render the warning glyph — extend `AppIcons` in
 `app-icon.slint` when you need more.
 
+### Forms (extended)
+
+#### AppCheckList
+
+`items: [CheckItem{label, checked, disabled}]`, `visible-rows` (scroll cap),
+`label`, `row-height`, `disabled`. Callback `item-toggled(index, checked)` —
+the owner mutates the model (and any derived state) from it; per-row
+`checked` may bind to individual properties so toggles fan out (see the
+gallery's chain-reaction demo).
+
+#### AppDatePicker
+
+`date: Date` (in-out; `year == 0` = none → placeholder), `placeholder`,
+`label`, `disabled`. Callbacks `accepted()`, `canceled()`. Built on the
+std-widgets `DatePickerPopup`; `Date` is the std-widgets struct
+(`{year, month, day}`), which maps to a plain C++ struct in the generated
+API — no string parsing anywhere.
+
+### Containers (grouping)
+
+#### AppPanel
+
+`title`, `icon-name`, `tone: AppPanelTone` (`surface` `tinted` `sunken`
+`transparent`), `content-padding`, `bordered`, `fill` (stretch weights).
+Content via `@children`. Lighter than AppCard: no shadow, no header slot.
+
+#### AppGroupBox
+
+`title`, `icon-name`, `content-padding`, `fill`. Content via `@children`.
+Classic fieldset look: the caption floats on the top border.
+
+### Media
+
+#### AppImage
+
+`source: image` (empty → themed placeholder + optional caption), `fit:
+AppImageFit` (`contain` `cover` `fill`), `corner-radius`, `checkered`,
+`fill`, `fallback-icon`. Set the source from C++ with
+`slint::Image::load_from_path(...)` (or `load_from_embedded_data`).
+
+### Layout
+
+#### AppGrid / AppGridRow / AppGridItem
+
+Bootstrap-aligned responsive grid vocabulary. `AppGrid` exposes breakpoint
+flags (`at-sm/md/lg/xl`, min-width 576/768/992/1200 px) resolved against a
+caller-supplied `viewport-width` — bind it to a width that never derives
+from the grid's own content (the page's width), or the binding loops.
+`AppGridRow` is a HorizontalLayout; `AppGridItem.span` (1..12) is the
+relative width weight within its row.
+
+```slint
+grid := AppGrid {
+    viewport-width: root.width;
+    AppGridRow {
+        AppGridItem { span: grid.at-lg ? 3 : 12; AppCard { ... } }
+    }
+}
+```
+
 ## Responsive patterns
 
 Slint has no CSS media queries; the idiomatic equivalents used here:
 
 1. **Width-threshold conditionals** — e.g. the app shell:
    `collapsed: root.width < 600px` on the sidebar
-2. **`block` properties** — stretch controls full-width inside narrow
+2. **`AppGrid` breakpoint flags** — Bootstrap-style `at-sm/md/lg/xl` for
+   span-based column layouts (see Layout above)
+3. **`block` properties** — stretch controls full-width inside narrow
    containers
-3. **`horizontal-stretch` / `vertical-stretch`** — let layouts redistribute
+4. **`horizontal-stretch` / `vertical-stretch`** — let layouts redistribute
    space instead of hardcoding sizes
-4. **Token-derived sizes** — preferred sizes come from `Metrics`, so a theme
+5. **Token-derived sizes** — preferred sizes come from `Metrics`, so a theme
    change reflows everything
 
 ## Adding a component

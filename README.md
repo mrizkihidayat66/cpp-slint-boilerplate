@@ -59,6 +59,16 @@ The task chain has its own test suite (`tests/unit/TestTasks.cpp`): seed /
 insert / update / remove, validation rules, duplicate rejection, sort
 invariants, pagination clamping, and post-delete ordering.
 
+To build **every branch** (main + simple/intermediate/advanced) into one
+comparable output tree — `build/bin/<Debug|Release>/<x64|x86>/
+slint-boilerplate-<branch>.exe` — run:
+
+```bash
+build/harness/build-matrix.cmd
+```
+
+See [docs/BRANCHES.md](docs/BRANCHES.md) for the collected-binary layout.
+
 ## Prerequisites
 
 - CMake 3.21+ and a C++20 compiler (MSVC 2022, GCC 12+, or Clang 15+)
