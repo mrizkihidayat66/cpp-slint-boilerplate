@@ -37,9 +37,8 @@ private:
     void bindUiCallbacks();
     void loadInitialData();
 
-    /// Push settings values into the AppState global (and mirror the theme).
-    /// AppState is taken by const-ref: generated globals are handed out as
-    /// const&, but their setters are const methods.
+    /// Push the service-owned settings into the AppState global and flip
+    /// the Palette theme flag (live light/dark switch).
     void pushSettings(const ::app::AppState &state, const models::AppSettings &settings);
 
     ServiceLocator m_services;

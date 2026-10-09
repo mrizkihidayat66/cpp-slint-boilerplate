@@ -20,10 +20,14 @@ export component AppBreadcrumb inherits Rectangle {
         for crumb[i] in root.model : HorizontalLayout {
             spacing: Metrics.space-2;
 
-            if i > 0 : AppIcon {
-                name: "chevron-right";
-                size: Typography.font-size-xs;
-                color: Palette.text-disabled;
+            if i > 0 : VerticalLayout {
+                // Fixed-height separator centered against the crumb text.
+                alignment: center;
+                AppIcon {
+                    name: "chevron-right";
+                    size: Typography.font-size-xs;
+                    accent-color: Palette.text-disabled;
+                }
             }
 
             crumb-area := TouchArea {

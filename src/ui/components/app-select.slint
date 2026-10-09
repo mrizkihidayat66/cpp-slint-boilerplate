@@ -25,6 +25,11 @@ export component AppSelect inherits Rectangle {
         root.selected-index >= 0 && root.selected-index < root.model.length
             ? root.model[root.selected-index]
             : "";
+    // ListView's preferred-height is undefined (viewport widget) — compute
+    // the popup height from the option count so every option is reachable.
+    private property <length> option-height: Metrics.control-height-sm;
+    private property <length> popup-height:
+        min((root.model.length + 0.5) * root.option-height, 240px);
 
     touch := TouchArea {
         enabled: !root.disabled;
@@ -32,8 +37,6 @@ export component AppSelect inherits Rectangle {
         clicked => {
             root.open = !root.open;
         }
-        // Close when clicking anywhere else.
-        property <bool> outside-click: self.pressed && !root.open;
     }
 
     background: root.disabled ? Palette.surface-alt : Palette.surface;
@@ -51,14 +54,18 @@ export component AppSelect inherits Rectangle {
             color: root.selected-text != "" && !root.disabled ? Palette.text : Palette.text-muted;
             vertical-alignment: center;
             overflow: elide;
+            horizontal-stretch: 1;
         }
 
-        Rectangle { horizontal-stretch: 0; }
-
-        AppIcon {
-            name: root.open ? "chevron-up" : "chevron-down";
-            size: Typography.font-size-sm;
-            accent-color: Palette.text-muted;
+        // Fixed-height chevron centered vertically — a bare child in a
+        // HorizontalLayout aligns to the TOP.
+        VerticalLayout {
+            alignment: center;
+            AppIcon {
+                name: root.open ? "chevron-up" : "chevron-down";
+                size: Typography.font-size-sm;
+                accent-color: Palette.text-muted;
+            }
         }
     }
 
@@ -72,14 +79,16 @@ export component AppSelect inherits Rectangle {
         border-color: Palette.border;
         drop-shadow-blur: Metrics.elevation-2;
         drop-shadow-color: Palette.shadow;
-        height: min(list-view.preferred-height, 240px);
+        clip: true;
+        height: root.popup-height;
 
-        list-view := ListView {
+        ListView {
             x: Metrics.space-1;
             width: parent.width - 2 * Metrics.space-1;
             height: parent.height;
+
             for option[i] in root.model : Rectangle {
-                height: Metrics.control-height-sm;
+                height: root.option-height;
                 border-radius: Metrics.radius-sm;
                 background: i == root.selected-index ? Palette.info-surface : transparent;
 
@@ -91,14 +100,16 @@ export component AppSelect inherits Rectangle {
                     }
                 }
 
-                Text {
-                    x: Metrics.space-2;
-                    y: parent.height / 2 - self.height / 2;
-                    text: option;
-                    font-size: Typography.font-size-md;
-                    color: i == root.selected-index ? Palette.primary : Palette.text;
-                    overflow: elide;
-                    width: parent.width - 2 * Metrics.space-2;
+                HorizontalLayout {
+                    padding-left: Metrics.space-2;
+                    Text {
+                        text: option;
+                        font-size: Typography.font-size-md;
+                        color: i == root.selected-index ? Palette.primary : Palette.text;
+                        vertical-alignment: center;
+                        overflow: elide;
+                        horizontal-stretch: 1;
+                    }
                 }
             }
         }

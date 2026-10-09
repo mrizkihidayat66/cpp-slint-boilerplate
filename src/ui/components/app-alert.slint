@@ -49,13 +49,18 @@ export component AppAlert inherits Rectangle {
         spacing: Metrics.space-2;
         alignment: start;
 
-        AppIcon {
-            name: root.variant == AppAlertVariant.success ? "check"
-                : root.variant == AppAlertVariant.warning ? "warning"
-                : root.variant == AppAlertVariant.danger ? "error"
-                : "info";
-            size: Typography.font-size-md;
-            accent-color: root.accent;
+        // Fixed-height icon centered vertically — a bare child in a
+        // HorizontalLayout aligns to the TOP.
+        VerticalLayout {
+            alignment: center;
+            AppIcon {
+                name: root.variant == AppAlertVariant.success ? "check"
+                    : root.variant == AppAlertVariant.warning ? "warning"
+                    : root.variant == AppAlertVariant.danger ? "error"
+                    : "info";
+                size: Typography.font-size-md;
+                accent-color: root.accent;
+            }
         }
 
         VerticalLayout {
@@ -76,13 +81,16 @@ export component AppAlert inherits Rectangle {
             }
         }
 
-        if root.dismissible : TouchArea {
-            width: close-icon.size + Metrics.space-2;
-            clicked => { root.dismissed(); }
-            close-icon := AppIcon {
-                name: "close";
-                size: Typography.font-size-sm;
-                accent-color: Palette.text-muted;
+        if root.dismissible : VerticalLayout {
+            alignment: center;
+            dismiss-touch := TouchArea {
+                width: close-icon.size + Metrics.space-2;
+                clicked => { root.dismissed(); }
+                close-icon := AppIcon {
+                    name: "close";
+                    size: Typography.font-size-sm;
+                    accent-color: Palette.text-muted;
+                }
             }
         }
     }

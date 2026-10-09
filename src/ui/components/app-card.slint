@@ -68,12 +68,14 @@ export component AppCard inherits Rectangle {
                     font-size: Typography.font-size-lg;
                     font-weight: Typography.font-weight-semibold;
                     color: Palette.text;
+                    vertical-alignment: center;
                 }
                 if root.subtitle != "" : Text {
                     text: root.subtitle;
                     font-size: Typography.font-size-sm;
                     color: Palette.text-muted;
                     overflow: elide;
+                    vertical-alignment: center;
                 }
             }
         }

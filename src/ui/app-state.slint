@@ -41,12 +41,13 @@ export global AppState {
     in-out property <bool> auto-start: false;
     in-out property <int> language-index: 0;
 
+    /// Fired by the settings page's Save button; C++ persists via
+    /// SettingsService and re-pushes the normalized values.
+    callback request-save-settings();
+    /// Fired by the settings page's Reset button; C++ re-pushes the values
+    /// the service owns (discarding unsaved edits).
+    callback request-reload-settings();
+
     callback request-navigation(int);
     callback request-quit();
-    // Fired by the settings page's Save button; C++ persists via
-    // SettingsService, then confirms through status-message.
-    callback request-save-settings();
-    // Fired by the settings page's Reset button; C++ re-pushes the values
-    // the service currently owns (discarding unsaved edits).
-    callback request-reload-settings();
 }
