@@ -3,9 +3,9 @@ REM build-matrix.cmd - build every branch x every preset, collecting the
 REM final binaries into build\bin\<Config>\<arch>\slint-boilerplate-<branch>.exe
 REM plus the Slint runtime DLL (shared: identical Slint version everywhere).
 REM
-REM Intermediate build trees live under build\build-win\<branch>\ and are
-REM intentionally kept (no deletion; remove that folder manually when disk
-REM space matters). Worktrees are reused across runs.
+REM Intermediate build trees live under build\build-win\<arch>\<branch>\ and
+REM are intentionally kept (no deletion; remove that folder manually when
+REM disk space matters). Worktrees are reused across runs.
 REM
 REM The per-arch Slint dependency cache (.deps-cache\<arch>) is reused from
 REM the MAIN checkout via -DSLINT_CACHE_DIR so worktrees never re-download.
@@ -15,7 +15,7 @@ REM
 REM Usage: build-matrix.cmd [branch ...]   (default: main simple intermediate advanced)
 
 setlocal enabledelayedexpansion
-set "ROOT=%~dp0..\.."
+set "ROOT=%~dp0.."
 for %%I in ("%ROOT%") do set "ROOT=%%~fI"
 set "CMAKE=C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 set "VCVARS=C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat"
@@ -45,15 +45,7 @@ echo ###########################################################
 echo ### Building branch %FULL%
 echo ###########################################################
 
-set "WT=%WORK%\%BR%"
-git -C "%ROOT%" worktree prune
-if exist "%WT%\CMakeLists.txt" (
-    echo Reusing worktree at %WT%
-) else (
-    git -C "%ROOT%" worktree add --detach "%WT%" "%FULL%"
-    if errorlevel 1 (echo WORKTREE FAILED for %FULL% & set /a FAILURES+=1 & exit /b 0)
-)
-
+set "WT_PREV="
 for %%P in (x64-debug x64-release x86-debug x86-release) do call :build_preset %BR% %%P
 exit /b 0
 
@@ -69,13 +61,32 @@ if not "%PRESET:x86=%"=="%PRESET%" set "ARCH=x86"
 
 echo.
 echo --- %BR% / %PRESET% (%CFG% %ARCH%) ---
-call "%VCVARS%" %ARCH% >nul 2>&1
 
-set "BUILD_DIR=%WORK%\%BR%\build\%PRESET%"
+set "WT=%WORK%\%ARCH%\%BR%"
+if not "%WT%"=="%WT_PREV%" (
+    git -C "%ROOT%" worktree prune
+    if exist "%WT%\CMakeLists.txt" (
+        echo Reusing worktree at %WT%
+    ) else (
+        git -C "%ROOT%" worktree add --detach "%WT%" "%FULL%"
+        if errorlevel 1 (echo WORKTREE FAILED for %FULL% & set /a FAILURES+=1 & exit /b 0)
+    )
+    set "WT_PREV=%WT%"
+)
+set "BUILD_DIR=%WT%\build\%PRESET%"
+
+REM vcvarsall prepends to PATH on every call; repeated calls grow the
+REM environment until cmd dies with "The input line is too long".
+REM Build each preset inside setlocal/endlocal so the polluted
+REM environment is discarded afterwards.
+setlocal
+call "%VCVARS%" %ARCH% >nul 2>&1
+if errorlevel 1 (endlocal & echo VCVARS FAILED for %ARCH% & set /a FAILURES+=1 & exit /b 0)
 "%CMAKE%" --preset %PRESET% -S "%WT%" -B "%BUILD_DIR%" -DSLINT_CACHE_DIR="%ROOT%\.deps-cache"
-if errorlevel 1 (echo CONFIGURE FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+if errorlevel 1 (endlocal & echo CONFIGURE FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
 "%CMAKE%" --build "%BUILD_DIR%" --target slint-boilerplate
-if errorlevel 1 (echo BUILD FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+if errorlevel 1 (endlocal & echo BUILD FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+endlocal
 
 set "DEST=%BINOUT%\%CFG%\%ARCH%"
 if not exist "%DEST%" mkdir "%DEST%"
