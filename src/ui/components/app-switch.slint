@@ -52,7 +52,7 @@ export component AppSwitch inherits Rectangle {
     }
 
     label-text := Text {
-        y: root.track-height / 2 - self.height / 2;
+        y: (root.height - self.preferred-height) / 2;
         x: root.label-first ? root.track-width + Metrics.space-3 : 0;
         width: root.label != "" ? root.width - root.track-width - Metrics.space-3 : 0;
         text: root.label;

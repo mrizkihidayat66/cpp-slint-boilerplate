@@ -1,0 +1,73 @@
+// AppGroupBox — titled frame that visually groups a form section
+// (WinForms GroupBox / HTML fieldset). The title floats on the top border
+// with a small horizontal inset, the classic fieldset look.
+
+import { Palette, Typography, Metrics } from "../theme/theme.slint";
+import { AppIcon } from "app-icon.slint";
+
+export component AppGroupBox inherits Rectangle {
+    /// Caption on the frame's top border. Empty hides the caption.
+    in property <string> title;
+    /// Leading caption icon name (AppIcon).
+    in property <string> icon-name;
+    /// Content padding (named to avoid clashing with the element `padding`).
+    in property <length> content-padding: Metrics.space-4;
+    /// Fill the parent layout instead of hugging content.
+    in property <bool> fill: false;
+
+    // Height is driven by the layout (stretch or hug) — same contract as
+    // AppPanel; see the note there.
+    horizontal-stretch: root.fill ? 1 : 0;
+    vertical-stretch: root.fill ? 1 : 0;
+    border-radius: Metrics.radius-md;
+    border-width: Metrics.border-width;
+    border-color: Palette.border;
+    background: transparent;
+
+    // Content inset leaves room for the caption that sits on the top border.
+    content := VerticalLayout {
+        y: root.has-title ? Metrics.space-3 : root.content-padding;
+        height: parent.height
+            - (root.has-title ? Metrics.space-3 : root.content-padding)
+            - root.content-padding;
+        padding-left: root.content-padding;
+        padding-right: root.content-padding;
+        spacing: Metrics.space-3;
+
+        @children
+    }
+
+    private property <bool> has-title: root.title != "" || root.icon-name != "";
+
+    if root.has-title : Rectangle {
+        x: Metrics.space-4;
+        y: -8px;
+        height: 16px;
+        width: title-row.preferred-width + 2 * Metrics.space-2;
+        background: transparent; // the page background shows through the gap
+
+        title-row := HorizontalLayout {
+            padding-left: Metrics.space-2;
+            padding-right: Metrics.space-2;
+            spacing: Metrics.space-2;
+            alignment: start;
+
+            if root.icon-name != "" : VerticalLayout {
+                // Fixed-height icon centered against the caption text.
+                alignment: center;
+                AppIcon {
+                    name: root.icon-name;
+                    size: Typography.font-size-sm;
+                    accent-color: Palette.text-muted;
+                }
+            }
+            Text {
+                text: root.title;
+                font-size: Typography.font-size-sm;
+                font-weight: Typography.font-weight-semibold;
+                color: Palette.text-muted;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

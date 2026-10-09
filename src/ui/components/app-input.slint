@@ -58,10 +58,15 @@ export component AppInput inherits Rectangle {
                 padding-right: Metrics.space-2;
                 spacing: Metrics.space-2;
 
-                if root.icon-name != "" : AppIcon {
-                    name: root.icon-name;
-                    size: Typography.font-size-md;
-                    accent-color: root.disabled ? Palette.text-disabled : Palette.text-muted;
+                // Fixed-height icon centered vertically — a bare child in a
+                // HorizontalLayout aligns to the TOP.
+                if root.icon-name != "" : VerticalLayout {
+                    alignment: center;
+                    AppIcon {
+                        name: root.icon-name;
+                        size: Typography.font-size-md;
+                        accent-color: root.disabled ? Palette.text-disabled : Palette.text-muted;
+                    }
                 }
 
                 input := TextInput {
@@ -76,17 +81,20 @@ export component AppInput inherits Rectangle {
                     edited => { root.edited(); }
                 }
 
-                if root.clearable && !root.disabled && !root.read-only && root.text != "" : TouchArea {
-                    width: clear-glyph.width + Metrics.space-1;
-                    clicked => {
-                        root.text = "";
-                        root.cleared();
-                        root.edited();
-                    }
-                    clear-glyph := AppIcon {
-                        name: "close";
-                        size: Typography.font-size-sm;
-                        accent-color: Palette.text-muted;
+                if root.clearable && !root.disabled && !root.read-only && root.text != "" : VerticalLayout {
+                    alignment: center;
+                    clear-touch := TouchArea {
+                        width: clear-glyph.width + Metrics.space-1;
+                        clicked => {
+                            root.text = "";
+                            root.cleared();
+                            root.edited();
+                        }
+                        clear-glyph := AppIcon {
+                            name: "close";
+                            size: Typography.font-size-sm;
+                            accent-color: Palette.text-muted;
+                        }
                     }
                 }
             }

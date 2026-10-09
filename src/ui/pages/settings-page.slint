@@ -1,10 +1,24 @@
-// settings-page.slint — stub on the main branch.
+// settings-page.slint — real settings form, persisted by SettingsService.
 //
-// The full settings implementation (persisted SettingsService, theme toggle,
-// form controls showcase) lands on the examples/intermediate branch.
+// Controls bind two-way straight to AppState; the Save button fires
+// request-save-settings (C++ persists + sets status-message), Reset fires
+// request-reload-settings (C++ re-pushes the persisted values, which flow
+// back into the controls through the bindings).
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
-import { AppCard, AppIcon, AppButton, AppButtonVariant } from "../components/library.slint";
+import { AppState } from "../app-state.slint";
+import {
+    AppCard,
+    AppInput,
+    AppSelect,
+    AppSwitch,
+    AppButton,
+    AppButtonVariant,
+    AppAlert,
+    AppAlertVariant,
+    AppBadge,
+    AppBadgeVariant,
+} from "../components/library.slint";
 
 export component SettingsPage inherits Rectangle {
     background: Palette.background;
@@ -25,35 +39,210 @@ export component SettingsPage inherits Rectangle {
                 y: Metrics.space-6;
                 spacing: Metrics.space-5;
 
-                VerticalLayout {
-                    spacing: 2px;
-                    Text {
-                        text: "Settings";
-                        font-size: Typography.font-size-xl;
-                        font-weight: Typography.font-weight-bold;
-                        color: Palette.text;
+                // --- Header ------------------------------------------------------------
+                HorizontalLayout {
+                    spacing: Metrics.space-4;
+                    alignment: space-between;
+
+                    VerticalLayout {
+                        alignment: center;
+                        spacing: 2px;
+                        Text {
+                            text: "Settings";
+                            font-size: Typography.font-size-xl;
+                            font-weight: Typography.font-weight-bold;
+                            color: Palette.text;
+                            vertical-alignment: center;
+                        }
+                        Text {
+                            text: "Preferences are persisted to %APPDATA%\\cpp-slint-boilerplate\\settings.json";
+                            font-size: Typography.font-size-md;
+                            color: Palette.text-muted;
+                            vertical-alignment: center;
+                        }
                     }
-                    Text {
-                        text: "Configure the application";
-                        font-size: Typography.font-size-md;
-                        color: Palette.text-muted;
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
+                        alignment: center;
+                        AppBadge {
+                            text: AppState.dark ? "Dark theme" : "Light theme";
+                            variant: AppState.dark
+                                ? AppBadgeVariant.info
+                                : AppBadgeVariant.neutral;
+                            dot: true;
+                        }
                     }
                 }
 
+                // --- Profile card -------------------------------------------------------
                 AppCard {
-                    title: "Coming in examples/intermediate";
-                    subtitle: "This page is a stub on the main branch";
+                    title: "Profile";
+                    subtitle: "Shown in the sidebar footer";
+                    header-icon-name: "users";
+
+                    VerticalLayout {
+                        spacing: Metrics.space-4;
+
+                        AppInput {
+                            label: "Display name";
+                            placeholder: "Your name";
+                            text <=> AppState.display-name;
+                            icon-name: "users";
+                            helper-text: "3–32 characters";
+                        }
+                    }
+                }
+
+                // --- Appearance card ----------------------------------------------------
+                AppCard {
+                    title: "Appearance";
+                    subtitle: "Applies when you save";
                     header-icon-name: "settings";
 
-                    Text {
-                        text: "The intermediate example branch implements a real settings form —\n"
-                            + "inputs, switches, and selects — backed by a persisted\n"
-                            + "SettingsService (%APPDATA% JSON).";
-                        font-size: Typography.font-size-md;
-                        color: Palette.text-muted;
-                        wrap: word-wrap;
+                    HorizontalLayout {
+                        spacing: Metrics.space-4;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Dark theme";
+                                font-size: Typography.font-size-md;
+                                font-weight: Typography.font-weight-medium;
+                                color: Palette.text;
+                            }
+                            Text {
+                                text: "Switch between light and dark palettes";
+                                font-size: Typography.font-size-sm;
+                                color: Palette.text-muted;
+                            }
+                        }
+                        Rectangle { horizontal-stretch: 1; }
+                        AppSwitch {
+                            checked <=> AppState.dark;
+                        }
                     }
                 }
+
+                // --- Behavior card ------------------------------------------------------
+                AppCard {
+                    title: "Behavior";
+                    subtitle: "Application-level switches";
+                    header-icon-name: "activity";
+
+                    VerticalLayout {
+                        spacing: Metrics.space-4;
+
+                        HorizontalLayout {
+                            spacing: Metrics.space-4;
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Desktop notifications";
+                                    font-size: Typography.font-size-md;
+                                    font-weight: Typography.font-weight-medium;
+                                    color: Palette.text;
+                                }
+                                Text {
+                                    text: "Show a toast when a task completes";
+                                    font-size: Typography.font-size-sm;
+                                    color: Palette.text-muted;
+                                }
+                            }
+                            Rectangle { horizontal-stretch: 1; }
+                            AppSwitch {
+                                checked <=> AppState.notifications;
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: Metrics.space-4;
+                            VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: "Launch on system start";
+                                    font-size: Typography.font-size-md;
+                                    font-weight: Typography.font-weight-medium;
+                                    color: Palette.text;
+                                }
+                                Text {
+                                    text: "Start minimized in the tray";
+                                    font-size: Typography.font-size-sm;
+                                    color: Palette.text-muted;
+                                }
+                            }
+                            Rectangle { horizontal-stretch: 1; }
+                            AppSwitch {
+                                checked <=> AppState.auto-start;
+                            }
+                        }
+                    }
+                }
+
+                // --- Language card ------------------------------------------------------
+                AppCard {
+                    title: "Language";
+                    subtitle: "Interface language";
+                    header-icon-name: "document";
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-4;
+
+                        VerticalLayout {
+                            spacing: 2px;
+                            Text {
+                                text: "Interface language";
+                                font-size: Typography.font-size-md;
+                                font-weight: Typography.font-weight-medium;
+                                color: Palette.text;
+                            }
+                            Text {
+                                text: "Requires a restart to fully apply";
+                                font-size: Typography.font-size-sm;
+                                color: Palette.text-muted;
+                            }
+                        }
+                        Rectangle { horizontal-stretch: 1; }
+
+                        VerticalLayout {
+                            alignment: center;
+                            AppSelect {
+                                width: 160px;
+                                model: ["English", "Bahasa Indonesia"];
+                                selected-index <=> AppState.language-index;
+                            }
+                        }
+                    }
+                }
+
+                // --- Save bar ------------------------------------------------------------
+                HorizontalLayout {
+                    height: 56px;
+                    alignment: end;
+                    spacing: Metrics.space-3;
+
+                    if AppState.status-message != "" : AppAlert {
+                        variant: AppAlertVariant.success;
+                        title: "Saved";
+                        text: AppState.status-message;
+                        vertical-stretch: 1;
+                    }
+
+                    AppButton {
+                        variant: AppButtonVariant.outline;
+                        text: "Reset";
+                        icon-name: "refresh";
+                        clicked => { AppState.request-reload-settings(); }
+                    }
+                    AppButton {
+                        variant: AppButtonVariant.primary;
+                        text: "Save settings";
+                        icon-name: "check";
+                        clicked => { AppState.request-save-settings(); }
+                    }
+                }
+
+                Rectangle { height: 8px; }
             }
         }
     }

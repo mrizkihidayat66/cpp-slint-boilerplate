@@ -83,10 +83,15 @@ export component AppTable inherits Rectangle {
                     overflow: elide;
                 }
 
-                if root.sort-column == c : AppIcon {
-                    name: root.sort-ascending ? "chevron-up" : "chevron-down";
-                    size: Typography.font-size-xs;
-                    color: Palette.primary;
+                // Fixed-height sort indicator centered vertically — a bare
+                // child in a HorizontalLayout aligns to the TOP.
+                if root.sort-column == c : VerticalLayout {
+                    alignment: center;
+                    AppIcon {
+                        name: root.sort-ascending ? "chevron-up" : "chevron-down";
+                        size: Typography.font-size-xs;
+                        accent-color: Palette.primary;
+                    }
                 }
             }
         }
@@ -113,14 +118,21 @@ export component AppTable inherits Rectangle {
             HorizontalLayout {
                 padding: 0;
 
-                for cell[i] in row.cells : Text {
-                    width: root.width * (root.columns[i].weight > 0 ? root.columns[i].weight : 1)
-                        / root.total-weight;
-                    text: cell;
-                    font-size: Typography.font-size-sm;
-                    color: Palette.text;
-                    vertical-alignment: center;
-                    overflow: elide;
+                for cell[i] in row.cells : HorizontalLayout {
+                    // Same left inset as the header so body text lines up
+                    // with the column titles.
+                    padding-left: Metrics.space-3;
+                    padding-right: Metrics.space-2;
+
+                    Text {
+                        width: root.width * (root.columns[i].weight > 0 ? root.columns[i].weight : 1)
+                            / root.total-weight;
+                        text: cell;
+                        font-size: Typography.font-size-sm;
+                        color: Palette.text;
+                        vertical-alignment: center;
+                        overflow: elide;
+                    }
                 }
             }
 

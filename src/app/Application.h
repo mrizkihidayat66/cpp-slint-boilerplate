@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "app/ServiceLocator.h"
+#include "models/SettingsModels.h"
 #include "app-window.h"
 
 namespace cpp_slint_boilerplate::app {
@@ -35,6 +36,10 @@ private:
     void registerServices();
     void bindUiCallbacks();
     void loadInitialData();
+
+    /// Push the service-owned settings into the AppState global and flip
+    /// the Palette theme flag (live light/dark switch).
+    void pushSettings(const ::app::AppState &state, const models::AppSettings &settings);
 
     ServiceLocator m_services;
 
