@@ -216,17 +216,17 @@ export component SettingsPage inherits Rectangle {
                 }
 
                 // --- Save bar ------------------------------------------------------------
+                // Status alert on its own line so it never competes with
+                // the buttons for width; buttons get a fixed-height row.
+                if AppState.status-message != "" : AppAlert {
+                    variant: AppAlertVariant.success;
+                    title: "Saved";
+                    text: AppState.status-message;
+                }
+
                 HorizontalLayout {
-                    height: 56px;
                     alignment: end;
                     spacing: Metrics.space-3;
-
-                    if AppState.status-message != "" : AppAlert {
-                        variant: AppAlertVariant.success;
-                        title: "Saved";
-                        text: AppState.status-message;
-                        vertical-stretch: 1;
-                    }
 
                     AppButton {
                         variant: AppButtonVariant.outline;

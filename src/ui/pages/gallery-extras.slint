@@ -69,33 +69,37 @@ export component ButtonAlignmentSection inherits Rectangle {
 
 AppCard {
     title: "Button content alignment";
-    subtitle: "Left / center / right within stretched buttons, trailing icons";
+    subtitle: "Equal widths, simple left / center / right";
 
     VerticalLayout {
         spacing: Metrics.space-2;
 
-        AppButton {
-            text: "Left aligned";
-            icon-name: "plus";
-            block: true;
-            text-align: AppButtonTextAlign.left;
-        }
-        AppButton {
-            text: "Center aligned";
-            icon-name: "grid";
-            block: true;
-            text-align: AppButtonTextAlign.center;
-        }
-        AppButton {
-            text: "Right aligned";
-            icon-name: "settings";
-            trailing-icon-name: "chevron-right";
-            block: true;
-            text-align: AppButtonTextAlign.right;
-            variant: AppButtonVariant.secondary;
-        }
+        // Three equal-width buttons in one row — `block` stretches each
+        // to an equal share, and `text-align` does exactly what it says.
         HorizontalLayout {
             spacing: Metrics.space-2;
+            AppButton {
+                text: "Left";
+                block: true;
+                text-align: AppButtonTextAlign.left;
+            }
+            AppButton {
+                text: "Center";
+                block: true;
+                text-align: AppButtonTextAlign.center;
+            }
+            AppButton {
+                text: "Right";
+                block: true;
+                text-align: AppButtonTextAlign.right;
+            }
+        }
+
+        // Icon variants on their own line, out of the alignment demo.
+        HorizontalLayout {
+            spacing: Metrics.space-2;
+            AppButton { text: "With icon"; icon-name: "plus"; }
+            AppButton { text: "Trailing"; trailing-icon-name: "chevron-right"; }
             AppButton { icon-name: "edit"; square: true; }
             AppButton { icon-name: "trash"; square: true; variant: AppButtonVariant.danger; }
             AppButton { icon-name: "check"; square: true; variant: AppButtonVariant.success; }
@@ -277,45 +281,75 @@ export component ResponsiveGridSection inherits Rectangle {
 
 AppCard {
     title: "Responsive grid";
-    subtitle: "12-column AppGrid — resize the window and watch cells reflow";
+    subtitle: "12-column AppGrid, Bootstrap-style spans — resize the window";
 
-    grid := AppGrid {
-        gap: Metrics.space-3;
-        viewport-width: root.page-width;
+    VerticalLayout {
+        spacing: Metrics.space-3;
 
-        // 4-up on large, 2-up on small, stacked on extra-small.
-        AppGridRow {
-            grid-gap: Metrics.space-3;
-            AppGridItem {
-                span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                AppCard { title: "1"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-            }
-            AppGridItem {
-                span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                AppCard { title: "2"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-            }
+        // Live breakpoint readout makes the reflow observable.
+        Text {
+            text: "viewport: " + floor(grid.viewport-width / 1px) + "px — "
+                + (grid.at-xl ? "xl (≥1200px): 3 columns"
+                : grid.at-lg ? "lg (≥992px): 3 columns"
+                : grid.at-md ? "md (≥768px): 2 columns"
+                : grid.at-sm ? "sm (≥576px): 2 columns"
+                : "xs (<576px): stacked");
+            font-size: Typography.font-size-sm;
+            color: Palette.text-muted;
         }
-        AppGridRow {
-            grid-gap: Metrics.space-3;
-            AppGridItem {
-                span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                AppCard { title: "3"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+
+        grid := AppGrid {
+            gap: Metrics.space-3;
+            viewport-width: root.page-width;
+
+            // 4-up on large, 2-up on small, stacked on extra-small.
+            AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem {
+                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
+                    AppCard { title: "1"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
+                    AppCard { title: "2"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
+                    AppCard { title: "3"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
+                    AppCard { title: "4"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
             }
-            AppGridItem {
-                span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                AppCard { title: "4"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+            // Column merging: full-width, then two halves, on one row the
+            // span arithmetic wraps Bootstrap-style.
+            AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem {
+                    span: 12;
+                    AppCard { title: "Full width"; height: 64px; Text { text: "span 12 — the whole row"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-sm ? 6 : 12;
+                    AppCard { title: "Half"; height: 64px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-sm ? 6 : 12;
+                    AppCard { title: "Half"; height: 64px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
             }
-        }
-        // 2-up on large, stacked below.
-        AppGridRow {
-            grid-gap: Metrics.space-3;
-            AppGridItem {
-                span: grid.at-lg ? 6 : 12;
-                AppCard { title: "5"; height: 88px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-            }
-            AppGridItem {
-                span: grid.at-lg ? 6 : 12;
-                AppCard { title: "6"; height: 88px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+            // 2-up on large, stacked below.
+            AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem {
+                    span: grid.at-lg ? 6 : 12;
+                    AppCard { title: "5"; height: 88px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
+                AppGridItem {
+                    span: grid.at-lg ? 6 : 12;
+                    AppCard { title: "6"; height: 88px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                }
             }
         }
     }

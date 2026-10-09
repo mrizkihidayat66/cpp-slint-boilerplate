@@ -68,17 +68,12 @@ AppCard {
                 }
                 AppInput { label: "Disabled"; text: "read only"; disabled: true; }
             }
+        }
 
-            VerticalLayout {
-                spacing: Metrics.space-4;
-                horizontal-stretch: 1;
-
-                AppTextarea {
-                    label: "Textarea";
-                    placeholder: "Multi-line…";
-                    maxlength: 120;
-                }
-            }
+        AppTextarea {
+            label: "Textarea";
+            placeholder: "Multi-line…";
+            maxlength: 120;
         }
 
         HorizontalLayout {
@@ -106,6 +101,10 @@ AppCard {
                 AppRadio { label: "Option A"; value: "a"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
                 AppRadio { label: "Option B"; value: "b"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
             }
+        }
+
+        HorizontalLayout {
+            spacing: Metrics.space-6;
 
             VerticalLayout {
                 spacing: Metrics.space-2;
@@ -117,19 +116,19 @@ AppCard {
                 AppSwitch { label: "Notifications"; checked: GalleryDemoState.switch-a; toggled => { GalleryDemoState.switch-a = !GalleryDemoState.switch-a; } }
                 AppSwitch { label: "Disabled"; disabled: true; }
             }
+        }
 
-            VerticalLayout {
-                spacing: Metrics.space-2;
-                Text {
-                    text: "Select";
-                    font-size: Typography.font-size-sm;
-                    color: Palette.text-muted;
-                }
-                AppSelect {
-                    model: ["Red", "Green", "Blue"];
-                    selected-index: GalleryDemoState.selected-index;
-                    selected(i, v) => { GalleryDemoState.selected-index = i; }
-                }
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            Text {
+                text: "Select";
+                font-size: Typography.font-size-sm;
+                color: Palette.text-muted;
+            }
+            AppSelect {
+                model: ["Red", "Green", "Blue"];
+                selected-index: GalleryDemoState.selected-index;
+                selected(i, v) => { GalleryDemoState.selected-index = i; }
             }
         }
 

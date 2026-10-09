@@ -139,8 +139,16 @@ export component GalleryPage inherits Rectangle {
                         AppButton { text: "Small"; size: AppButtonSize.sm; }
                         AppButton { text: "Medium"; size: AppButtonSize.md; }
                         AppButton { text: "Large"; size: AppButtonSize.lg; }
+                    }
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
                         AppButton { text: "With icon"; icon-name: "plus"; }
                         AppButton { text: "Loading"; loading: true; }
+                    }
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
                         AppButton { text: "Disabled"; disabled: true; }
                     }
                 }
@@ -151,13 +159,15 @@ export component GalleryPage inherits Rectangle {
                 title: "Badges";
                 subtitle: "Semantic variants, pill and dot styles";
 
+                // Every variant carries a dot — the dot is the semantic-
+                // variant marker, not a per-variant special case.
                 HorizontalLayout {
                     spacing: Metrics.space-2;
-                    AppBadge { text: "Primary"; }
+                    AppBadge { text: "Primary"; dot: true; }
                     AppBadge { text: "Success"; variant: AppBadgeVariant.success; dot: true; }
-                    AppBadge { text: "Warning"; variant: AppBadgeVariant.warning; }
+                    AppBadge { text: "Warning"; variant: AppBadgeVariant.warning; dot: true; }
                     AppBadge { text: "Danger"; variant: AppBadgeVariant.danger; dot: true; }
-                    AppBadge { text: "Info"; variant: AppBadgeVariant.info; }
+                    AppBadge { text: "Info"; variant: AppBadgeVariant.info; dot: true; }
                     AppBadge { text: "Pill neutral"; variant: AppBadgeVariant.neutral; pill: true; }
                 }
             }

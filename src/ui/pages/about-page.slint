@@ -2,7 +2,7 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
-import { AppCard, AppButton, AppButtonVariant } from "../components/library.slint";
+import { AppCard } from "../components/library.slint";
 
 export component AboutPage inherits Rectangle {
     background: Palette.background;
@@ -24,6 +24,7 @@ export component AboutPage inherits Rectangle {
                 y: Metrics.space-6;
                 spacing: Metrics.space-5;
 
+                // --- Header — same shell as the other pages.
                 VerticalLayout {
                     spacing: 2px;
                     Text {
@@ -41,6 +42,7 @@ export component AboutPage inherits Rectangle {
                     }
                 }
 
+                // --- Application — full-width, key facts about the build.
                 AppCard {
                     title: "cpp-slint-boilerplate";
                     subtitle: "A professional C++20 + Slint desktop application boilerplate";

@@ -36,6 +36,7 @@ export component AppSelect inherits Rectangle {
         mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
         clicked => {
             root.open = !root.open;
+            if (root.open) { popup.show(); } else { popup.close(); }
         }
     }
 
@@ -69,9 +70,11 @@ export component AppSelect inherits Rectangle {
         }
     }
 
-    if root.open : popup := Rectangle {
+    // PopupWindow renders in a top layer above everything — a plain child
+    // Rectangle would be covered by siblings painted after this component.
+    popup := PopupWindow {
         x: 0;
-        y: parent.height + Metrics.space-1;
+        y: root.height + Metrics.space-1;
         width: root.width;
         border-radius: Metrics.radius-md;
         background: Palette.surface;
@@ -97,6 +100,7 @@ export component AppSelect inherits Rectangle {
                         root.selected-index = i;
                         root.selected(i, option);
                         root.open = false;
+                        popup.close();
                     }
                 }
 

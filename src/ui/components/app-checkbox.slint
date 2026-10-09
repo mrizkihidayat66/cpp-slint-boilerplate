@@ -28,6 +28,7 @@ export component AppCheckbox inherits Rectangle {
     }
 
     box := Rectangle {
+        x: 0;
         width: root.box-size;
         height: root.box-size;
         y: (root.height - root.box-size) / 2;
@@ -40,7 +41,7 @@ export component AppCheckbox inherits Rectangle {
 
         if root.checked : AppIcon {
             name: "check";
-            size: root.box-size - 4px;
+            size: root.box-size - 1px;
             color: Palette.text-on-primary;
             x: (parent.width - self.width) / 2;
             y: (parent.height - self.height) / 2;
