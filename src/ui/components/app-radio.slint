@@ -39,6 +39,7 @@ export component AppRadio inherits Rectangle {
     circle := Rectangle {
         width: root.circle-size;
         height: root.circle-size;
+        y: (root.height - root.circle-size) / 2;
         border-radius: root.circle-size / 2;
         background: Palette.surface;
         border-width: root.is-checked() ? Metrics.border-width-strong : Metrics.border-width;
@@ -50,12 +51,14 @@ export component AppRadio inherits Rectangle {
             height: root.circle-size / 2;
             border-radius: self.width / 2;
             background: root.disabled ? Palette.primary-disabled : Palette.primary;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
         }
     }
 
     label-text := Text {
         x: root.circle-size + Metrics.space-2;
-        y: root.circle-size / 2 - self.height / 2;
+        y: (root.height - self.preferred-height) / 2;
         text: root.label;
         font-size: Typography.font-size-md;
         color: root.disabled ? Palette.text-disabled : Palette.text;

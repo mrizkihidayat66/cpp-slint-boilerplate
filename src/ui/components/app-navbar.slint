@@ -32,9 +32,13 @@ export component AppNavbar inherits Rectangle {
         spacing: Metrics.space-3;
         alignment: start;
 
-        if root.icon-name != "" : AppIcon {
-            name: root.icon-name;
-            size: Typography.font-size-lg;
+        if root.icon-name != "" : VerticalLayout {
+            // Fixed-height icon centered vertically in the navbar band.
+            alignment: center;
+            AppIcon {
+                name: root.icon-name;
+                size: Typography.font-size-lg;
+            }
         }
 
         VerticalLayout {

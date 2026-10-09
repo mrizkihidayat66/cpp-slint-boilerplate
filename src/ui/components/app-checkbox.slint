@@ -30,6 +30,7 @@ export component AppCheckbox inherits Rectangle {
     box := Rectangle {
         width: root.box-size;
         height: root.box-size;
+        y: (root.height - root.box-size) / 2;
         border-radius: Metrics.radius-sm;
         background: root.checked || (root.indeterminate && !root.checked)
             ? (root.disabled ? Palette.primary-disabled : Palette.primary)
@@ -41,18 +42,22 @@ export component AppCheckbox inherits Rectangle {
             name: "check";
             size: root.box-size - 4px;
             color: Palette.text-on-primary;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
         }
         if !root.checked && root.indeterminate : Rectangle {
             width: root.box-size / 2;
             height: 2px;
             border-radius: 1px;
             background: Palette.text-on-primary;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
         }
     }
 
     label-text := Text {
         x: root.box-size + Metrics.space-2;
-        y: root.box-size / 2 - self.height / 2;
+        y: (root.height - self.preferred-height) / 2;
         text: root.label;
         font-size: Typography.font-size-md;
         color: root.disabled ? Palette.text-disabled : Palette.text;

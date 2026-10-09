@@ -64,11 +64,13 @@ export component DashboardPage inherits Rectangle {
                             font-size: Typography.font-size-xl;
                             font-weight: Typography.font-weight-bold;
                             color: Palette.text;
+                            vertical-alignment: center;
                         }
                         Text {
                             text: "Overview of your workspace activity";
                             font-size: Typography.font-size-md;
                             color: Palette.text-muted;
+                            vertical-alignment: center;
                         }
                     }
 
@@ -185,18 +187,18 @@ export component DashboardPage inherits Rectangle {
                                         font-weight: Typography.font-weight-medium;
                                         color: Palette.text;
                                         overflow: elide;
+                                        vertical-alignment: center;
                                     }
                                     Text {
                                         text: activity.action;
                                         font-size: Typography.font-size-sm;
                                         color: Palette.text-muted;
                                         overflow: elide;
+                                        vertical-alignment: center;
                                     }
                                 }
 
-                                // Spacer
-                                Rectangle { horizontal-stretch: 1; }
-
+                                // Timestamp pinned to the right edge.
                                 HorizontalLayout {
                                     alignment: center;
                                     Text {
