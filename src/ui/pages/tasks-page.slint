@@ -57,11 +57,13 @@ export component TasksPage inherits Rectangle {
                     font-size: Typography.font-size-xl;
                     font-weight: Typography.font-weight-bold;
                     color: Palette.text;
+                    vertical-alignment: center;
                 }
                 Text {
                     text: "Repository → Validation → Service chain, sortable and paginated";
                     font-size: Typography.font-size-md;
                     color: Palette.text-muted;
+                    vertical-alignment: center;
                 }
             }
 
@@ -154,21 +156,13 @@ export component TasksPage inherits Rectangle {
                     }
                 }
 
-                if !AppState.tasks-loading && AppState.tasks-total > 0 : Rectangle {
-                    height: Metrics.control-height-sm;
+                if !AppState.tasks-loading && AppState.tasks-total > 0 : VerticalLayout {
+                    spacing: Metrics.space-2;
 
+                    // Centered pagination bar — the hint moved to a caption
+                    // line below the table so pagination owns the row.
                     HorizontalLayout {
-                        spacing: Metrics.space-3;
                         alignment: center;
-
-                        Text {
-                            text: "Click a row to edit · click headers to sort";
-                            font-size: Typography.font-size-sm;
-                            color: Palette.text-faint;
-                            vertical-alignment: center;
-                        }
-                        Rectangle { horizontal-stretch: 1; }
-
                         AppPagination {
                             page: AppState.tasks-page;
                             page-count: AppState.tasks-page-count;
@@ -176,6 +170,13 @@ export component TasksPage inherits Rectangle {
                                 AppState.request-task-page(p);
                             }
                         }
+                    }
+
+                    Text {
+                        text: "Click a row to edit · click headers to sort";
+                        horizontal-alignment: center;
+                        font-size: Typography.font-size-sm;
+                        color: Palette.text-faint;
                     }
                 }
             }

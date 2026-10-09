@@ -52,10 +52,14 @@ export component AppGroupBox inherits Rectangle {
             spacing: Metrics.space-2;
             alignment: start;
 
-            if root.icon-name != "" : AppIcon {
-                name: root.icon-name;
-                size: Typography.font-size-sm;
-                accent-color: Palette.text-muted;
+            if root.icon-name != "" : VerticalLayout {
+                // Fixed-height icon centered against the caption text.
+                alignment: center;
+                AppIcon {
+                    name: root.icon-name;
+                    size: Typography.font-size-sm;
+                    accent-color: Palette.text-muted;
+                }
             }
             Text {
                 text: root.title;

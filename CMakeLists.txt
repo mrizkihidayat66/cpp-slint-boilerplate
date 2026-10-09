@@ -28,6 +28,7 @@ add_library(boilerplate-core STATIC
     src/models/TaskModels.cpp
     src/services/DashboardService.cpp
     src/services/AboutService.cpp
+    src/services/SettingsService.cpp
     src/services/TaskRepository.cpp
     src/services/TaskService.cpp
     src/services/TaskValidationService.cpp)

@@ -107,6 +107,11 @@ AppCard {
 export component ContainersSection inherits Rectangle {
     background: transparent;
 
+    // Section root width, fixed by the page layout — sizing children from
+    // THIS (not parent.width of the inner layout) breaks the width feedback
+    // loop: panel.width -> layout -> panel.layoutinfo -> width.
+    in property <length> section-width;
+
 AppCard {
     title: "Panels & group boxes";
     subtitle: "AppPanel tones, AppGroupBox fieldset";
@@ -114,10 +119,13 @@ AppCard {
     HorizontalLayout {
         spacing: Metrics.space-4;
 
+        // Explicit thirds of the fixed section width — deterministic and
+        // content-independent (a stretched row divides only the leftover).
         AppPanel {
             title: "Panel";
             icon-name: "folder";
-            horizontal-stretch: 1;
+            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+                - 2 * Metrics.space-4) / 3;
             Text {
                 text: "Bordered surface with a pinned title row. Use for content grouping.";
                 color: Palette.text-muted;
@@ -129,7 +137,8 @@ AppCard {
             title: "Tinted panel";
             icon-name: "info";
             tone: AppPanelTone.tinted;
-            horizontal-stretch: 1;
+            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+                - 2 * Metrics.space-4) / 3;
             Text {
                 text: "Tone surface calls attention without an alert's urgency.";
                 color: Palette.text-muted;
@@ -140,7 +149,8 @@ AppCard {
         AppGroupBox {
             title: "GroupBox";
             icon-name: "user";
-            horizontal-stretch: 1;
+            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+                - 2 * Metrics.space-4) / 3;
             VerticalLayout {
                 spacing: Metrics.space-2;
                 AppCheckbox { label: "Fieldset member"; checked: true; }
@@ -219,18 +229,41 @@ export component ImagesSection inherits Rectangle {
 
 AppCard {
     title: "Images";
-    subtitle: "Fit modes, placeholder";
+    subtitle: "Fit modes, placeholder, checkered backdrop";
 
-    HorizontalLayout {
-        spacing: Metrics.space-4;
+    VerticalLayout {
+        spacing: Metrics.space-3;
 
-        AppImage { caption: "contain"; fill: true; }
-        AppImage { caption: "cover"; fit: AppImageFit.cover; fill: true; }
-        AppImage { caption: "fill"; fit: AppImageFit.fill; fill: true; }
-        AppImage {
-            caption: "checkered";
-            checkered: true;
-            fill: true;
+        HorizontalLayout {
+            spacing: Metrics.space-4;
+            height: 140px;
+
+            AppImage {
+                caption: "contain (placeholder)";
+                fill: true;
+            }
+            AppImage {
+                caption: "cover (placeholder)";
+                fit: AppImageFit.cover;
+                fill: true;
+            }
+            AppImage {
+                caption: "fill (placeholder)";
+                fit: AppImageFit.fill;
+                fill: true;
+            }
+            AppImage {
+                caption: "checkered backdrop";
+                checkered: true;
+                fill: true;
+            }
+        }
+
+        Text {
+            text: "Empty sources render a themed placeholder (icon + caption) — a missing picture stays visible, never blank. Set `source` from C++ with slint::Image::load_from_path(...).";
+            font-size: Typography.font-size-sm;
+            color: Palette.text-muted;
+            wrap: word-wrap;
         }
     }
 }

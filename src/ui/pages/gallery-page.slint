@@ -172,7 +172,7 @@ export component GalleryPage inherits Rectangle {
             // --- Extended sections (separate components to keep
             // the generated code within MSVC nesting limits) -----
             ButtonAlignmentSection { width: 100%; }
-            ContainersSection { width: 100%; }
+            ContainersSection { width: 100%; section-width: root.width; }
             DatePickerCheckListSection { width: 100%; }
             ImagesSection { width: 100%; }
             ResponsiveGridSection { width: 100%; page-width: root.width; }

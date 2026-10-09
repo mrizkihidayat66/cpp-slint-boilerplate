@@ -66,6 +66,23 @@ export global AppState {
     in-out property <int> tasks-delete-id: 0;
     in-out property <string> tasks-delete-title: "";
 
+    // --- Settings (inherited from examples/intermediate) ---------------------
+    // Bound two-way to the settings page controls. C++ maps these to the
+    // persisted AppSettings POCO (bool dark <-> "light"/"dark",
+    // int language-index <-> "en"/"id").
+    in-out property <string> display-name: "";
+    in-out property <bool> dark: false;
+    in-out property <bool> notifications: true;
+    in-out property <bool> auto-start: false;
+    in-out property <int> language-index: 0;
+
+    /// Fired by the settings page's Save button; C++ persists via
+    /// SettingsService and re-pushes the normalized values.
+    callback request-save-settings();
+    /// Fired by the settings page's Reset button; C++ re-pushes the values
+    /// the service owns (discarding unsaved edits).
+    callback request-reload-settings();
+
     callback request-navigation(int);
     callback request-quit();
     callback request-task-sort(int, bool);

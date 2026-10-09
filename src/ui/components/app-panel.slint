@@ -41,10 +41,14 @@ export component AppPanel inherits Rectangle {
             spacing: Metrics.space-2;
             alignment: start;
 
-            if root.icon-name != "" : AppIcon {
-                name: root.icon-name;
-                size: Typography.font-size-md;
-                accent-color: Palette.primary;
+            if root.icon-name != "" : VerticalLayout {
+                // Fixed-height icon centered against the title text.
+                alignment: center;
+                AppIcon {
+                    name: root.icon-name;
+                    size: Typography.font-size-md;
+                    accent-color: Palette.primary;
+                }
             }
             if root.title != "" : Text {
                 text: root.title;

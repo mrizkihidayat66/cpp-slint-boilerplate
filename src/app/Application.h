@@ -6,6 +6,7 @@
 #include <optional>
 
 #include "app/ServiceLocator.h"
+#include "models/SettingsModels.h"
 #include "models/TaskModels.h"
 #include "app-window.h"
 
@@ -44,6 +45,10 @@ private:
 
     /// Clear the form-dialog error properties.
     void clearFormErrors(const ::app::AppState &state);
+
+    /// Push the service-owned settings into the AppState global and flip
+    /// the Palette theme flag (live light/dark switch).
+    void pushSettings(const ::app::AppState &state, const models::AppSettings &settings);
 
     ServiceLocator m_services;
 

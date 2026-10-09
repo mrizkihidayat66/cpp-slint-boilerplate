@@ -167,28 +167,25 @@ AppCard {
         AppAlert { text: "Something needs attention."; variant: AppAlertVariant.warning; }
         AppAlert { text: "Something went wrong."; variant: AppAlertVariant.danger; }
 
+        // Progress on its own line, left-aligned like the alerts above.
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            AppProgress { value: 0.72; show-percentage: true; }
+            AppProgress { value: -1; }  // indeterminate
+        }
+
+        // Spinners on their own line, left-aligned.
         HorizontalLayout {
-            spacing: Metrics.space-4;
+            spacing: Metrics.space-3;
             alignment: start;
+            VerticalLayout { alignment: center; AppSpinner { size: 14px; } }
+            VerticalLayout { alignment: center; AppSpinner { size: 20px; } }
+            VerticalLayout { alignment: center; AppSpinner { size: 28px; } }
+        }
 
-            VerticalLayout {
-                spacing: Metrics.space-2;
-                AppProgress { value: 0.72; show-percentage: true; }
-                AppProgress { value: -1; }  // indeterminate
-            }
-
-            Rectangle { width: 1px; background: Palette.border; }
-
-            HorizontalLayout {
-                spacing: Metrics.space-3;
-                alignment: center;
-                AppSpinner { size: 14px; }
-                AppSpinner { size: 20px; }
-                AppSpinner { size: 28px; }
-            }
-
-            Rectangle { width: 1px; background: Palette.border; }
-
+        // Tooltip on its own line, left-aligned.
+        HorizontalLayout {
+            alignment: start;
             AppTooltip {
                 text: "Hover me for a tooltip";
                 placement: AppTooltipPlacement.top;
@@ -211,33 +208,39 @@ AppCard {
     title: "Avatars & icons";
     subtitle: "Initials fallback, status dot, icon set";
 
-    HorizontalLayout {
+    VerticalLayout {
         spacing: Metrics.space-4;
 
-        AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; }
-        AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; }
-        AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; }
-        AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; }
-
-        Rectangle { width: 1px; background: Palette.border; }
-
+        // Avatars on their own line, left-aligned.
         HorizontalLayout {
             spacing: Metrics.space-3;
-            AppIcon { name: "home"; size: 18px; }
-            AppIcon { name: "settings"; size: 18px; }
-            AppIcon { name: "search"; size: 18px; }
-            AppIcon { name: "chart"; size: 18px; }
-            AppIcon { name: "calendar"; size: 18px; }
-            AppIcon { name: "document"; size: 18px; }
-            AppIcon { name: "folder"; size: 18px; }
-            AppIcon { name: "edit"; size: 18px; }
-            AppIcon { name: "trash"; size: 18px; }
-            AppIcon { name: "check"; size: 18px; }
-            AppIcon { name: "warning"; size: 18px; }
-            AppIcon { name: "activity"; size: 18px; }
-            AppIcon { name: "clock"; size: 18px; }
-            AppIcon { name: "refresh"; size: 18px; }
-            AppIcon { name: "logout"; size: 18px; }
+            alignment: start;
+            VerticalLayout { alignment: center; AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; } }
+            VerticalLayout { alignment: center; AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; } }
+            VerticalLayout { alignment: center; AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; } }
+            VerticalLayout { alignment: center; AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; } }
+        }
+
+        // Icon set on its own line, left-aligned.
+        HorizontalLayout {
+            spacing: Metrics.space-3;
+            alignment: start;
+            VerticalLayout { alignment: center; AppIcon { name: "home"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "settings"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "search"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "chart"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "calendar"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "document"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "folder"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "edit"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "trash"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "check"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "warning"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "activity"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "clock"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "refresh"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "logout"; size: 18px; } }
+            VerticalLayout { alignment: center; AppIcon { name: "image"; size: 18px; } }
         }
     }
 }

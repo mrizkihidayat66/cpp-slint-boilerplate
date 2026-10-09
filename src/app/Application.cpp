@@ -8,9 +8,11 @@
 
 #include "models/AboutModels.h"
 #include "models/DashboardModels.h"
+#include "models/SettingsModels.h"
 #include "models/TaskModels.h"
 #include "services/AboutService.h"
 #include "services/DashboardService.h"
+#include "services/SettingsService.h"
 #include "services/TaskRepository.h"
 #include "services/TaskService.h"
 #include "services/TaskValidationService.h"
@@ -83,6 +85,7 @@ void Application::registerServices()
 {
     m_services.registerConstructed<services::DashboardService>();
     m_services.registerConstructed<services::AboutService>();
+    m_services.registerConstructed<services::SettingsService>();
 
     // Task chain — registration order is initialization order:
     // repository and validation first, the orchestrating service last.
@@ -123,6 +126,29 @@ void Application::bindUiCallbacks()
     });
 
     state.on_request_quit([] { slint::quit_event_loop(); });
+
+    // Settings: persist the values the settings page committed to AppState.
+    // `this` is captured for pushSettings (it flips the Palette theme flag).
+    state.on_request_save_settings([this, &state]() {
+        const auto settings = m_services.get<services::SettingsService>();
+
+        models::AppSettings updated;
+        updated.displayName = std::string(state.get_display_name());
+        updated.theme = state.get_dark() ? "dark" : "light";
+        updated.language = state.get_language_index() == 1 ? "id" : "en";
+        updated.notifications = state.get_notifications();
+        updated.autoStart = state.get_auto_start();
+        settings->save(updated);
+
+        // Confirm with the normalized values the service now owns.
+        pushSettings(state, settings->settings());
+    });
+
+    // Settings: discard unsaved edits — re-push what the service owns.
+    state.on_request_reload_settings([this, &state]() {
+        const auto settings = m_services.get<services::SettingsService>();
+        pushSettings(state, settings->settings());
+    });
 
     // Screenshot harness / smoke runs: open the Tasks page's form or delete
     // confirmation without user interaction. "form" shows a create dialog
@@ -284,6 +310,22 @@ void Application::loadInitialData()
 
     // Tasks: first page, default sort (id = created order).
     pushTasks(state);
+
+    // Settings: push the loaded values (Palette.dark is set directly so the
+    // theme applies even before the settings page is instantiated).
+    pushSettings(state, m_services.get<services::SettingsService>()->settings());
+}
+
+void Application::pushSettings(const ::app::AppState &state, const models::AppSettings &settings)
+{
+    state.set_display_name(slint::SharedString(settings.displayName));
+    state.set_dark(settings.theme == "dark");
+    state.set_language_index(settings.language == "id" ? 1 : 0);
+    state.set_notifications(settings.notifications);
+    state.set_auto_start(settings.autoStart);
+
+    // Live theme switch: every Palette token reacts immediately.
+    (**m_window).global<::app::Palette>().set_dark(settings.theme == "dark");
 }
 
 void Application::pushTasks(const ::app::AppState &state)
