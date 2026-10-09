@@ -1,0 +1,14 @@
+// Preview-only harness: FormControlsSection standalone for functional
+// testing of checkbox/radio/switch/select/slider. NOT part of the build.
+import { FormControlsSection } from "../../src/ui/pages/gallery-sections.slint";
+
+export component FormPreview inherits Window {
+    preferred-width: 1024px;
+    preferred-height: 1000px;
+    background: #fafafa;
+
+    FormControlsSection {
+        x: 0; y: 0;
+        width: parent.width; height: parent.height;
+    }
+}

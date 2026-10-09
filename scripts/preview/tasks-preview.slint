@@ -1,0 +1,40 @@
+// Preview-only harness: TasksPage with the C++ seed data inlined so the
+// interpreter can render it standalone. NOT part of the build.
+
+import { TasksPage } from "../../src/ui/pages/tasks-page.slint";
+import { AppState } from "../../src/ui/app-state.slint";
+
+export component TasksPreview inherits Window {
+    preferred-width: 1024px;
+    preferred-height: 680px;
+    background: #fafafa;
+
+    init => {
+        AppState.tasks-rows = [
+            { cells: ["1", "Set up CI pipeline", "M Rizki", "Done"] },
+            { cells: ["2", "Write onboarding docs", "Ada Lovelace", "Done"] },
+            { cells: ["3", "Implement login form", "Grace Hopper", "Done"] },
+            { cells: ["4", "Migrate settings to JSON", "M Rizki", "Done"] },
+            { cells: ["5", "Design settings page", "Grace Hopper", "Done"] },
+            { cells: ["6", "Add component gallery", "Ada Lovelace", "Done"] },
+            { cells: ["7", "Dark theme tokens", "M Rizki", "In progress"] },
+            { cells: ["8", "Sortable task table", "Grace Hopper", "In progress"] },
+            { cells: ["9", "Pagination controls", "Ada Lovelace", "In progress"] },
+            { cells: ["10", "Task dialog validation", "M Rizki", "In progress"] },
+        ];
+        AppState.tasks-total = 23;
+        AppState.tasks-page = 1;
+        AppState.tasks-page-count = 3;
+        AppState.tasks-sort-column = 0;
+        AppState.tasks-sort-ascending = true;
+        AppState.tasks-loading = false;
+        // Show the form dialog on open so its layout can be audited too
+        // (in the real app C++ sets this after request-task-create()).
+        AppState.tasks-form-visible = true;
+    }
+
+    TasksPage {
+        x: 0; y: 0;
+        width: parent.width; height: parent.height;
+    }
+}

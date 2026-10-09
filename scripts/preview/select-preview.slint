@@ -1,0 +1,18 @@
+// Preview-only harness: AppSelect + AppSlider standalone for functional
+// testing. NOT part of the build.
+import { AppSelect, AppSlider } from "../../src/ui/components/library.slint";
+
+export component SelectPreview inherits Window {
+    preferred-width: 600px;
+    preferred-height: 500px;
+    background: #fafafa;
+
+    VerticalLayout {
+        padding: 40px;
+        spacing: 40px;
+
+        AppSelect { model: ["Red", "Green", "Blue"]; }
+
+        AppSlider { minimum: 0; maximum: 100; value: 20; }
+    }
+}

@@ -5,9 +5,15 @@
 # process so state never leaks between shots.
 
 param(
-    [string]$Exe = "D:\Development\wip\cpp-slint-boilerplate\build\x64-debug\slint-boilerplate.exe",
-    [string]$OutDir = "D:\Development\wip\cpp-slint-boilerplate\build\shots"
+    [string]$Exe = "",
+    [string]$OutDir = "$PSScriptRoot\..\build\shots"
 )
+
+if (-not $Exe) {
+    # Default: the advanced branch's collected x64-debug binary from the
+    # build matrix (scripts/build-matrix.cmd).
+    $Exe = "$PSScriptRoot\..\build\bin\Debug\x64\slint-boilerplate-advanced.exe"
+}
 
 $ErrorActionPreference = "Stop"
 $harness = "$PSScriptRoot\capture-ui.ps1"
