@@ -41,8 +41,14 @@ export component AppTable inherits Rectangle {
     callback row-activated(int, AppTableRow);
     callback sort-requested(int, bool);
 
+    /// Height cap so long tables don't grow the page unboundedly.
+    in property <length> max-content-height: 480px;
+
     width: 100%;
-    height: min(header.preferred-height + rows-view.preferred-height, 480px);
+    // Deterministic content height: ListView's own preferred height is not
+    // defined (viewport widget), so compute header + rows ourselves.
+    height: min(header.height + root.row-height * root.rows.length,
+        root.max-content-height);
 
     border-radius: Metrics.radius-md;
     background: Palette.surface;

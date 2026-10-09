@@ -129,7 +129,10 @@ export component TasksPage inherits Rectangle {
                     }
                 }
 
-                if !AppState.tasks-loading && AppState.tasks-total > 0 : Rectangle {
+                // VerticalLayout (not bare Rectangle) so the wrapper's
+                // preferred height comes from AppTable — a Rectangle with
+                // no height would collapse to 0 in this VerticalLayout.
+                if !AppState.tasks-loading && AppState.tasks-total > 0 : VerticalLayout {
                     AppTable {
                         columns: [
                             { title: "#", weight: 0.5 },
