@@ -47,17 +47,22 @@ export component AppCard inherits Rectangle {
             padding-bottom: Metrics.space-3;
             spacing: Metrics.space-3;
 
-            if root.header-icon-name != "" : Rectangle {
-                width: 30px;
-                height: 30px;
-                border-radius: Metrics.radius-sm;
-                background: Palette.primary-tint;
-                AppIcon {
-                    name: root.header-icon-name;
-                    size: 15px;
-                    accent-color: Palette.primary;
-                    x: (parent.width - self.width) / 2;
-                    y: (parent.height - self.height) / 2;
+            if root.header-icon-name != "" : VerticalLayout {
+                // Center the 30px icon tile against the two-line header text.
+                padding: 0;
+                alignment: center;
+                Rectangle {
+                    width: 30px;
+                    height: 30px;
+                    border-radius: Metrics.radius-sm;
+                    background: Palette.primary-tint;
+                    AppIcon {
+                        name: root.header-icon-name;
+                        size: 15px;
+                        accent-color: Palette.primary;
+                        x: (parent.width - self.width) / 2;
+                        y: (parent.height - self.height) / 2;
+                    }
                 }
             }
 
