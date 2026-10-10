@@ -35,29 +35,6 @@ import {
     AppBreadcrumb,
 } from "../components/library.slint";
 
-component SectionTitle inherits Rectangle {
-    in property <string> title;
-    in property <string> subtitle;
-
-    height: 44px;
-
-    VerticalLayout {
-        alignment: center;
-        spacing: 1px;
-        Text {
-            text: root.title;
-            font-size: Typography.font-size-lg;
-            font-weight: Typography.font-weight-semibold;
-            color: Palette.text;
-        }
-        if root.subtitle != "" : Text {
-            text: root.subtitle;
-            font-size: Typography.font-size-sm;
-            color: Palette.text-muted;
-        }
-    }
-}
-
 export component GalleryPage inherits Rectangle {
     background: Palette.background;
     // The Flickable below can hold rows wider than the viewport at small
