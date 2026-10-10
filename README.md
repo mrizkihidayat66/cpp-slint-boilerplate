@@ -19,8 +19,8 @@ applications on Windows — x64 **and** x86 (32-bit).
   supports 32-bit targets. See [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md).
 - **Progressive examples** — from a ~17-line app to full CRUD with service
   chains, on separate branches. See [docs/BRANCHES.md](docs/BRANCHES.md).
-- **CI** — Windows matrix (x64 + x86 × Debug/Release), formatting check,
-  unit tests, GPU-less smoke run.
+- **CI** — Windows matrix (x64 + x86 × Debug/Release) plus Linux and macOS
+  legs, formatting check, unit tests, GPU-less smoke run.
 - **Docs** — coding style, contribution guide, architecture deep-dive,
   component catalog, build instructions.
 
@@ -35,6 +35,11 @@ For 32-bit builds:
 ```bash
 rustup target add i686-pc-windows-msvc
 ```
+
+CI also builds and tests on Linux and macOS; those legs use the `native-*`
+presets and need a host toolchain (`g++` / `clang++`) plus, on Linux, a few
+development packages — see
+[docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos).
 
 ## Quickstart
 
@@ -73,7 +78,7 @@ makes every later build fast.
 - [x] Dark palette + runtime theme switching — see `examples/intermediate`
 - [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
 - [ ] Richer icon set (bundled vector assets)
-- [ ] Linux/macOS CI legs
+- [x] Linux/macOS CI legs (`native-*` presets) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos)
 - [ ] Release artifact workflow (packaged zip/installer)
 
 ## License
