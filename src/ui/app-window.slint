@@ -6,17 +6,19 @@
 
 import { Palette, Typography, Metrics } from "theme/theme.slint";
 import { StatCard, ActivityItem, AppState } from "app-state.slint";
+import { AppInfo } from "app-info.slint";
 import { AppSidebar } from "components/library.slint";
 import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages.slint";
 
-// Re-export so the C++ side can reach it via window->global<AppState>();
+// Re-export so the C++ side can reach them via window->global<...>();
 // only exported globals appear in the generated API. Palette is exported
 // too — the settings flow flips its `dark` flag for the live theme switch.
 export { AppState } from "app-state.slint";
+export { AppInfo } from "app-info.slint";
 export { Palette } from "theme/theme.slint";
 
 export component AppWindow inherits Window {
-    title: "cpp-slint-boilerplate";
+    title: AppInfo.technical-name;
     preferred-width: 1024px;
     preferred-height: 680px;
     min-width: Metrics.window-min-width;
@@ -38,7 +40,7 @@ export component AppWindow inherits Window {
 
     HorizontalLayout {
         AppSidebar {
-            brand-title: "Boilerplate";
+            brand-title: AppInfo.display-name;
             brand-subtitle: "C++ · Slint";
             items: [
                 { icon-name: "home", label: "Dashboard" },

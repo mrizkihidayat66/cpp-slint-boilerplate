@@ -6,6 +6,7 @@
 
 #include <slint.h>
 
+#include "app/AppMetadata.h"
 #include "models/AboutModels.h"
 #include "models/DashboardModels.h"
 #include "services/AboutService.h"
@@ -85,6 +86,14 @@ void Application::bindUiCallbacks()
 void Application::loadInitialData()
 {
     auto &window = **m_window;
+
+    // Application identity — the single CMakeLists.txt definition, pushed to
+    // the UI so the window title, sidebar brand and About card all agree.
+    auto &info = window.global<::app::AppInfo>();
+    info.set_display_name(slint::SharedString(app::kDisplayName));
+    info.set_technical_name(slint::SharedString(app::kTechnicalName));
+    info.set_version(slint::SharedString(app::kVersion));
+
     const auto &dashboard = m_services.get<services::DashboardService>();
     window.set_stat_cards(models::toSlintModel(dashboard->statCards()));
 
