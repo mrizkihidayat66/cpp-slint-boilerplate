@@ -61,7 +61,7 @@ makes every later build fast.
 
 - [x] Dark palette + runtime theme switching — see `examples/intermediate`
 - [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
-- [ ] Richer icon set (bundled vector assets)
+- [x] Richer icon set — 95 built-in stroke icons plus an `AppIcons` catalog — see [docs/COMPONENTS.md](docs/COMPONENTS.md#appicon)
 - [x] Linux/macOS CI legs (`native-*` presets) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos)
 - [x] Release artifact workflow — portable ZIP via CPack, published on `v*` tags by [.github/workflows/release.yml](.github/workflows/release.yml)
 
