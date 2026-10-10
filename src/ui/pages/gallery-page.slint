@@ -30,6 +30,7 @@ import {
     AppAvatar,
     AppAvatarSize,
     AppIcon,
+    AppIcons,
     AppPagination,
     AppNavbar,
     AppBreadcrumb,
@@ -53,6 +54,11 @@ export component GalleryPage inherits Rectangle {
     property <int> tab-index: 0;
     property <string> input-text: "Ada Lovelace";
     property <string> input-error: "";
+
+    // Columns for the icon grid. 12 columns of 24px plus gaps need ~376px of
+    // card body, which the page only has from ~500px wide; below that the grid
+    // drops to 8 so it never overflows the (viewport-pinned) content width.
+    private property <int> icon-columns: root.width >= 500px ? 12 : 8;
 
     Flickable {
         x: 0;
@@ -310,7 +316,7 @@ export component GalleryPage inherits Rectangle {
             // --- Avatars & icons ---------------------------------------------
             AppCard {
                 title: "Avatars & icons";
-                subtitle: "Initials fallback, status dot, icon set";
+                subtitle: "Initials fallback, status dot, and the full icon catalog";
 
                 VerticalLayout {
                     spacing: Metrics.space-4;
@@ -325,31 +331,26 @@ export component GalleryPage inherits Rectangle {
                         VerticalLayout { alignment: center; AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; } }
                     }
 
-                    // Icon set on two lines: 16 icons in a single row is wider
-                    // than the minimum window width and Slint layouts do not wrap.
-                    HorizontalLayout {
-                        spacing: Metrics.space-3;
-                        alignment: start;
-                        VerticalLayout { alignment: center; AppIcon { name: "home"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "settings"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "search"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "chart"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "calendar"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "document"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "folder"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "edit"; size: 18px; } }
-                    }
-                    HorizontalLayout {
-                        spacing: Metrics.space-3;
-                        alignment: start;
-                        VerticalLayout { alignment: center; AppIcon { name: "trash"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "check"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "warning"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "activity"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "clock"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "refresh"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "logout"; size: 18px; } }
-                        VerticalLayout { alignment: center; AppIcon { name: "image"; size: 18px; } }
+                    // Icon catalog — every name in the AppIcons global. Slint
+                    // layouts never wrap, so instead of a wrapping flow the grid
+                    // reflows by changing its column count (root.icon-columns).
+                    // AppIcons.names is the single source of truth, so an icon
+                    // added to app-icon.slint appears here automatically.
+                    GridLayout {
+                        spacing: Metrics.space-2;
+                        for icon[i] in AppIcons.names: Rectangle {
+                            width: 24px;
+                            height: 24px;
+                            row: i / root.icon-columns;
+                            col: mod(i, root.icon-columns);
+                            AppIcon {
+                                name: icon;
+                                size: 18px;
+                                // Centre in the cell even if the grid stretches it.
+                                x: (parent.width - self.width) / 2;
+                                y: (parent.height - self.height) / 2;
+                            }
+                        }
                     }
                 }
             }

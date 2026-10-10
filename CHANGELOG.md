@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the software renderer headlessly.
 - Release workflow: on a `v*` tag, build the x64 release and publish a portable
   ZIP (executable + Slint runtime DLL) to a GitHub Release.
+- Richer icon set: 95 built-in vector icons (up from 31), each an inline 24-unit
+  stroke path, plus an `AppIcons` catalog global that lists every name for
+  pickers and galleries.
+
+### Changed
+
+- The component gallery's "Avatars & icons" card now enumerates the full
+  `AppIcons` set in a grid that reflows with the page width instead of showing a
+  fixed 16 icons.
 
 ## [0.1.0] - 2026-10-07
 
