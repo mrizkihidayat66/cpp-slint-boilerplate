@@ -322,14 +322,19 @@ AppCard {
                     AppCard { title: "4"; height: 88px; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
                 }
             }
-            // Column merging: full-width, then two halves, on one row the
-            // span arithmetic wraps Bootstrap-style.
+            // Column merging: a row that totals exactly 12 (6+6) reads as
+            // "half + half"; AppGridRow is a HorizontalLayout (no wrapping),
+            // so a 12-span item gets its OWN row — putting span 12 and two
+            // span-6 items in one row would squeeze all three side by side.
             AppGridRow {
                 grid-gap: Metrics.space-3;
                 AppGridItem {
                     span: 12;
                     AppCard { title: "Full width"; height: 64px; Text { text: "span 12 — the whole row"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
                 }
+            }
+            AppGridRow {
+                grid-gap: Metrics.space-3;
                 AppGridItem {
                     span: grid.at-sm ? 6 : 12;
                     AppCard { title: "Half"; height: 64px; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }

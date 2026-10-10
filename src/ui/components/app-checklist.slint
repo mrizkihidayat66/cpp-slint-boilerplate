@@ -107,7 +107,9 @@ export component AppCheckList inherits Rectangle {
                                     if item.checked : AppIcon {
                                         name: "check";
                                         size: Typography.font-size-lg - 4px;
-                                        color: Palette.text-on-primary;
+                                        // accent-color = path stroke (plain
+                                        // `color:` paints a solid square).
+                                        accent-color: Palette.text-on-primary;
                                         x: (parent.width - self.width) / 2;
                                         y: (parent.height - self.height) / 2;
                                     }

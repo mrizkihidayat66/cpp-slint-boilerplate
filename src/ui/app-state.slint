@@ -34,7 +34,13 @@ export struct ActivityItem {
 export global AppState {
     in-out property <int> current-page: 0;
     in-out property <string> status-message: "";
-    in-out property <string> about-text: "";
+    // Structured about fields — the About page renders them as key/value
+    // rows (one Text pair per line) instead of parsing a \n-joined blob.
+    in-out property <string> about-description: "";
+    in-out property <string> about-version: "";
+    in-out property <string> about-slint-version: "";
+    in-out property <string> about-compiler: "";
+    in-out property <string> about-build-type: "";
     /// Gallery scroll position as a 0..1 fraction of the scrollable range
     /// (screenshot harness hook; UI users scroll with the wheel).
     in-out property <float> gallery-scroll: 0;

@@ -54,7 +54,7 @@ AppCard {
                     label: "Name";
                     placeholder: "Enter your name";
                     icon-name: "user";
-                    text: GalleryDemoState.input-text;
+                    text <=> GalleryDemoState.input-text;
                     edited => {
                         GalleryDemoState.input-error = GalleryDemoState.input-text.character-count > 12
                             ? "Max 12 characters" : "";
@@ -65,6 +65,8 @@ AppCard {
                     text: "bad";
                     error-text: GalleryDemoState.input-error;
                     helper-text: "Helper text appears without an error";
+                    // static demo value, not bound — clicking away must not
+                    // feed "bad" back into the shared demo state
                 }
                 AppInput { label: "Disabled"; text: "read only"; disabled: true; }
             }
@@ -76,46 +78,44 @@ AppCard {
             maxlength: 120;
         }
 
-        HorizontalLayout {
-            spacing: Metrics.space-6;
-
-            VerticalLayout {
-                spacing: Metrics.space-2;
-                Text {
-                    text: "Checkbox";
-                    font-size: Typography.font-size-sm;
-                    color: Palette.text-muted;
-                }
-                AppCheckbox { label: "Checked"; checked: GalleryDemoState.check-a; toggled => { GalleryDemoState.check-a = !GalleryDemoState.check-a; } }
-                AppCheckbox { label: "Unchecked"; checked: GalleryDemoState.check-b; }
-                AppCheckbox { label: "Disabled"; disabled: true; checked: true; }
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            Text {
+                text: "Checkbox";
+                font-size: Typography.font-size-sm;
+                color: Palette.text-muted;
             }
-
-            VerticalLayout {
-                spacing: Metrics.space-2;
-                Text {
-                    text: "Radio";
-                    font-size: Typography.font-size-sm;
-                    color: Palette.text-muted;
-                }
-                AppRadio { label: "Option A"; value: "a"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
-                AppRadio { label: "Option B"; value: "b"; group-value: GalleryDemoState.radio-group; selected(v) => { GalleryDemoState.radio-group = v; } }
-            }
+            // Two-way (<=>) keeps the global in the loop; a one-way binding
+            // plus handler would be overwritten by the component's own
+            // assignment, silently desyncing demo state.
+            AppCheckbox { label: "Checked"; checked <=> GalleryDemoState.check-a; }
+            AppCheckbox { label: "Unchecked"; checked <=> GalleryDemoState.check-b; }
+            AppCheckbox { label: "Disabled"; disabled: true; checked: true; }
         }
 
-        HorizontalLayout {
-            spacing: Metrics.space-6;
-
-            VerticalLayout {
-                spacing: Metrics.space-2;
-                Text {
-                    text: "Switch";
-                    font-size: Typography.font-size-sm;
-                    color: Palette.text-muted;
-                }
-                AppSwitch { label: "Notifications"; checked: GalleryDemoState.switch-a; toggled => { GalleryDemoState.switch-a = !GalleryDemoState.switch-a; } }
-                AppSwitch { label: "Disabled"; disabled: true; }
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            Text {
+                text: "Radio";
+                font-size: Typography.font-size-sm;
+                color: Palette.text-muted;
             }
+            // A radio group shares ONE two-way bound group-value; clicking a
+            // different option flips the single global and every member
+            // re-renders — exactly one selection at a time.
+            AppRadio { label: "Option A"; value: "a"; group-value <=> GalleryDemoState.radio-group; }
+            AppRadio { label: "Option B"; value: "b"; group-value <=> GalleryDemoState.radio-group; }
+        }
+
+        VerticalLayout {
+            spacing: Metrics.space-2;
+            Text {
+                text: "Switch";
+                font-size: Typography.font-size-sm;
+                color: Palette.text-muted;
+            }
+            AppSwitch { label: "Notifications"; checked <=> GalleryDemoState.switch-a; }
+            AppSwitch { label: "Disabled"; disabled: true; }
         }
 
         VerticalLayout {
@@ -127,8 +127,7 @@ AppCard {
             }
             AppSelect {
                 model: ["Red", "Green", "Blue"];
-                selected-index: GalleryDemoState.selected-index;
-                selected(i, v) => { GalleryDemoState.selected-index = i; }
+                selected-index <=> GalleryDemoState.selected-index;
             }
         }
 
@@ -140,11 +139,10 @@ AppCard {
                 color: Palette.text-muted;
             }
             AppSlider {
-                value: GalleryDemoState.slider-value;
+                value <=> GalleryDemoState.slider-value;
                 minimum: 0;
                 maximum: 100;
                 step: 1;
-                changed(v) => { GalleryDemoState.slider-value = v; }
             }
         }
     }
@@ -257,14 +255,13 @@ AppCard {
 
         AppTabs {
             model: ["Overview", "Analytics", "Reports"];
-            current-index: GalleryDemoState.tab-index;
-            current-index-changed(i) => { GalleryDemoState.tab-index = i; }
+            current-index <=> GalleryDemoState.tab-index;
         }
 
         AppTabs {
             model: ["One", "Two", "Three"];
             variant: AppTabsVariant.pills;
-            current-index: GalleryDemoState.tab-index;
+            current-index <=> GalleryDemoState.tab-index;
         }
 
         HorizontalLayout {
@@ -272,10 +269,9 @@ AppCard {
             alignment: start;
 
             AppPagination {
-                page: GalleryDemoState.current-page;
+                page <=> GalleryDemoState.current-page;
                 page-count: 12;
                 window-size: 2;
-                page-changed(p) => { GalleryDemoState.current-page = p; }
             }
         }
     }

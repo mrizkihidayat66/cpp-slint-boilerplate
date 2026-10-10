@@ -303,10 +303,12 @@ void Application::loadInitialData()
 
     const auto &about = m_services.get<services::AboutService>()->aboutInfo();
     auto &state = window.global<::app::AppState>();
-    state.set_about_text(slint::SharedString(
-            about.applicationName + " v" + about.version + "\n" + about.description + "\n\n"
-            + "Slint: " + about.slintVersion + "\nCompiler: " + about.compiler + "\nBuild: "
-            + about.buildType));
+    // Structured fields — the About page lays them out as key/value rows.
+    state.set_about_description(slint::SharedString(about.description));
+    state.set_about_version(slint::SharedString(about.version));
+    state.set_about_slint_version(slint::SharedString(about.slintVersion));
+    state.set_about_compiler(slint::SharedString(about.compiler));
+    state.set_about_build_type(slint::SharedString(about.buildType));
 
     // Tasks: first page, default sort (id = created order).
     pushTasks(state);

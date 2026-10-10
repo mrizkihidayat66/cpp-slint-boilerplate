@@ -51,7 +51,10 @@ target_apply_warnings(boilerplate-core)
 # Application executable
 # ---------------------------------------------------------------------------
 
-add_executable(slint-boilerplate src/main.cpp)
+# WIN32 subsystem: no console window popping up alongside the app. This
+# matters for capture-ui.ps1 too — the console belongs to the same PID and
+# could win the "first visible window" race, capturing cmd instead of the UI.
+add_executable(slint-boilerplate WIN32 src/main.cpp)
 target_link_libraries(slint-boilerplate PRIVATE boilerplate-core)
 
 # Copy the Slint runtime DLL next to the exe so it runs from the build dir

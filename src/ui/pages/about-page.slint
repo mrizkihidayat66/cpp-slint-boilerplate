@@ -51,10 +51,72 @@ export component AboutPage inherits Rectangle {
                         spacing: Metrics.space-3;
 
                         Text {
-                            text: AppState.about-text;
+                            text: AppState.about-description;
                             font-size: Typography.font-size-md;
                             color: Palette.text;
                             wrap: word-wrap;
+                        }
+
+                        Rectangle { height: Metrics.space-2; }
+
+                        // Key/value rows — one Text pair per line so each row
+                        // aligns like the other pages' lists instead of one
+                        // monolithic \n-joined blob.
+                        HorizontalLayout {
+                            Text {
+                                text: "Version";
+                                font-size: Typography.font-size-md;
+                                color: Palette.text-muted;
+                                width: 140px;
+                            }
+                            Text {
+                                text: AppState.about-version;
+                                font-size: Typography.font-size-md;
+                                color: Palette.text;
+                                horizontal-stretch: 1;
+                            }
+                        }
+                        HorizontalLayout {
+                            Text {
+                                text: "Slint";
+                                font-size: Typography.font-size-md;
+                                color: Palette.text-muted;
+                                width: 140px;
+                            }
+                            Text {
+                                text: AppState.about-slint-version;
+                                font-size: Typography.font-size-md;
+                                color: Palette.text;
+                                horizontal-stretch: 1;
+                            }
+                        }
+                        HorizontalLayout {
+                            Text {
+                                text: "Compiler";
+                                font-size: Typography.font-size-md;
+                                color: Palette.text-muted;
+                                width: 140px;
+                            }
+                            Text {
+                                text: AppState.about-compiler;
+                                font-size: Typography.font-size-md;
+                                color: Palette.text;
+                                horizontal-stretch: 1;
+                            }
+                        }
+                        HorizontalLayout {
+                            Text {
+                                text: "Build";
+                                font-size: Typography.font-size-md;
+                                color: Palette.text-muted;
+                                width: 140px;
+                            }
+                            Text {
+                                text: AppState.about-build-type;
+                                font-size: Typography.font-size-md;
+                                color: Palette.text;
+                                horizontal-stretch: 1;
+                            }
                         }
                     }
                 }
