@@ -18,12 +18,16 @@ export component AppTabs inherits Rectangle {
     width: 100%;
 
     HorizontalLayout {
-        spacing: root.variant == AppTabsVariant.pills ? Metrics.space-2 : Metrics.space-4;
+        // Tighten at narrow widths so three tabs still fit the strip.
+        spacing: root.variant == AppTabsVariant.pills || root.width < 320px
+            ? Metrics.space-2
+            : Metrics.space-4;
         alignment: start;
 
         for tab-label[i] in root.model : tab := Rectangle {
             height: 100%;
-            width: tab-text.preferred-width + 2 * Metrics.space-4;
+            width: tab-text.preferred-width
+                + 2 * (root.width < 320px ? Metrics.space-3 : Metrics.space-4);
             border-radius: root.variant == AppTabsVariant.pills ? Metrics.radius-pill : 0;
             background: root.variant == AppTabsVariant.pills && i == root.current-index
                 ? Palette.primary

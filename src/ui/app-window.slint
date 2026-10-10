@@ -27,6 +27,15 @@ export component AppWindow inherits Window {
     in-out property <[StatCard]> stat-cards: [];
     in-out property <[ActivityItem]> recent-activity: [];
 
+    // Sidebar collapse flag. Set imperatively in a `changed` handler: a plain
+    // declarative binding (`collapsed: root.width < 600px`) forms a binding
+    // loop window-layout -> collapsed -> sidebar-width -> window-layout, which
+    // the interpreter preview refuses to render.
+    private property <bool> sidebar-collapsed: false;
+    changed width => {
+        root.sidebar-collapsed = root.width < 600px;
+    }
+
     HorizontalLayout {
         AppSidebar {
             brand-title: "Boilerplate";
@@ -38,7 +47,7 @@ export component AppWindow inherits Window {
                 { icon-name: "info", label: "About" },
             ];
             current-index <=> AppState.current-page;
-            collapsed: root.width < 600px;
+            collapsed: root.sidebar-collapsed;
             navigate(index) => {
                 AppState.request-navigation(index);
             }

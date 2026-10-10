@@ -30,7 +30,15 @@ export struct ActivityItem {
 export global AppState {
     in-out property <int> current-page: 0;
     in-out property <string> status-message: "";
-    in-out property <string> about-text: "";
+    // Structured about fields — the About page renders them as key/value
+    // rows instead of a \n-joined blob. Defaults keep the page readable in
+    // preview/harness runs with no C++ services attached; Application
+    // overwrites them at startup.
+    in-out property <string> about-description: "A professional C++20 + Slint desktop application boilerplate.";
+    in-out property <string> about-version: "(development)";
+    in-out property <string> about-slint-version: "(unknown)";
+    in-out property <string> about-compiler: "(unknown)";
+    in-out property <string> about-build-type: "(unknown)";
     // --- Settings (inherited from examples/intermediate) ---------------------
     // Bound two-way to the settings page controls. C++ maps these to the
     // persisted AppSettings POCO (bool dark <-> "light"/"dark",

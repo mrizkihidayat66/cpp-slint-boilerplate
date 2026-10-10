@@ -60,6 +60,9 @@ component SectionTitle inherits Rectangle {
 
 export component GalleryPage inherits Rectangle {
     background: Palette.background;
+    // The Flickable below can hold rows wider than the viewport at small
+    // widths; clip so that content never paints over the sidebar.
+    clip: true;
 
     // Interactive state
     property <string> radio-group: "a";
@@ -79,6 +82,10 @@ export component GalleryPage inherits Rectangle {
         y: 0;
         width: 100%;
         height: 100%;
+        // Pin the content width to the viewport: without this a row wider
+        // than the page (wide button/badge rows) makes the whole page
+        // horizontally pannable — the "page can be moved" defect.
+        content-width: self.width;
 
         VerticalLayout {
             padding: Metrics.space-6;
@@ -114,6 +121,9 @@ export component GalleryPage inherits Rectangle {
                         AppButton { text: "Primary"; }
                         AppButton { text: "Secondary"; variant: AppButtonVariant.secondary; }
                         AppButton { text: "Outline"; variant: AppButtonVariant.outline; }
+                    }
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
                         AppButton { text: "Ghost"; variant: AppButtonVariant.ghost; }
                         AppButton { text: "Danger"; variant: AppButtonVariant.danger; }
                     }
@@ -123,6 +133,9 @@ export component GalleryPage inherits Rectangle {
                         AppButton { text: "Small"; size: AppButtonSize.sm; }
                         AppButton { text: "Medium"; size: AppButtonSize.md; }
                         AppButton { text: "Large"; size: AppButtonSize.lg; }
+                    }
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
                         AppButton { text: "With icon"; icon-name: "plus"; }
                         AppButton { text: "Loading"; loading: true; }
                         AppButton { text: "Disabled"; disabled: true; }
@@ -135,14 +148,20 @@ export component GalleryPage inherits Rectangle {
                 title: "Badges";
                 subtitle: "Semantic variants, pill and dot styles";
 
-                HorizontalLayout {
+                VerticalLayout {
                     spacing: Metrics.space-2;
-                    AppBadge { text: "Primary"; }
-                    AppBadge { text: "Success"; variant: AppBadgeVariant.success; dot: true; }
-                    AppBadge { text: "Warning"; variant: AppBadgeVariant.warning; }
-                    AppBadge { text: "Danger"; variant: AppBadgeVariant.danger; dot: true; }
-                    AppBadge { text: "Info"; variant: AppBadgeVariant.info; }
-                    AppBadge { text: "Pill neutral"; variant: AppBadgeVariant.neutral; pill: true; }
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
+                        AppBadge { text: "Primary"; }
+                        AppBadge { text: "Success"; variant: AppBadgeVariant.success; dot: true; }
+                        AppBadge { text: "Warning"; variant: AppBadgeVariant.warning; }
+                    }
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
+                        AppBadge { text: "Danger"; variant: AppBadgeVariant.danger; dot: true; }
+                        AppBadge { text: "Info"; variant: AppBadgeVariant.info; }
+                        AppBadge { text: "Pill neutral"; variant: AppBadgeVariant.neutral; pill: true; }
+                    }
                 }
             }
 
@@ -326,23 +345,29 @@ export component GalleryPage inherits Rectangle {
 
                     Rectangle { width: 1px; background: Palette.border; }
 
-                    HorizontalLayout {
-                        spacing: Metrics.space-3;
-                        AppIcon { name: "home"; size: 18px; }
-                        AppIcon { name: "settings"; size: 18px; }
-                        AppIcon { name: "search"; size: 18px; }
-                        AppIcon { name: "chart"; size: 18px; }
-                        AppIcon { name: "calendar"; size: 18px; }
-                        AppIcon { name: "document"; size: 18px; }
-                        AppIcon { name: "folder"; size: 18px; }
-                        AppIcon { name: "edit"; size: 18px; }
-                        AppIcon { name: "trash"; size: 18px; }
-                        AppIcon { name: "check"; size: 18px; }
-                        AppIcon { name: "warning"; size: 18px; }
-                        AppIcon { name: "activity"; size: 18px; }
-                        AppIcon { name: "clock"; size: 18px; }
-                        AppIcon { name: "refresh"; size: 18px; }
-                        AppIcon { name: "logout"; size: 18px; }
+                    VerticalLayout {
+                        spacing: Metrics.space-2;
+                        HorizontalLayout {
+                            spacing: Metrics.space-3;
+                            AppIcon { name: "home"; size: 18px; }
+                            AppIcon { name: "settings"; size: 18px; }
+                            AppIcon { name: "search"; size: 18px; }
+                            AppIcon { name: "chart"; size: 18px; }
+                            AppIcon { name: "calendar"; size: 18px; }
+                            AppIcon { name: "document"; size: 18px; }
+                            AppIcon { name: "folder"; size: 18px; }
+                            AppIcon { name: "edit"; size: 18px; }
+                        }
+                        HorizontalLayout {
+                            spacing: Metrics.space-3;
+                            AppIcon { name: "trash"; size: 18px; }
+                            AppIcon { name: "check"; size: 18px; }
+                            AppIcon { name: "warning"; size: 18px; }
+                            AppIcon { name: "activity"; size: 18px; }
+                            AppIcon { name: "clock"; size: 18px; }
+                            AppIcon { name: "refresh"; size: 18px; }
+                            AppIcon { name: "logout"; size: 18px; }
+                        }
                     }
                 }
             }
