@@ -65,7 +65,11 @@ export component SettingsPage inherits Rectangle {
                             font-size: Typography.font-size-md;
                             color: Palette.text-muted;
                             vertical-alignment: center;
-                            wrap: word-wrap;
+                            // The path is a single unbreakable token, so
+                            // word-wrap cannot shrink it below its full width.
+                            // Elide instead: the header stays one line and can
+                            // shrink with the window.
+                            overflow: elide;
                         }
                     }
 
@@ -117,11 +121,13 @@ export component SettingsPage inherits Rectangle {
                                 font-size: Typography.font-size-md;
                                 font-weight: Typography.font-weight-medium;
                                 color: Palette.text;
+                                wrap: word-wrap;
                             }
                             Text {
                                 text: "Switch between light and dark palettes";
                                 font-size: Typography.font-size-sm;
                                 color: Palette.text-muted;
+                                wrap: word-wrap;
                             }
                         }
                         Rectangle { horizontal-stretch: 1; }
@@ -149,11 +155,13 @@ export component SettingsPage inherits Rectangle {
                                     font-size: Typography.font-size-md;
                                     font-weight: Typography.font-weight-medium;
                                     color: Palette.text;
+                                    wrap: word-wrap;
                                 }
                                 Text {
                                     text: "Show a toast when a task completes";
                                     font-size: Typography.font-size-sm;
                                     color: Palette.text-muted;
+                                    wrap: word-wrap;
                                 }
                             }
                             Rectangle { horizontal-stretch: 1; }
@@ -171,11 +179,13 @@ export component SettingsPage inherits Rectangle {
                                     font-size: Typography.font-size-md;
                                     font-weight: Typography.font-weight-medium;
                                     color: Palette.text;
+                                    wrap: word-wrap;
                                 }
                                 Text {
                                     text: "Start minimized in the tray";
                                     font-size: Typography.font-size-sm;
                                     color: Palette.text-muted;
+                                    wrap: word-wrap;
                                 }
                             }
                             Rectangle { horizontal-stretch: 1; }
@@ -202,11 +212,13 @@ export component SettingsPage inherits Rectangle {
                                 font-size: Typography.font-size-md;
                                 font-weight: Typography.font-weight-medium;
                                 color: Palette.text;
+                                wrap: word-wrap;
                             }
                             Text {
                                 text: "Requires a restart to fully apply";
                                 font-size: Typography.font-size-sm;
                                 color: Palette.text-muted;
+                                wrap: word-wrap;
                             }
                         }
                         Rectangle { horizontal-stretch: 1; }
