@@ -74,15 +74,17 @@ configure/build reuses `.deps-cache/`.
 
 ## Pinning a Slint version
 
-`CMake/FetchSlint.cmake` tracks the `release/1` branch by default — it moves
-with patch releases. For a reproducible build, pin the tag:
+`CMake/FetchSlint.cmake` pins a concrete release tag (`v1.18.1` by default)
+for reproducible builds. To upgrade, change `SLINT_FETCH_TAG` and
+`SLINT_VERSION_STRING` together:
 
 ```cmake
-GIT_TAG v1.18.1   # instead of release/1
+set(SLINT_FETCH_TAG "v1.18.1")   # a release tag, not the moving release/1 branch
 ```
 
 then delete `.deps-cache/` (or the slint subdirectory inside it) to force a
-re-fetch.
+re-fetch. To track the moving `release/1` branch instead, pass
+`-DSLINT_FETCH_TAG=release/1` at configure time.
 
 ## Backends and renderers
 
