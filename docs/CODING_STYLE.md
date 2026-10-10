@@ -1,9 +1,8 @@
 # Coding style
 
-The goal: a codebase that is **racy, terstruktur, maintainable, konsisten dan
-profesional** — clean, structured, maintainable, consistent, and professional.
-Two languages live here (C++ and Slint markup); each has its own rules, and a
-few rules govern the boundary between them.
+The goal: a codebase that is **clean, structured, maintainable, consistent, and
+professional**. Two languages live here (C++ and Slint markup); each has its own
+rules, and a few rules govern the boundary between them.
 
 ## C++
 
@@ -16,7 +15,7 @@ Highlights:
 - 4-space indentation, no tabs; 100-column limit
 - Braces: functions open on a new line, control statements do not
 - `PascalCase` types, `camelCase` functions and locals, `m_` member prefix,
-  `UPPER_CASE` constants, `k` prefix for `constexpr` in headers
+  `k` prefix for constants (`kMaxTitleLength`, `kPageSize`)
 
 ### File and module organization
 
@@ -39,7 +38,7 @@ Highlights:
 | Function / method  | `camelCase`           | `statCards()`               |
 | Member variable    | `m_` + `camelCase`    | `m_services`                |
 | Free function      | `camelCase`           | `toSlint()`                 |
-| Constant           | `UPPER_SNAKE`         | `MAX_RETRIES`               |
+| Constant           | `k` + `PascalCase`    | `kMaxTitleLength`           |
 | File name          | class name            | `DashboardService.cpp`      |
 
 No type-encoding prefixes in file names. The single tolerated interface

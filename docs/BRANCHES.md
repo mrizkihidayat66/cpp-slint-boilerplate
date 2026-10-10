@@ -45,17 +45,20 @@ build/bin/Debug/x86/...
 build/bin/Release/x86/...
 ```
 
-Intermediate worktrees/build trees live under `build/build-win/<branch>/`
+Intermediate worktrees/build trees live under `build/build-win/<arch>/<branch>/`
 and can be deleted once you are done comparing; the shared Slint cache
 (`.deps-cache/`) is reused from the main checkout, so a full matrix run
 only compiles each architecture's Rust runtime once.
 
 ## Maintenance policy
 
-- The branches are **forks of `main`**, cut after `main` is tagged
-- Shared fixes (build breakage, Slint API changes) are **cherry-picked**
-  from `main` into each branch and re-tagged
+- The branches are **parallel timelines** forked from a common ancestor —
+  none is a superset of another. `main` is the source of truth.
+- Shared fixes (build breakage, Slint API changes, layout regressions) are
+  made **on `main` first**, then cherry-picked into each branch
 - Nothing merges back into `main` by default — `main` stays the clean
   reference scaffold
 - New components land in `main`'s library and are cherry-picked when a branch
   needs them
+- Tagging is currently repo-wide (`v0.1.0` on all branches); per-branch tags
+  may be added later if the demos start to diverge
