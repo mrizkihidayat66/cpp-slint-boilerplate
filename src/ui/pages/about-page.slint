@@ -4,6 +4,8 @@ import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
 import { AppCard } from "../components/library.slint";
 
+// One definition row: muted fixed-width label + value. Kept a top-level
+// component (Slint forbids nested component declarations).
 component AboutRow inherits HorizontalLayout {
     in property <string> label;
     in property <string> value;
@@ -18,67 +20,62 @@ component AboutRow inherits HorizontalLayout {
         font-size: Typography.font-size-md;
         color: Palette.text;
         horizontal-stretch: 1;
+        // Elide so a long value can never widen the page and enable
+        // horizontal panning.
+        overflow: elide;
     }
 }
 
 export component AboutPage inherits Rectangle {
     background: Palette.background;
+    clip: true;
 
+    // The Flickable's only child must be a LAYOUT: a plain Rectangle child is
+    // vertically centered by Slint's default geometry (and, being no layout,
+    // never extends the scrollable height). A layout fills the viewport and
+    // makes the page scroll exactly as tall as its content.
     Flickable {
         x: 0;
         y: 0;
         width: 100%;
         height: 100%;
 
-        Rectangle {
-            width: 100%;
-            height: content-column.preferred-height + 2 * Metrics.space-6;
-            clip: false;
+        VerticalLayout {
+            padding: Metrics.space-6;
+            spacing: Metrics.space-5;
+            alignment: start;
 
-            content-column := VerticalLayout {
-                x: Metrics.space-6;
-                width: parent.width - 2 * Metrics.space-6;
-                y: Metrics.space-6;
-                spacing: Metrics.space-5;
+            // --- Header — same shell as the other pages.
+            VerticalLayout {
+                spacing: 2px;
+                Text {
+                    text: "About";
+                    font-size: Typography.font-size-xl;
+                    font-weight: Typography.font-weight-bold;
+                    color: Palette.text;
+                }
+                Text {
+                    text: "Version and build information";
+                    font-size: Typography.font-size-md;
+                    color: Palette.text-muted;
+                }
+            }
 
-                // --- Header — same shell as the other pages.
+            // --- Application — full-width, key facts about the build.
+            AppCard {
+                title: "cpp-slint-boilerplate";
+                subtitle: AppState.about-description;
+
+                // Definition rows, the same visual language as the other
+                // pages' lists: muted fixed-width label + value.
                 VerticalLayout {
-                    spacing: 2px;
-                    Text {
-                        text: "About";
-                        font-size: Typography.font-size-xl;
-                        font-weight: Typography.font-weight-bold;
-                        color: Palette.text;
-                        vertical-alignment: center;
-                    }
-                    Text {
-                        text: "Version and build information";
-                        font-size: Typography.font-size-md;
-                        color: Palette.text-muted;
-                        vertical-alignment: center;
-                    }
+                    spacing: Metrics.space-3;
+
+                    AboutRow { label: "Version"; value: AppState.about-version; }
+                    AboutRow { label: "Slint"; value: AppState.about-slint-version; }
+                    AboutRow { label: "Compiler"; value: AppState.about-compiler; }
+                    AboutRow { label: "Build"; value: AppState.about-build-type; }
                 }
-
-                // --- Application — full-width, key facts about the build.
-                AppCard {
-                    title: "cpp-slint-boilerplate";
-                    subtitle: "A professional C++20 + Slint desktop application boilerplate";
-
-                    // Definition rows, the same visual language as the other
-                    // pages' lists: muted fixed-width label + value. The app
-                    // description already lives in the card subtitle, so it
-                    // is not repeated as a body paragraph.
-                    VerticalLayout {
-                        spacing: Metrics.space-3;
-
-                        AboutRow { label: "Version"; value: AppState.about-version; }
-                        AboutRow { label: "Slint"; value: AppState.about-slint-version; }
-                        AboutRow { label: "Compiler"; value: AppState.about-compiler; }
-                        AboutRow { label: "Build"; value: AppState.about-build-type; }
-                    }
-                }
-
-                Rectangle { height: 8px; }
             }
         }
     }

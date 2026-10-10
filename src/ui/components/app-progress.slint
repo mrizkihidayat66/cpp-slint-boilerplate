@@ -31,6 +31,9 @@ export component AppProgress inherits Rectangle {
         height: root.thickness;
         border-radius: root.thickness / 2;
         background: Palette.surface-alt;
+        // Clip the moving blocks to the track: without this the determinate
+        // fill and the indeterminate runner paint past the rounded ends.
+        clip: true;
 
         // Determinate: one fill anchored at x:0 growing strictly left→right.
         if !root.indeterminate : fill := Rectangle {

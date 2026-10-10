@@ -304,6 +304,7 @@ void Application::loadInitialData()
     const auto &about = m_services.get<services::AboutService>()->aboutInfo();
     auto &state = window.global<::app::AppState>();
     // Structured fields — the About page lays them out as key/value rows.
+    state.set_about_description(slint::SharedString(about.description));
     state.set_about_version(slint::SharedString(about.version));
     state.set_about_slint_version(slint::SharedString(about.slintVersion));
     state.set_about_compiler(slint::SharedString(about.compiler));

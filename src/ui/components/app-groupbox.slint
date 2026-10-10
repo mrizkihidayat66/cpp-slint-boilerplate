@@ -44,9 +44,10 @@ export component AppGroupBox inherits Rectangle {
     private property <bool> has-title: root.title != "" || root.icon-name != "";
 
     if root.has-title : Rectangle {
-        // Align the caption with the first pixel of the CONTENT (same inset
-        // as content-padding-left below), not with an arbitrary space-3.
-        x: root.content-padding;
+        // Align the caption TEXT with the first pixel of the content: the
+        // title row itself adds a space-2 left padding, so the box starts
+        // one space-2 to the left of the content inset.
+        x: root.content-padding - Metrics.space-2;
         y: -8px;
         height: 16px;
         width: title-row.preferred-width + 2 * Metrics.space-2;

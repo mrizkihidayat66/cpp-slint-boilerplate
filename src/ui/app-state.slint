@@ -36,10 +36,13 @@ export global AppState {
     in-out property <string> status-message: "";
     // Structured about fields — the About page renders them as key/value
     // rows (one Text pair per line) instead of parsing a \n-joined blob.
-    in-out property <string> about-version: "";
-    in-out property <string> about-slint-version: "";
-    in-out property <string> about-compiler: "";
-    in-out property <string> about-build-type: "";
+    // Defaults keep the page readable in preview/harness runs with no C++
+    // services attached; Application overwrites them at startup.
+    in-out property <string> about-description: "A professional C++20 + Slint desktop application boilerplate.";
+    in-out property <string> about-version: "(development)";
+    in-out property <string> about-slint-version: "(unknown)";
+    in-out property <string> about-compiler: "(unknown)";
+    in-out property <string> about-build-type: "(unknown)";
     /// Gallery scroll position as a 0..1 fraction of the scrollable range
     /// (screenshot harness hook; UI users scroll with the wheel).
     in-out property <float> gallery-scroll: 0;
