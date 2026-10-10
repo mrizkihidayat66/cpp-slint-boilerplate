@@ -28,6 +28,11 @@ The first build compiles Slint from source (10–20 min); the shared cache in
 VS Code: open the folder and install the recommended extensions (Slint LSP,
 CMake Tools, clangd) — tasks and launch configs are provided in `.vscode/`.
 
+Optional tooling — cross-branch matrix builds, screenshot capture, live
+preview and MCP-driven interaction checks — lives in `scripts/`; see
+[../scripts/README.md](../scripts/README.md). None of it is required to
+build or run the app.
+
 ## Workflow
 
 1. Branch from `main`: `feat/<topic>`, `fix/<topic>`, `docs/<topic>`

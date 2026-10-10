@@ -68,6 +68,9 @@ scripts/build-matrix.cmd
 ```
 
 See [docs/BRANCHES.md](docs/BRANCHES.md) for the collected-binary layout.
+The rest of `scripts/` (screenshot capture, live preview, MCP-driven
+interaction and alignment checks) is described in
+[scripts/README.md](scripts/README.md).
 
 ## Prerequisites
 
@@ -87,6 +90,7 @@ the per-architecture cache under `.deps-cache/` makes every later build fast.
 - [docs/BRANCHES.md](docs/BRANCHES.md) — the progressive example tour
 - [docs/CODING_STYLE.md](docs/CODING_STYLE.md) — C++ and Slint style rules
 - [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — setup, workflow, PR checklist
+- [scripts/README.md](scripts/README.md) — optional build, capture and MCP verification harness
 
 ## Roadmap
 

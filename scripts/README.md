@@ -1,9 +1,16 @@
 # scripts/ — development & verification harness
 
-Windows-only tooling used to build and verify this repository. None of it is
+Optional tooling used to build and verify this repository. None of it is
 needed to build or run the app itself — the CMake presets in the repo root are
 the supported path (see [../docs/BUILDING_SLINT.md](../docs/BUILDING_SLINT.md)).
 All output lands under `build/`, which is git-ignored.
+
+Most of this harness targets Windows, but the MCP clients are plain Python and
+run anywhere a live preview is reachable:
+
+| Runs anywhere | Windows-only |
+| ------------- | ------------ |
+| `mcp.py`, `mcp-query.py`, `mcp-check.py`, `functional-test.py`, `verify-align.py` (Python; talk to the Slint LSP MCP endpoint) | `build-matrix.cmd`, `capture-all.ps1`, `capture-ui.ps1`, `live-preview.py`, `shot-pages.py`, `preview/kill-lp.ps1` (launch `slint-lsp.exe`, enumerate windows via Win32, or invoke PowerShell) |
 
 ## Build
 
