@@ -51,3 +51,9 @@ makes every later build fast.
   x86/x64 details, troubleshooting
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — component catalog
 - [docs/CODING_STYLE.md](docs/CODING_STYLE.md) — markup + C++ conventions
+
+## License
+
+This repository's scaffolding code is released under the [MIT License](LICENSE).
+That covers this boilerplate only — Slint is licensed separately, and you must
+choose one of its licenses for any app you ship. See [NOTICE.md](NOTICE.md).
