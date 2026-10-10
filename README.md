@@ -21,6 +21,8 @@ applications on Windows — x64 **and** x86 (32-bit).
   chains, on separate branches. See [docs/BRANCHES.md](docs/BRANCHES.md).
 - **CI** — Windows matrix (x64 + x86 × Debug/Release) plus Linux and macOS
   legs, formatting check, unit tests, GPU-less smoke run.
+- **Releases** — push a `v*` tag to publish a portable ZIP (executable + Slint
+  runtime DLL) to a GitHub Release. See [CHANGELOG.md](CHANGELOG.md).
 - **Docs** — coding style, contribution guide, architecture deep-dive,
   component catalog, build instructions.
 
@@ -79,7 +81,7 @@ makes every later build fast.
 - [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
 - [ ] Richer icon set (bundled vector assets)
 - [x] Linux/macOS CI legs (`native-*` presets) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos)
-- [ ] Release artifact workflow (packaged zip/installer)
+- [x] Release artifact workflow — portable ZIP via CPack, published on `v*` tags by [.github/workflows/release.yml](.github/workflows/release.yml)
 
 ## License
 
