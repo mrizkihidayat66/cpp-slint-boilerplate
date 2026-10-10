@@ -82,7 +82,7 @@ ctest --preset x64-debug
 - [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
 - [ ] Richer icon set (bundled vector assets)
 - [x] Linux/macOS CI legs (`native-*` presets) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos)
-- [ ] Release artifact workflow (packaged zip/installer)
+- [x] Release artifact workflow — portable ZIP via CPack, published on `v*` tags by [.github/workflows/release.yml](.github/workflows/release.yml)
 
 ## License
 
