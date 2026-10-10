@@ -6,6 +6,17 @@ project(
     DESCRIPTION "C++20 + Slint desktop application — simple example"
     LANGUAGES CXX)
 
+# ---------------------------------------------------------------------------
+# Application identity — the single place to rename the app.
+#
+# APP_TECHNICAL_NAME is the machine-facing name (window title, About card);
+# APP_DISPLAY_NAME is the short brand in the UI header. Both reach C++ as
+# compile definitions and, through the AppInfo global, the .slint surfaces.
+# The version comes from PROJECT_VERSION above — do not hardcode it again.
+# ---------------------------------------------------------------------------
+set(APP_TECHNICAL_NAME "cpp-slint-boilerplate")
+set(APP_DISPLAY_NAME "Boilerplate")
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -32,6 +43,13 @@ target_link_libraries(boilerplate-ui PUBLIC Slint::Slint)
 
 add_executable(slint-boilerplate src/main.cpp)
 target_include_directories(slint-boilerplate PRIVATE src)
+
+# AppMetadata.h bakes these values in as macros, so the target that includes it
+# must see the same defines.
+target_compile_definitions(slint-boilerplate PRIVATE
+    APP_TECHNICAL_NAME="${APP_TECHNICAL_NAME}"
+    APP_DISPLAY_NAME="${APP_DISPLAY_NAME}"
+    APP_VERSION="${PROJECT_VERSION}")
 target_link_libraries(slint-boilerplate PRIVATE boilerplate-ui)
 
 # Slint's headers and the generated app-window.h are third-party: pull them in

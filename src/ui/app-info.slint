@@ -1,0 +1,15 @@
+// app-info.slint — application identity, defined once in CMakeLists.txt and
+// pushed from C++ (main.cpp) at startup.
+//
+// Its own file, like theme.slint, so pages and components can import the
+// identity without pulling in the whole app-state.slint module. The defaults
+// keep preview/harness runs — which attach no C++ — rendering a sensible name.
+
+export global AppInfo {
+    /// Short brand shown in the sidebar header, e.g. "Boilerplate".
+    in-out property <string> display-name: "Boilerplate";
+    /// Full/technical name: window title, About card, settings directory.
+    in-out property <string> technical-name: "cpp-slint-boilerplate";
+    /// Application version, from PROJECT_VERSION in CMakeLists.txt.
+    in-out property <string> version: "0.1.0";
+}

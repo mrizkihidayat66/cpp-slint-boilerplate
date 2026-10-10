@@ -6,6 +6,7 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppIcon } from "app-icon.slint";
+import { AppInfo } from "../app-info.slint";
 
 export struct AppSidebarItem {
     icon-name: string,
@@ -164,7 +165,7 @@ export component AppSidebar inherits Rectangle {
                 alignment: start;
                 spacing: Metrics.space-3;
 
-                // Version pill — vertically centered, "v0.1" centered inside.
+                // Version pill — vertically centered, the version centered inside.
                 VerticalLayout {
                     alignment: center;
                     Rectangle {
@@ -173,7 +174,7 @@ export component AppSidebar inherits Rectangle {
                         border-radius: Metrics.radius-pill;
                         background: Palette.sidebar-hover;
                         Text {
-                            text: "v0.1";
+                            text: AppInfo.version;
                             font-size: 9px;
                             color: Palette.sidebar-text;
                             x: (parent.width - self.preferred-width) / 2;
@@ -182,7 +183,7 @@ export component AppSidebar inherits Rectangle {
                     }
                 }
                 Text {
-                    text: "cpp-slint-boilerplate";
+                    text: AppInfo.technical-name;
                     font-size: Typography.font-size-xs;
                     color: Palette.sidebar-text;
                     vertical-alignment: center;

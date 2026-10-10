@@ -3,6 +3,7 @@
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
 import { AppCard } from "../components/library.slint";
+import { AppInfo } from "../app-info.slint";
 
 // One definition row: muted fixed-width label + value. Kept a top-level
 // component (Slint forbids nested component declarations).
@@ -63,7 +64,7 @@ export component AboutPage inherits Rectangle {
 
             // --- Application — full-width, key facts about the build.
             AppCard {
-                title: "cpp-slint-boilerplate";
+                title: AppInfo.technical-name;
                 subtitle: AppState.about-description;
 
                 // Definition rows, the same visual language as the other
