@@ -25,6 +25,6 @@ application built with Slint.
 ## Slint source
 
 Slint is fetched at configure time via CMake `FetchContent` from
-<https://github.com/slint-ui/slint> (the `release/1` branch by default). Its
-license and notices apply to that fetched copy, not to anything in this
-repository.
+<https://github.com/slint-ui/slint>, pinned to the `v1.18.1` release tag by
+default (`SLINT_FETCH_TAG` in `CMake/FetchSlint.cmake`). Its license and notices
+apply to that fetched copy, not to anything in this repository.
