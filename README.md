@@ -9,7 +9,7 @@ This branch is the third stop of the progressive tour (see
 
 | Branch | Demonstrates |
 | ------ | ------------ |
-| `examples/simple` | Ship a Slint app with ~30 lines of C++ |
+| `examples/simple` | Ship a Slint app with ~17 lines of C++ |
 | `examples/intermediate` | State + a real service: settings persisted to `%APPDATA%`, live theme |
 | **`examples/advanced`** | **Full CRUD: `TaskRepository → TaskValidationService → TaskService`** |
 
@@ -19,7 +19,7 @@ Open **Tasks** in the sidebar:
 
 - **Sortable table** — click a column header to sort ascending, click again
   to flip. The reorder happens in C++ (the view never sorts).
-- **Pagination** — 10 rows per page over a 22-row seed set; the bar
+- **Pagination** — 10 rows per page over a 23-row seed set; the bar
   recalculates after every mutation.
 - **Create / edit** — “New task” or click a row. The dialog validates the
   draft through `TaskValidationService` and shows per-field errors under
@@ -85,6 +85,16 @@ the per-architecture cache under `.deps-cache/` makes every later build fast.
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — the component library API
 - [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md) — dependency setup, x86/x64
 - [docs/BRANCHES.md](docs/BRANCHES.md) — the progressive example tour
+- [docs/CODING_STYLE.md](docs/CODING_STYLE.md) — C++ and Slint style rules
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — setup, workflow, PR checklist
+
+## Roadmap
+
+- [x] Dark palette + runtime theme switching — see `examples/intermediate`
+- [ ] Skia renderer preset
+- [ ] Richer icon set (bundled vector assets)
+- [ ] Linux/macOS CI legs
+- [ ] Release artifact workflow (packaged zip/installer)
 
 ## License
 
