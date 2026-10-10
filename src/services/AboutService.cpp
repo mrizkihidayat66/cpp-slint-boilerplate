@@ -13,7 +13,7 @@ void AboutService::initialize()
         // The Slint C++ API exposes no public runtime version accessor; the
         // fetched release is recorded in CMake/FetchSlint.cmake. Keep this
         // string in sync when pinning SLINT_FETCH_TAG.
-        .slintVersion = "1.x (release/1)",
+        .slintVersion = "1.18.1",
         .compiler =
 #if defined(_MSC_VER)
             "MSVC " + std::to_string(_MSC_VER),

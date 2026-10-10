@@ -52,14 +52,14 @@ set(SLINT_FEATURE_RENDERER_SOFTWARE OFF CACHE BOOL "software renderer")
 
 # --- Acquire ----------------------------------------------------------------
 #
-# `release/1` is Slint's stable release branch — it moves forward with patch
-# releases. For a fully reproducible build, pin the tag instead:
-#   git -C .deps-cache/... checkout v1.18.1
-# or set GIT_TAG to a specific tag below before configuring.
+# Pinned to a release tag for reproducible builds: `release/1` moves forward
+# with every patch release, so the same commit could otherwise build against
+# different Slint versions. Bump SLINT_FETCH_TAG (and SLINT_VERSION_STRING)
+# together when upgrading.
 
-set(SLINT_FETCH_TAG "release/1" CACHE STRING
-    "Git ref of slint-ui/slint to fetch (release/1 moves; pin e.g. v1.18.1 for reproducibility)")
-set(SLINT_VERSION_STRING "1.x (release/1)" CACHE STRING
+set(SLINT_FETCH_TAG "v1.18.1" CACHE STRING
+    "Git ref of slint-ui/slint to fetch (a release tag, for reproducibility)")
+set(SLINT_VERSION_STRING "1.18.1" CACHE STRING
     "Human-readable Slint version shown on the About page")
 
 FetchContent_Declare(
@@ -67,7 +67,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/slint-ui/slint.git
     GIT_TAG ${SLINT_FETCH_TAG}
     SOURCE_SUBDIR api/cpp
-    GIT_SHALLOW FALSE)
+    GIT_SHALLOW TRUE)
 
 # FetchContent_MakeAvailable adds the api/cpp subdirectory directly; it
 # defines the Slint::Slint target (and the slint_target_sources command) in
