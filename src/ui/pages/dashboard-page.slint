@@ -39,6 +39,10 @@ export component DashboardPage inherits Rectangle {
             VerticalLayout {
                 padding: Metrics.space-6;
                 spacing: Metrics.space-5;
+                // Pin content to the top: without this a short page is
+                // vertically centered inside the tall Flickable viewport
+                // (same reason About/Settings/Gallery set alignment: start).
+                alignment: start;
 
                 // --- Page header -----------------------------------------------------
                 HorizontalLayout {
