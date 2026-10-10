@@ -335,7 +335,9 @@ AppCard {
     title: "Cards";
     subtitle: "Elevation presets: flat, raised, floating";
 
-    HorizontalLayout {
+    // Three cards side by side need ~377px of body width; below that they
+    // stack (Slint layouts never wrap, so the row structure itself changes).
+    if root.width >= 440px : HorizontalLayout {
         spacing: Metrics.space-4;
 
         AppCard {
@@ -354,6 +356,25 @@ AppCard {
             title: "Floating";
             elevation: AppCardElevation.floating;
             horizontal-stretch: 1;
+            Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+    }
+    if root.width < 440px : VerticalLayout {
+        spacing: Metrics.space-3;
+
+        AppCard {
+            title: "Flat";
+            elevation: AppCardElevation.flat;
+            Text { text: "bordered: true"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+        AppCard {
+            title: "Raised";
+            elevation: AppCardElevation.raised;
+            Text { text: "default elevation"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+        }
+        AppCard {
+            title: "Floating";
+            elevation: AppCardElevation.floating;
             Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
         }
     }

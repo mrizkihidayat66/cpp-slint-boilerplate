@@ -29,8 +29,8 @@ export component AppImage inherits Rectangle {
     horizontal-stretch: root.fill ? 1 : 0;
     vertical-stretch: root.fill ? 1 : 0;
 
-    width: 120px;
-    height: 120px;
+    width: root.fill ? 0px : 120px;
+    height: root.fill ? 0px : 120px;
     border-radius: root.corner-radius;
     clip: true;
     background: root.checkered ? Palette.surface-alt : Palette.background;

@@ -95,14 +95,30 @@ AppCard {
             }
         }
 
-        // Icon variants on their own line, out of the alignment demo.
-        HorizontalLayout {
+        // Icon variants on their own line, out of the alignment demo. Five
+        // buttons need ~344px; below that they split into two rows (Slint
+        // layouts never wrap, so the row structure itself changes).
+        if root.width >= 400px : HorizontalLayout {
             spacing: Metrics.space-2;
             AppButton { text: "With icon"; icon-name: "plus"; }
             AppButton { text: "Trailing"; trailing-icon-name: "chevron-right"; }
             AppButton { icon-name: "edit"; square: true; }
             AppButton { icon-name: "trash"; square: true; variant: AppButtonVariant.danger; }
             AppButton { icon-name: "check"; square: true; variant: AppButtonVariant.success; }
+        }
+        if root.width < 400px : VerticalLayout {
+            spacing: Metrics.space-2;
+            HorizontalLayout {
+                spacing: Metrics.space-2;
+                AppButton { text: "With icon"; icon-name: "plus"; }
+                AppButton { text: "Trailing"; trailing-icon-name: "chevron-right"; }
+            }
+            HorizontalLayout {
+                spacing: Metrics.space-2;
+                AppButton { icon-name: "edit"; square: true; }
+                AppButton { icon-name: "trash"; square: true; variant: AppButtonVariant.danger; }
+                AppButton { icon-name: "check"; square: true; variant: AppButtonVariant.success; }
+            }
         }
     }
 }
@@ -111,24 +127,22 @@ AppCard {
 export component ContainersSection inherits Rectangle {
     background: transparent;
 
-    // Section root width, fixed by the page layout — sizing children from
-    // THIS (not parent.width of the inner layout) breaks the width feedback
-    // loop: panel.width -> layout -> panel.layoutinfo -> width.
-    in property <length> section-width;
-
 AppCard {
     title: "Panels & group boxes";
     subtitle: "AppPanel tones, AppGroupBox fieldset";
 
-    HorizontalLayout {
+    // Three panels side by side need ~548px of section width (the GroupBox
+    // fieldset sets the floor); below that they stack. Panel widths come from
+    // root.width -- the width the page layout gives THIS section. Sizing from
+    // it (not parent.width of the inner layout) breaks the width feedback
+    // loop panel.width -> layout -> panel.layoutinfo -> width.
+    if root.width >= 560px : HorizontalLayout {
         spacing: Metrics.space-4;
 
-        // Explicit thirds of the fixed section width — deterministic and
-        // content-independent (a stretched row divides only the leftover).
         AppPanel {
             title: "Panel";
             icon-name: "folder";
-            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+            width: (root.width - 2 * Metrics.space-5 - 2 * Metrics.space-4
                 - 2 * Metrics.space-4) / 3;
             Text {
                 text: "Bordered surface with a pinned title row. Use for content grouping.";
@@ -141,7 +155,7 @@ AppCard {
             title: "Tinted panel";
             icon-name: "info";
             tone: AppPanelTone.tinted;
-            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+            width: (root.width - 2 * Metrics.space-5 - 2 * Metrics.space-4
                 - 2 * Metrics.space-4) / 3;
             Text {
                 text: "Tone surface calls attention without an alert's urgency.";
@@ -153,8 +167,42 @@ AppCard {
         AppGroupBox {
             title: "GroupBox";
             icon-name: "user";
-            width: (root.section-width - 2 * Metrics.space-5 - 2 * Metrics.space-4
+            width: (root.width - 2 * Metrics.space-5 - 2 * Metrics.space-4
                 - 2 * Metrics.space-4) / 3;
+            VerticalLayout {
+                spacing: Metrics.space-2;
+                AppCheckbox { label: "Fieldset member"; checked: true; }
+                AppCheckbox { label: "Another member"; }
+            }
+        }
+    }
+    if root.width < 560px : VerticalLayout {
+        spacing: Metrics.space-4;
+
+        AppPanel {
+            title: "Panel";
+            icon-name: "folder";
+            Text {
+                text: "Bordered surface with a pinned title row. Use for content grouping.";
+                color: Palette.text-muted;
+                font-size: Typography.font-size-sm;
+                wrap: word-wrap;
+            }
+        }
+        AppPanel {
+            title: "Tinted panel";
+            icon-name: "info";
+            tone: AppPanelTone.tinted;
+            Text {
+                text: "Tone surface calls attention without an alert's urgency.";
+                color: Palette.text-muted;
+                font-size: Typography.font-size-sm;
+                wrap: word-wrap;
+            }
+        }
+        AppGroupBox {
+            title: "GroupBox";
+            icon-name: "user";
             VerticalLayout {
                 spacing: Metrics.space-2;
                 AppCheckbox { label: "Fieldset member"; checked: true; }
@@ -238,7 +286,9 @@ AppCard {
     VerticalLayout {
         spacing: Metrics.space-3;
 
-        HorizontalLayout {
+        // Four across needs ~528px; below that the row becomes a 2x2 block
+        // (Slint layouts never wrap, so the row structure itself changes).
+        if root.width >= 576px : HorizontalLayout {
             spacing: Metrics.space-4;
             height: 140px;
 
@@ -260,6 +310,22 @@ AppCard {
                 caption: "checkered backdrop";
                 checkered: true;
                 fill: true;
+            }
+        }
+        if root.width < 576px : VerticalLayout {
+            spacing: Metrics.space-4;
+
+            HorizontalLayout {
+                spacing: Metrics.space-4;
+                height: 140px;
+                AppImage { caption: "contain (placeholder)"; fill: true; }
+                AppImage { caption: "cover (placeholder)"; fit: AppImageFit.cover; fill: true; }
+            }
+            HorizontalLayout {
+                spacing: Metrics.space-4;
+                height: 140px;
+                AppImage { caption: "fill (placeholder)"; fit: AppImageFit.fill; fill: true; }
+                AppImage { caption: "checkered backdrop"; checkered: true; fill: true; }
             }
         }
 
@@ -365,6 +431,85 @@ AppCard {
 }
 }
 
+component BindingColumnInput inherits VerticalLayout {
+VerticalLayout {
+spacing: Metrics.space-3;
+horizontal-stretch: 1;
+Text {
+    text: "1 — Two-way binding";
+    font-size: Typography.font-size-sm;
+    font-weight: Typography.font-weight-semibold;
+    color: Palette.text;
+}
+HorizontalLayout {
+    spacing: Metrics.space-3;
+    AppInput {
+        label: "Name";
+        text <=> GalleryDemoState.chain-name;
+        placeholder: "Type here…";
+    }
+}
+Text {
+    text: "Live preview: " + GalleryDemoState.chain-name;
+    font-size: Typography.font-size-md;
+    color: Palette.primary;
+}
+Rectangle { height: Metrics.space-2; }
+Text {
+    text: "2 — Chain reaction";
+    font-size: Typography.font-size-sm;
+    font-weight: Typography.font-weight-semibold;
+    color: Palette.text;
+}
+AppSwitch {
+    label: "Enable the button";
+    checked <=> GalleryDemoState.chain-enabled;
+}
+AppButton {
+    text: "Counter: " + GalleryDemoState.chain-count;
+    disabled: !GalleryDemoState.chain-enabled;
+    clicked => { GalleryDemoState.chain-count = GalleryDemoState.chain-count + 1; }
+}
+}
+}
+
+component BindingColumnDerived inherits VerticalLayout {
+VerticalLayout {
+spacing: Metrics.space-3;
+horizontal-stretch: 1;
+Text {
+    text: "3 — Computed from the checklist";
+    font-size: Typography.font-size-sm;
+    font-weight: Typography.font-weight-semibold;
+    color: Palette.text;
+}
+Text {
+    text: "Checked members: " + GalleryDemoState.checked-count + " of " + GalleryDemoState.checked-total;
+    font-size: Typography.font-size-md;
+    color: Palette.text;
+}
+AppProgress {
+    value: GalleryDemoState.checked-count / GalleryDemoState.checked-total;
+    show-percentage: true;
+}
+Rectangle { height: Metrics.space-2; }
+Text {
+    text: "4 — Greeting (combines everything)";
+    font-size: Typography.font-size-sm;
+    font-weight: Typography.font-weight-semibold;
+    color: Palette.text;
+}
+AppAlert {
+    variant: GalleryDemoState.chain-enabled ? AppAlertVariant.success : AppAlertVariant.warning;
+    title: "Hello, " + GalleryDemoState.chain-name + "!";
+    text: GalleryDemoState.checked-count > 0
+        ? GalleryDemoState.checked-count + " members selected · due " + GalleryDemoState.due-date.year
+            + "-" + GalleryDemoState.due-date.month + "-" + GalleryDemoState.due-date.day
+        : "No members selected yet";
+}
+}
+}
+
 export component BindingSection inherits Rectangle {
     background: transparent;
 
@@ -372,89 +517,16 @@ AppCard {
     title: "Binding & chain reactions";
     subtitle: "Two-way binding, reactive state, control → control propagation";
 
-    HorizontalLayout {
+    // Two columns need ~397px of body width; below that they stack.
+    if root.width >= 460px : HorizontalLayout {
         spacing: Metrics.space-6;
-
-        VerticalLayout {
-            spacing: Metrics.space-3;
-            horizontal-stretch: 1;
-
-            Text {
-                text: "1 — Two-way binding";
-                font-size: Typography.font-size-sm;
-                font-weight: Typography.font-weight-semibold;
-                color: Palette.text;
-            }
-            HorizontalLayout {
-                spacing: Metrics.space-3;
-                AppInput {
-                    label: "Name";
-                    text <=> GalleryDemoState.chain-name;
-                    placeholder: "Type here…";
-                }
-            }
-            Text {
-                text: "Live preview: " + GalleryDemoState.chain-name;
-                font-size: Typography.font-size-md;
-                color: Palette.primary;
-            }
-
-            Rectangle { height: Metrics.space-2; }
-
-            Text {
-                text: "2 — Chain reaction";
-                font-size: Typography.font-size-sm;
-                font-weight: Typography.font-weight-semibold;
-                color: Palette.text;
-            }
-            AppSwitch {
-                label: "Enable the button";
-                checked <=> GalleryDemoState.chain-enabled;
-            }
-            AppButton {
-                text: "Counter: " + GalleryDemoState.chain-count;
-                disabled: !GalleryDemoState.chain-enabled;
-                clicked => { GalleryDemoState.chain-count = GalleryDemoState.chain-count + 1; }
-            }
-        }
-
-        VerticalLayout {
-            spacing: Metrics.space-3;
-            horizontal-stretch: 1;
-
-            Text {
-                text: "3 — Computed from the checklist";
-                font-size: Typography.font-size-sm;
-                font-weight: Typography.font-weight-semibold;
-                color: Palette.text;
-            }
-            Text {
-                text: "Checked members: " + GalleryDemoState.checked-count + " of " + GalleryDemoState.checked-total;
-                font-size: Typography.font-size-md;
-                color: Palette.text;
-            }
-            AppProgress {
-                value: GalleryDemoState.checked-count / GalleryDemoState.checked-total;
-                show-percentage: true;
-            }
-
-            Rectangle { height: Metrics.space-2; }
-
-            Text {
-                text: "4 — Greeting (combines everything)";
-                font-size: Typography.font-size-sm;
-                font-weight: Typography.font-weight-semibold;
-                color: Palette.text;
-            }
-            AppAlert {
-                variant: GalleryDemoState.chain-enabled ? AppAlertVariant.success : AppAlertVariant.warning;
-                title: "Hello, " + GalleryDemoState.chain-name + "!";
-                text: GalleryDemoState.checked-count > 0
-                    ? GalleryDemoState.checked-count + " members selected · due " + GalleryDemoState.due-date.year
-                        + "-" + GalleryDemoState.due-date.month + "-" + GalleryDemoState.due-date.day
-                    : "No members selected yet";
-            }
-        }
+        BindingColumnInput { horizontal-stretch: 1; }
+        BindingColumnDerived { horizontal-stretch: 1; }
+    }
+    if root.width < 460px : VerticalLayout {
+        spacing: Metrics.space-5;
+        BindingColumnInput { }
+        BindingColumnDerived { }
     }
 }
 }
