@@ -76,19 +76,27 @@ export component AppSelect inherits Rectangle {
         x: 0;
         y: root.height + Metrics.space-1;
         width: root.width;
-        border-radius: Metrics.radius-md;
-        background: Palette.surface;
-        border-width: Metrics.border-width;
-        border-color: Palette.border;
-        drop-shadow-blur: Metrics.elevation-2;
-        drop-shadow-color: Palette.shadow;
-        clip: true;
         height: root.popup-height;
 
-        ListView {
-            x: Metrics.space-1;
-            width: parent.width - 2 * Metrics.space-1;
+        // PopupWindow has no visual properties of its own (no background,
+        // border, clip, ...) — everything visual lives on this child.
+        panel := Rectangle {
+            x: 0;
+            y: 0;
+            width: parent.width;
             height: parent.height;
+            border-radius: Metrics.radius-md;
+            background: Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: Palette.border;
+            drop-shadow-blur: Metrics.elevation-2;
+            drop-shadow-color: Palette.shadow;
+            clip: true;
+
+            ListView {
+                x: Metrics.space-1;
+                width: parent.width - 2 * Metrics.space-1;
+                height: parent.height;
 
             for option[i] in root.model : Rectangle {
                 height: root.option-height;
@@ -115,6 +123,7 @@ export component AppSelect inherits Rectangle {
                         horizontal-stretch: 1;
                     }
                 }
+            }
             }
         }
     }

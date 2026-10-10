@@ -67,6 +67,12 @@ if not "%WT%"=="%WT_PREV%" (
     git -C "%ROOT%" worktree prune
     if exist "%WT%\CMakeLists.txt" (
         echo Reusing worktree at %WT%
+        REM CRITICAL: a reused worktree sits at whatever commit it was
+        REM created at. Re-point it at the branch tip or we silently
+        REB build stale code while reporting success.
+        git -C "%WT%" checkout --detach "%FULL%" >nul 2>&1
+        if errorlevel 1 (echo CHECKOUT FAILED for %FULL% & set /a FAILURES+=1 & exit /b 0)
+        for /f %%H in ('git -C "%WT%" rev-parse --short HEAD') do echo   at %%H
     ) else (
         git -C "%ROOT%" worktree add --detach "%WT%" "%FULL%"
         if errorlevel 1 (echo WORKTREE FAILED for %FULL% & set /a FAILURES+=1 & exit /b 0)
@@ -85,11 +91,25 @@ if errorlevel 1 (endlocal & echo VCVARS FAILED for %ARCH% & set /a FAILURES+=1 &
 "%CMAKE%" --preset %PRESET% -S "%WT%" -B "%BUILD_DIR%" -DSLINT_CACHE_DIR="%ROOT%\.deps-cache"
 if errorlevel 1 (endlocal & echo CONFIGURE FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
 "%CMAKE%" --build "%BUILD_DIR%" --target slint-boilerplate
-if errorlevel 1 (endlocal & echo BUILD FAILED %BR% %PRESET% & set /a FAILURES+=1 & exit /b 0)
+if errorlevel 1 (
+    endlocal
+    echo BUILD FAILED %BR% %PRESET%
+    set /a FAILURES+=1
+    REM Deleting a stale exe is not enough: ninja leaves the previous binary
+    REM in place on codegen failure. Without deleting it, a stale binary
+    REM gets collected and reported as success.
+    if exist "%BUILD_DIR%\slint-boilerplate.exe" del "%BUILD_DIR%\slint-boilerplate.exe"
+    exit /b 1
+)
 endlocal
 
 set "DEST=%BINOUT%\%CFG%\%ARCH%"
 if not exist "%DEST%" mkdir "%DEST%"
+if not exist "%BUILD_DIR%\slint-boilerplate.exe" (
+    echo COLLECT SKIPPED %BR% %PRESET% - no binary produced by this build
+    set /a FAILURES+=1
+    exit /b 1
+)
 copy /y "%BUILD_DIR%\slint-boilerplate.exe" "%DEST%\slint-boilerplate-%BR%.exe" >nul
 copy /y "%BUILD_DIR%\slint_cpp.dll" "%DEST%\slint_cpp.dll" >nul
 echo COLLECTED %DEST%\slint-boilerplate-%BR%.exe
