@@ -312,39 +312,44 @@ export component GalleryPage inherits Rectangle {
                 title: "Avatars & icons";
                 subtitle: "Initials fallback, status dot, icon set";
 
-                HorizontalLayout {
+                VerticalLayout {
                     spacing: Metrics.space-4;
 
-                    AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; }
-                    AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; }
-                    AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; }
-                    AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; }
+                    // Avatars on their own line, left-aligned.
+                    HorizontalLayout {
+                        spacing: Metrics.space-3;
+                        alignment: start;
+                        VerticalLayout { alignment: center; AppAvatar { initials: "AL"; name: "Ada Lovelace"; size: AppAvatarSize.sm; } }
+                        VerticalLayout { alignment: center; AppAvatar { initials: "GH"; name: "Grace Hopper"; size: AppAvatarSize.md; } }
+                        VerticalLayout { alignment: center; AppAvatar { initials: "AT"; name: "Alan Turing"; size: AppAvatarSize.lg; show-status: true; } }
+                        VerticalLayout { alignment: center; AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; } }
+                    }
 
-                    Rectangle { width: 1px; background: Palette.border; }
-
-                    VerticalLayout {
-                        spacing: Metrics.space-2;
-                        HorizontalLayout {
-                            spacing: Metrics.space-3;
-                            AppIcon { name: "home"; size: 18px; }
-                            AppIcon { name: "settings"; size: 18px; }
-                            AppIcon { name: "search"; size: 18px; }
-                            AppIcon { name: "chart"; size: 18px; }
-                            AppIcon { name: "calendar"; size: 18px; }
-                            AppIcon { name: "document"; size: 18px; }
-                            AppIcon { name: "folder"; size: 18px; }
-                            AppIcon { name: "edit"; size: 18px; }
-                        }
-                        HorizontalLayout {
-                            spacing: Metrics.space-3;
-                            AppIcon { name: "trash"; size: 18px; }
-                            AppIcon { name: "check"; size: 18px; }
-                            AppIcon { name: "warning"; size: 18px; }
-                            AppIcon { name: "activity"; size: 18px; }
-                            AppIcon { name: "clock"; size: 18px; }
-                            AppIcon { name: "refresh"; size: 18px; }
-                            AppIcon { name: "logout"; size: 18px; }
-                        }
+                    // Icon set on two lines: 16 icons in a single row is wider
+                    // than the minimum window width and Slint layouts do not wrap.
+                    HorizontalLayout {
+                        spacing: Metrics.space-3;
+                        alignment: start;
+                        VerticalLayout { alignment: center; AppIcon { name: "home"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "settings"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "search"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "chart"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "calendar"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "document"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "folder"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "edit"; size: 18px; } }
+                    }
+                    HorizontalLayout {
+                        spacing: Metrics.space-3;
+                        alignment: start;
+                        VerticalLayout { alignment: center; AppIcon { name: "trash"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "check"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "warning"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "activity"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "clock"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "refresh"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "logout"; size: 18px; } }
+                        VerticalLayout { alignment: center; AppIcon { name: "image"; size: 18px; } }
                     }
                 }
             }
@@ -426,7 +431,10 @@ export component GalleryPage inherits Rectangle {
                 title: "Cards";
                 subtitle: "Elevation presets: flat, raised, floating";
 
-                HorizontalLayout {
+                // Three cards side by side need ~377px of body width; below that
+                // they stack (Slint layouts never wrap, so the row structure
+                // itself changes).
+                if root.width >= 440px : HorizontalLayout {
                     spacing: Metrics.space-4;
 
                     AppCard {
@@ -445,6 +453,25 @@ export component GalleryPage inherits Rectangle {
                         title: "Floating";
                         elevation: AppCardElevation.floating;
                         horizontal-stretch: 1;
+                        Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+                    }
+                }
+                if root.width < 440px : VerticalLayout {
+                    spacing: Metrics.space-3;
+
+                    AppCard {
+                        title: "Flat";
+                        elevation: AppCardElevation.flat;
+                        Text { text: "bordered: true"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+                    }
+                    AppCard {
+                        title: "Raised";
+                        elevation: AppCardElevation.raised;
+                        Text { text: "default elevation"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
+                    }
+                    AppCard {
+                        title: "Floating";
+                        elevation: AppCardElevation.floating;
                         Text { text: "for popovers"; color: Palette.text-muted; font-size: Typography.font-size-sm; }
                     }
                 }
