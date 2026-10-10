@@ -151,9 +151,7 @@ jobs:
 
       - name: Build
         run: cmake --build --preset native-${{ matrix.build_type }} --parallel
-
-      - name: Test
-        run: ctest --preset native-${{ matrix.build_type }} --output-on-failure
+      # No unit tests on this branch (no tests/ directory), so no Test step.
 
       # No GPU on the runners: SLINT_BACKEND=winit-software uses the software
       # renderer compiled in by default (CMake/FetchSlint.cmake). Linux runners
