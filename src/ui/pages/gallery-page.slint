@@ -98,8 +98,11 @@ export component GalleryPage inherits Rectangle {
 
         // Harness hook: fraction (0..1) of the scrollable height to show —
         // set via AppState.gallery-scroll (mouse-wheel automation is flaky).
+        // content-y is the content's position RELATIVE to the viewport and is
+        // negative when scrolled down, so the fraction is negated. Without the
+        // minus the content slides the wrong way and the page blanks out.
         content-y: self.content-height > self.height
-            ? min(1, max(0, AppState.gallery-scroll))
+            ? -min(1, max(0, AppState.gallery-scroll))
                 * (self.content-height - self.height)
             : 0;
 
