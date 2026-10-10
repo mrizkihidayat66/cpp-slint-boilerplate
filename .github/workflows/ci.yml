@@ -61,17 +61,20 @@ jobs:
         run: cmake --build --preset ${{ matrix.arch }}-${{ matrix.build_type }} --parallel
 
       - name: Test
-        if: matrix.arch == 'x64'
         run: ctest --preset ${{ matrix.arch }}-${{ matrix.build_type }} --output-on-failure
 
       - name: Smoke run (software renderer, GPU-less runner)
-        if: matrix.arch == 'x64'
         shell: pwsh
         run: |
-          $proc = Start-Process -FilePath "build/${{ matrix.arch }}-${{ matrix.build_type }}/slint-boilerplate.exe" `
-            -Environment @{ SLINT_BACKEND = "winit-software" } -PassThru
-          Start-Sleep -Seconds 5
-          if ($proc.HasExited) {
-            throw "App exited prematurely with code $($proc.ExitCode)"
+          $exe = "build/${{ matrix.arch }}-${{ matrix.build_type }}/slint-boilerplate.exe"
+          $env:SLINT_BACKEND = "winit-software"
+          try {
+            $proc = Start-Process -FilePath $exe -PassThru
+            Start-Sleep -Seconds 5
+            if ($proc.HasExited) {
+              throw "App exited prematurely with code $($proc.ExitCode)"
+            }
+            Stop-Process -Id $proc.Id -Force
+          } finally {
+            Remove-Item Env:\SLINT_BACKEND -ErrorAction SilentlyContinue
           }
-          Stop-Process -Id $proc.Id -Force
