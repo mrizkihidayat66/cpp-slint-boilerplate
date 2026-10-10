@@ -101,7 +101,7 @@ void Application::loadInitialData()
         activity.push_back(std::move(converted));
     }
     window.set_recent_activity(
-            std::make_shared<slint::VectorModel<::app::ActivityItem>>(std::move(activity)));
+        std::make_shared<slint::VectorModel<::app::ActivityItem>>(std::move(activity)));
 
     const auto &about = m_services.get<services::AboutService>()->aboutInfo();
     auto &state = window.global<::app::AppState>();

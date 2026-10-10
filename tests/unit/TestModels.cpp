@@ -39,10 +39,10 @@ TEST_CASE("toSlint copies all StatCard fields", "[models]")
 
 TEST_CASE("toSlint keeps trend direction distinct", "[models]")
 {
-    const StatCard up{ .title = "a", .value = "1", .delta = "+1", .trendPositive = true,
-                       .iconName = "chart" };
-    const StatCard down{ .title = "a", .value = "1", .delta = "-1", .trendPositive = false,
-                         .iconName = "chart" };
+    const StatCard up{
+        .title = "a", .value = "1", .delta = "+1", .trendPositive = true, .iconName = "chart"};
+    const StatCard down{
+        .title = "a", .value = "1", .delta = "-1", .trendPositive = false, .iconName = "chart"};
 
     CHECK(cpp_slint_boilerplate::models::toSlint(up).trend_positive);
     CHECK_FALSE(cpp_slint_boilerplate::models::toSlint(down).trend_positive);
@@ -51,9 +51,9 @@ TEST_CASE("toSlint keeps trend direction distinct", "[models]")
 TEST_CASE("toSlintModel preserves order and count", "[models]")
 {
     const std::vector<StatCard> cards{
-        { "one", "1", "+", true, "check" },
-        { "two", "2", "-", false, "warning" },
-        { "three", "3", "+", true, "chart" },
+        {"one", "1", "+", true, "check"},
+        {"two", "2", "-", false, "warning"},
+        {"three", "3", "+", true, "chart"},
     };
 
     const auto model = cpp_slint_boilerplate::models::toSlintModel(cards);

@@ -85,15 +85,13 @@ TEST_CASE("SettingsService parseJson rejects documents without theme", "[service
     // theme/language drive UI logic — a missing value must not fall through
     // to defaults silently.
     CHECK_FALSE(SettingsService::parseJson(R"({ "displayName": "x" })").has_value());
-    CHECK(SettingsService::parseJson(
-                  R"({ "theme": "light", "language": "en" })").has_value());
+    CHECK(SettingsService::parseJson(R"({ "theme": "light", "language": "en" })").has_value());
 }
 
 TEST_CASE("SettingsService persist survives re-initialize (reload)", "[services][settings]")
 {
     // Point the service at a temp directory (no real %APPDATA% writes).
-    const auto tempDir = std::filesystem::temp_directory_path()
-            / "boilerplate-settings-test";
+    const auto tempDir = std::filesystem::temp_directory_path() / "boilerplate-settings-test";
     std::filesystem::create_directories(tempDir);
 
     cpp_slint_boilerplate::models::AppSettings saved;

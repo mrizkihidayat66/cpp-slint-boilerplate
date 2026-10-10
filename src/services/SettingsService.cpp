@@ -4,10 +4,10 @@
 
 #include <cstdlib>
 #include <filesystem>
-#include <system_error>
-#include <utility>
 #include <fstream>
 #include <sstream>
+#include <system_error>
+#include <utility>
 
 namespace cpp_slint_boilerplate::services {
 namespace {
@@ -31,8 +31,8 @@ SettingsService::SettingsService(std::string directoryOverride)
 void SettingsService::initialize()
 {
     // Resolve the settings directory: real %APPDATA%, or the test override.
-    const std::string base = !m_directoryOverride.empty() ? m_directoryOverride
-                                                          : appDataDirectory();
+    const std::string base =
+        !m_directoryOverride.empty() ? m_directoryOverride : appDataDirectory();
     if (base.empty()) {
         // No APPDATA (service context?): fall back to defaults in memory.
         m_filePath.clear();
@@ -46,8 +46,7 @@ void SettingsService::initialize()
     // %APPDATA%\cpp-slint-boilerplate\ does not yet exist, and a silent
     // ofstream failure would make every save() a no-op.
     std::error_code ec;
-    std::filesystem::create_directories(
-            std::filesystem::path(m_filePath).parent_path(), ec);
+    std::filesystem::create_directories(std::filesystem::path(m_filePath).parent_path(), ec);
 
     std::ifstream file(m_filePath);
     if (!file) {
