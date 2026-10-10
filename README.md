@@ -70,3 +70,9 @@ ctest --preset x64-debug
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — layering rules this branch follows
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — component catalog
 - [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md) — dependency setup, x86/x64
+
+## License
+
+This repository's scaffolding code is released under the [MIT License](LICENSE).
+That covers this boilerplate only — Slint is licensed separately, and you must
+choose one of its licenses for any app you ship. See [NOTICE.md](NOTICE.md).
