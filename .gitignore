@@ -20,6 +20,7 @@ CMakeUserPresets.json
 # IDE / editor
 .vs/
 .idea/
+.claude/settings.local.json
 *.user
 *.suo
 *.sdf
