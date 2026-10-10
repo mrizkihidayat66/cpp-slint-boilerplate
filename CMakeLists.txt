@@ -18,16 +18,28 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(CMake/FetchSlint.cmake)
 
 # ---------------------------------------------------------------------------
-# Application executable — the whole app is main.cpp + generated UI code
+# Generated UI code — built as its own target so the warning policy below
+# judges our own sources only: Slint's generated C++ does not survive /WX.
+# ---------------------------------------------------------------------------
+
+add_library(boilerplate-ui STATIC)
+slint_target_sources(boilerplate-ui src/ui/app-window.slint NAMESPACE app)
+target_link_libraries(boilerplate-ui PUBLIC Slint::Slint)
+
+# ---------------------------------------------------------------------------
+# Application executable — main.cpp plus the generated UI code
 # ---------------------------------------------------------------------------
 
 add_executable(slint-boilerplate src/main.cpp)
-target_include_directories(slint-boilerplate PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(slint-boilerplate PRIVATE Slint::Slint)
+target_include_directories(slint-boilerplate PRIVATE src)
+target_link_libraries(slint-boilerplate PRIVATE boilerplate-ui)
 
-# Compiles every .slint file reachable from app-window.slint (theme,
-# components, pages are imported transitively) into generated C++.
-slint_target_sources(slint-boilerplate src/ui/app-window.slint NAMESPACE app)
+# Slint's headers and the generated app-window.h are third-party: pull them in
+# as SYSTEM includes so the warning flags judge our own code only.
+get_target_property(_slint_include_dirs Slint::Slint INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(slint-boilerplate SYSTEM PRIVATE
+    ${_slint_include_dirs}
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CMake/CompilerWarnings.cmake)
 target_apply_warnings(slint-boilerplate)
