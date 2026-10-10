@@ -46,5 +46,10 @@ function(target_apply_warnings target)
             -Wold-style-cast
             -Wunused
             -Woverloaded-virtual)
+        # Warnings-as-errors in CI (and locally via -DWARNING_AS_ERROR=ON),
+        # matching the MSVC /WX branch above.
+        if(WARNING_AS_ERROR OR DEFINED ENV{CI})
+            target_compile_options(${target} PRIVATE -Werror)
+        endif()
     endif()
 endfunction()
