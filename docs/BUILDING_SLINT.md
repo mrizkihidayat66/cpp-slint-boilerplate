@@ -49,6 +49,8 @@ paid **once per architecture**, not once per preset.
 | `x64-release`       | x64          | Release    | femtovg  | —                                        |
 | `x86-debug`         | x86          | Debug      | femtovg  | `Rust_CARGO_TARGET=i686-pc-windows-msvc` |
 | `x86-release`       | x86          | Release    | femtovg  | `Rust_CARGO_TARGET=i686-pc-windows-msvc` |
+| `native-debug`      | host         | Debug      | femtovg  | — (Linux/macOS: host compiler)           |
+| `native-release`    | host         | Release    | femtovg  | — (Linux/macOS: host compiler)           |
 | `x64-debug-skia`    | x64          | Debug      | skia     | `SLINT_FEATURE_RENDERER_SKIA=ON`         |
 | `x64-release-skia`  | x64          | Release    | skia     | `SLINT_FEATURE_RENDERER_SKIA=ON`         |
 
@@ -56,6 +58,11 @@ The two `*-skia` presets are opt-in builds of the [Skia renderer](#skia-renderer
 the default presets stay on femtovg (see [Backends and renderers](#backends-and-renderers)).
 There is no x86 Skia preset: rust-skia publishes prebuilt binaries only for
 64-bit Windows, so the 32-bit target does not build (see below).
+
+The `native-*` presets build with whatever compiler CMake finds for the host —
+`g++` on Linux, `clang++` on macOS — and are what the Linux/macOS CI legs use.
+On Windows they are not needed; use the architecture presets. See
+[Linux and macOS](#linux-and-macos).
 
 ```bash
 cmake --preset x64-debug          # configure
@@ -85,6 +92,36 @@ configure/build reuses `.deps-cache/`.
 > (`.deps-cache/<platform>/`), derived from `CMAKE_VS_PLATFORM_NAME` —
 > `CMAKE_SYSTEM_PROCESSOR` always reports the *host* (AMD64) and must not be
 > used for this.
+
+### Linux and macOS
+
+The boilerplate targets Windows, but the C++ layers and the Slint build are
+portable, and CI builds and tests both platforms on every push. Use the
+`native-*` presets (host toolchain, no `architecture` field):
+
+```bash
+cmake --preset native-release
+cmake --build --preset native-release
+ctest --preset native-release
+```
+
+**Linux** needs a few development packages beyond the usual build essentials.
+This is the set [Slint's own CI](https://github.com/slint-ui/slint) installs:
+
+```bash
+sudo apt-get install -y libxcb-shape0-dev libxcb-xfixes0-dev \
+    libxkbcommon-dev libxkbcommon-x11-dev libfontconfig-dev libwayland-dev \
+    libudev-dev libgbm-dev
+```
+
+**macOS** needs only the Xcode command-line tools and Rust — no extra packages.
+The default femtovg renderer uses OpenGL, which macOS still ships (deprecated but
+present).
+
+> The application itself is Windows-oriented: it persists settings under
+> `%APPDATA%`, which does not exist on Linux/macOS, so it runs with in-memory
+> defaults there. These legs exist to keep the portable layers (models,
+> services, Slint integration) honest — not to ship a Linux/macOS product.
 
 ## Pinning a Slint version
 
