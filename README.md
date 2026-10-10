@@ -70,7 +70,7 @@ makes every later build fast.
 
 ## Roadmap
 
-- [ ] Dark palette + runtime theme switching (examples/intermediate)
+- [x] Dark palette + runtime theme switching — see `examples/intermediate`
 - [ ] Skia renderer preset
 - [ ] Richer icon set (bundled vector assets)
 - [ ] Linux/macOS CI legs
