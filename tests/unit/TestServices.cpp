@@ -4,10 +4,12 @@
 
 #include <filesystem>
 
+#include "app/AppMetadata.h"
 #include "services/AboutService.h"
 #include "services/DashboardService.h"
 #include "services/SettingsService.h"
 
+using cpp_slint_boilerplate::app::kTechnicalName;
 using cpp_slint_boilerplate::services::AboutService;
 using cpp_slint_boilerplate::services::DashboardService;
 
@@ -38,7 +40,8 @@ TEST_CASE("AboutService reports build metadata after initialize", "[services]")
     service.initialize();
 
     const auto &info = service.aboutInfo();
-    CHECK(info.applicationName == "cpp-slint-boilerplate");
+    // Compares against the single source (CMakeLists.txt) rather than a literal.
+    CHECK(info.applicationName == kTechnicalName);
     CHECK(!info.version.empty());
     CHECK(!info.slintVersion.empty());
     CHECK((info.buildType == "Debug" || info.buildType == "Release"));

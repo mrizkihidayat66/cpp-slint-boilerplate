@@ -6,6 +6,7 @@
 
 import { Palette, Typography, Metrics } from "theme/theme.slint";
 import { StatCard, ActivityItem, AppState } from "app-state.slint";
+import { AppInfo } from "app-info.slint";
 import { AppSidebar } from "components/library.slint";
 import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages.slint";
 
@@ -14,10 +15,11 @@ import { DashboardPage, SettingsPage, AboutPage, GalleryPage } from "pages/pages
 // so Application can flip the live theme switch (Palette.dark) when the
 // settings load or save.
 export { AppState } from "app-state.slint";
+export { AppInfo } from "app-info.slint";
 export { Palette } from "theme/theme.slint";
 
 export component AppWindow inherits Window {
-    title: "cpp-slint-boilerplate";
+    title: AppInfo.technical-name;
     preferred-width: 1024px;
     preferred-height: 680px;
     min-width: Metrics.window-min-width;
@@ -39,7 +41,7 @@ export component AppWindow inherits Window {
 
     HorizontalLayout {
         AppSidebar {
-            brand-title: "Boilerplate";
+            brand-title: AppInfo.display-name;
             brand-subtitle: "C++ · Slint";
             items: [
                 { icon-name: "home", label: "Dashboard" },
