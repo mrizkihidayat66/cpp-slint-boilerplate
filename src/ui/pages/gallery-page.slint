@@ -135,11 +135,18 @@ export component GalleryPage inherits Rectangle {
                 VerticalLayout {
                     spacing: Metrics.space-3;
 
+                    // Split across two rows: a single 5-button row is wider
+                    // than the content area at the minimum window width, and
+                    // Slint layouts do not wrap — it would overflow and clip.
                     HorizontalLayout {
                         spacing: Metrics.space-2;
                         AppButton { text: "Primary"; }
                         AppButton { text: "Secondary"; variant: AppButtonVariant.secondary; }
                         AppButton { text: "Outline"; variant: AppButtonVariant.outline; }
+                    }
+
+                    HorizontalLayout {
+                        spacing: Metrics.space-2;
                         AppButton { text: "Ghost"; variant: AppButtonVariant.ghost; }
                         AppButton { text: "Danger"; variant: AppButtonVariant.danger; }
                     }
@@ -171,11 +178,17 @@ export component GalleryPage inherits Rectangle {
 
                 // Every variant carries a dot — the dot is the semantic-
                 // variant marker, not a per-variant special case.
+                // Two rows so the widest badge row fits the minimum window
+                // width (Slint layouts do not wrap).
                 HorizontalLayout {
                     spacing: Metrics.space-2;
                     AppBadge { text: "Primary"; dot: true; }
                     AppBadge { text: "Success"; variant: AppBadgeVariant.success; dot: true; }
                     AppBadge { text: "Warning"; variant: AppBadgeVariant.warning; dot: true; }
+                }
+
+                HorizontalLayout {
+                    spacing: Metrics.space-2;
                     AppBadge { text: "Danger"; variant: AppBadgeVariant.danger; dot: true; }
                     AppBadge { text: "Info"; variant: AppBadgeVariant.info; dot: true; }
                     AppBadge { text: "Pill neutral"; variant: AppBadgeVariant.neutral; pill: true; }
