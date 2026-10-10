@@ -32,24 +32,28 @@ export component AppProgress inherits Rectangle {
         border-radius: root.thickness / 2;
         background: Palette.surface-alt;
 
-        fill := Rectangle {
+        // Determinate: one fill anchored at x:0 growing strictly left→right.
+        if !root.indeterminate : fill := Rectangle {
             x: 0;
-            width: root.indeterminate
-                ? parent.width * 0.3
-                : parent.width * root.clamped;
+            width: parent.width * root.clamped;
             height: parent.height;
             border-radius: root.thickness / 2;
             background: Palette.primary;
 
             animate width { duration: 300ms; easing: ease-out; }
+        }
 
-            if root.indeterminate : Rectangle {
-                x: parent.width * Math.mod(animation-tick(), 1.2s) / 1.2s - parent.width / 2;
-                width: parent.width;
-                height: parent.height;
-                border-radius: root.thickness / 2;
-                background: Palette.primary;
-            }
+        // Indeterminate: a single runner looping -w → (track + w). Rendering
+        // it ON TOP of a static fill (the old shape) read as the bar
+        // "expanding both ways" — there must be exactly one moving block.
+        if root.indeterminate : Rectangle {
+            width: parent.width * 0.3;
+            height: parent.height;
+            border-radius: root.thickness / 2;
+            background: Palette.primary;
+            x: -self.width
+                + Math.mod(animation-tick(), 1.2s) / 1.2s
+                    * (parent.width + 2 * self.width);
         }
     }
 
