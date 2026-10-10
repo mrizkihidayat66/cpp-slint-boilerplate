@@ -29,19 +29,36 @@ add_library(boilerplate-core STATIC
     src/services/AboutService.cpp
     src/services/SettingsService.cpp)
 
-target_include_directories(boilerplate-core
-    PUBLIC
-        src
-        ${CMAKE_CURRENT_BINARY_DIR})
-
-target_link_libraries(boilerplate-core PUBLIC Slint::Slint)
+target_include_directories(boilerplate-core PUBLIC src)
 
 # Compiles every .slint file reachable from app-window.slint (theme,
 # components, pages are imported transitively) into generated C++.
-slint_target_sources(boilerplate-core src/ui/app-window.slint NAMESPACE app)
+#
+# The generated code is built as its own target so the warning policy in
+# CMake/CompilerWarnings.cmake judges our sources only: Slint's generated C++
+# does not survive -Werror / /WX, and that policy deliberately leaves
+# third-party code alone.
+add_library(boilerplate-ui STATIC)
+slint_target_sources(boilerplate-ui src/ui/app-window.slint NAMESPACE app)
+target_link_libraries(boilerplate-ui PUBLIC Slint::Slint)
+
+target_link_libraries(boilerplate-core PUBLIC boilerplate-ui)
+
+# Slint's headers and the generated app-window.h are third-party: pull them in
+# as SYSTEM includes so -Wall/-Wextra and /W4 judge our own code only.
+get_target_property(_slint_include_dirs Slint::Slint INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories(boilerplate-core SYSTEM PUBLIC
+    ${_slint_include_dirs}
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 include(CMake/CompilerWarnings.cmake)
 target_apply_warnings(boilerplate-core)
+
+# std::getenv() is used read-only (settings path, start page); the MSVC CRT
+# deprecation warning does not apply to those calls.
+if(MSVC)
+    target_compile_definitions(boilerplate-core PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 
 # ---------------------------------------------------------------------------
 # Application executable
