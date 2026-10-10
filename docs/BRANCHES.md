@@ -14,7 +14,7 @@ main ──┬── examples/simple        (minimal: UI only)
 | Branch                   | Demonstrates                                        |
 | ------------------------ | --------------------------------------------------- |
 | `main`                  | Clean scaffold, full 25-component library, layered architecture, CI |
-| `examples/simple`       | You can ship a Slint app with ~30 lines of C++. No services, no DI — static data inline in `.slint` |
+| `examples/simple`       | You can ship a Slint app with ~17 lines of C++. No services, no DI — static data inline in `.slint` |
 | `examples/intermediate`  | State management + a real service: settings page persisted to `%APPDATA%` JSON, theme toggle, component gallery page showing every control live |
 | `examples/advanced`     | CRUD the professional way: `TaskRepository → TaskValidationService → TaskService` chain via ServiceLocator, sortable + paginated `AppTable`, dialog forms with validation errors, delete confirmations, loading states |
 
