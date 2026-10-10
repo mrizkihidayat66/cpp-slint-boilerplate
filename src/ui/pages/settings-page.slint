@@ -7,6 +7,7 @@
 
 import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
+import { AppInfo } from "../app-info.slint";
 import {
     AppCard,
     AppInput,
@@ -61,7 +62,7 @@ export component SettingsPage inherits Rectangle {
                             vertical-alignment: center;
                         }
                         Text {
-                            text: "Preferences are persisted to %APPDATA%\\cpp-slint-boilerplate\\settings.json";
+                            text: "Preferences are persisted to %APPDATA%\\" + AppInfo.technical-name + "\\settings.json";
                             font-size: Typography.font-size-md;
                             color: Palette.text-muted;
                             vertical-alignment: center;

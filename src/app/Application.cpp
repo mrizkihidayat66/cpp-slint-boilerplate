@@ -6,6 +6,7 @@
 
 #include <slint.h>
 
+#include "app/AppMetadata.h"
 #include "models/AboutModels.h"
 #include "models/DashboardModels.h"
 #include "models/SettingsModels.h"
@@ -112,7 +113,7 @@ void Application::bindUiCallbacks()
     // BOILERPLATE_GALLERY_SCROLL scrolls the gallery to a 0..1 fraction of
     // its scrollable height (screenshot harness; wheel automation is flaky).
     if (const char *scroll = std::getenv("BOILERPLATE_GALLERY_SCROLL")) {
-        const float fraction = std::atof(scroll);
+        const float fraction = static_cast<float>(std::atof(scroll));
         if (fraction > 0.0f && fraction <= 1.0f) {
             state.set_gallery_scroll(fraction);
         }
@@ -284,6 +285,14 @@ void Application::bindUiCallbacks()
 void Application::loadInitialData()
 {
     auto &window = **m_window;
+
+    // Application identity — the single CMakeLists.txt definition, pushed to
+    // the UI so the window title, sidebar brand and About card all agree.
+    auto &info = window.global<::app::AppInfo>();
+    info.set_display_name(slint::SharedString(app::kDisplayName));
+    info.set_technical_name(slint::SharedString(app::kTechnicalName));
+    info.set_version(slint::SharedString(app::kVersion));
+
     const auto &dashboard = m_services.get<services::DashboardService>();
     window.set_stat_cards(models::toSlintModel(dashboard->statCards()));
 

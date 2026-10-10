@@ -9,6 +9,8 @@
 #include <system_error>
 #include <utility>
 
+#include "app/AppMetadata.h"
+
 namespace cpp_slint_boilerplate::services {
 namespace {
 
@@ -40,10 +42,10 @@ void SettingsService::initialize()
         return;
     }
 
-    m_filePath = base + "\\cpp-slint-boilerplate\\settings.json";
+    m_filePath = base + "\\" + std::string(app::kTechnicalName) + "\\settings.json";
 
     // Ensure the directory exists before any read/write — on a first run
-    // %APPDATA%\cpp-slint-boilerplate\ does not yet exist, and a silent
+    // %APPDATA%\<technical name>\ does not yet exist, and a silent
     // ofstream failure would make every save() a no-op.
     std::error_code ec;
     std::filesystem::create_directories(std::filesystem::path(m_filePath).parent_path(), ec);
