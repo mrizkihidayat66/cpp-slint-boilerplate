@@ -8,7 +8,7 @@ This branch answers one question: **how little C++ does a Slint app need?**
 
 ```
 src/
-├── main.cpp          # 14 lines: create the window, run the event loop
+├── main.cpp          # 17 lines: create the window, run the event loop
 └── ui/
     ├── app-window.slint   # window shell + inline demo data
     ├── app-state.slint    # shared structs / globals (markup-only)
@@ -51,6 +51,14 @@ makes every later build fast.
   x86/x64 details, troubleshooting
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — component catalog
 - [docs/CODING_STYLE.md](docs/CODING_STYLE.md) — markup + C++ conventions
+
+## Roadmap
+
+- [x] Dark palette + runtime theme switching — see `examples/intermediate`
+- [ ] Skia renderer preset
+- [ ] Richer icon set (bundled vector assets)
+- [ ] Linux/macOS CI legs
+- [ ] Release artifact workflow (packaged zip/installer)
 
 ## License
 
