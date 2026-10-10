@@ -71,17 +71,22 @@ See [docs/BRANCHES.md](docs/BRANCHES.md) for the collected-binary layout.
 
 ## Prerequisites
 
-- CMake 3.21+ and a C++20 compiler (MSVC 2022, GCC 12+, or Clang 15+)
-- Rust 1.92+ (Slint's compiler is built from source via Corrosion)
-- First configure downloads dependencies (Slint 1.18.1, Catch2 3.7.1) —
-  cached per architecture under `.deps-cache/`
+- Visual Studio 2022 (C++20-capable MSVC)
+- CMake 3.21+ with Ninja (both ship with VS)
+- Rust stable ≥ 1.92 ([rustup](https://rustup.rs)) — Slint is built from source
+
+The first configure fetches Slint 1.18.1 and Catch2 3.7.1 via CMake
+`FetchContent` and compiles Slint's Rust core — expect 10–20 minutes once;
+the per-architecture cache under `.deps-cache/` makes every later build fast.
 
 ## Documentation
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — layering and data-flow rules
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — the component library API
+- [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md) — dependency setup, x86/x64
 - [docs/BRANCHES.md](docs/BRANCHES.md) — the progressive example tour
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+No license is applied to this repository — see [NOTICE.md](NOTICE.md) for the
+Slint licensing options you must choose between when shipping an app.
