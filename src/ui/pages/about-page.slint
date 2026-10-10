@@ -4,6 +4,23 @@ import { Palette, Typography, Metrics } from "../theme/theme.slint";
 import { AppState } from "../app-state.slint";
 import { AppCard } from "../components/library.slint";
 
+component AboutRow inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> value;
+    Text {
+        text: root.label;
+        font-size: Typography.font-size-md;
+        color: Palette.text-muted;
+        width: 140px;
+    }
+    Text {
+        text: root.value;
+        font-size: Typography.font-size-md;
+        color: Palette.text;
+        horizontal-stretch: 1;
+    }
+}
+
 export component AboutPage inherits Rectangle {
     background: Palette.background;
 
@@ -53,23 +70,6 @@ export component AboutPage inherits Rectangle {
                     // is not repeated as a body paragraph.
                     VerticalLayout {
                         spacing: Metrics.space-3;
-
-                        component AboutRow inherits HorizontalLayout {
-                            in property <string> label;
-                            in property <string> value;
-                            Text {
-                                text: root.label;
-                                font-size: Typography.font-size-md;
-                                color: Palette.text-muted;
-                                width: 140px;
-                            }
-                            Text {
-                                text: root.value;
-                                font-size: Typography.font-size-md;
-                                color: Palette.text;
-                                horizontal-stretch: 1;
-                            }
-                        }
 
                         AboutRow { label: "Version"; value: AppState.about-version; }
                         AboutRow { label: "Slint"; value: AppState.about-slint-version; }
