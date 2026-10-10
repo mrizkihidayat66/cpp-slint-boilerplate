@@ -275,89 +275,90 @@ AppCard {
 
 export component ResponsiveGridSection inherits Rectangle {
     background: transparent;
-    // The gallery page's own width (fixed by the window, never by content) —
+    // The gallery page's own width (fixed by the window, never by content) --
     // the grid resolves breakpoints against it, breaking the width feedback.
     in property <length> page-width;
 
 AppCard {
     title: "Responsive grid";
-    subtitle: "12-column AppGrid, Bootstrap-style spans — resize the window";
+    subtitle: "12-column AppGrid, Bootstrap-style spans - resize the window";
 
     VerticalLayout {
         spacing: Metrics.space-3;
 
         // Live breakpoint readout makes the reflow observable.
         Text {
-            text: "viewport: " + floor(grid.viewport-width / 1px) + "px — "
-                + (grid.at-xl ? "xl (≥1200px): 3 columns"
-                : grid.at-lg ? "lg (≥992px): 3 columns"
-                : grid.at-md ? "md (≥768px): 2 columns"
-                : grid.at-sm ? "sm (≥576px): 2 columns"
-                : "xs (<576px): stacked");
+            text: "viewport: " + floor(grid.viewport-width / 1px) + "px -- "
+                + (grid.at-lg ? "lg (>=992px): 4 columns"
+                : grid.at-sm ? "sm (>=576px): 2 columns"
+                : "xs (<576px): 1 column (stacked)");
             font-size: Typography.font-size-sm;
             color: Palette.text-muted;
         }
 
+        // AppGridRow never wraps (Slint has no flow layout), so a REAL reflow
+        // means selecting a different row structure per breakpoint -- the
+        // Bootstrap col-lg-3 col-sm-6 col-12 behaviour spelled out with
+        // conditional rows. (Placing all four items in ONE row with
+        // span: at-lg ? 3 : at-sm ? 6 : 12 does NOT reflow: a single
+        // HorizontalLayout splits equal-span cells equally at every width.)
         grid := AppGrid {
             gap: Metrics.space-3;
             viewport-width: root.page-width;
 
-            // 4-up on large, 2-up on small, stacked on extra-small.
-            // No explicit heights: every demo card has the same content
-            // shape (title + one line), so each card's natural height is
-            // identical and every row comes out the same height.
-            AppGridRow {
+            // lg (>=992px): four 3-span cells in one row.
+            if grid.at-lg : AppGridRow {
                 grid-gap: Metrics.space-3;
-                AppGridItem {
-                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                    AppCard { title: "1"; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
-                AppGridItem {
-                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                    AppCard { title: "2"; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
-                AppGridItem {
-                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                    AppCard { title: "3"; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
-                AppGridItem {
-                    span: grid.at-lg ? 3 : grid.at-sm ? 6 : 12;
-                    AppCard { title: "4"; Text { text: "span 3 / 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
+                AppGridItem { span: 3; AppCard { title: "1"; Text { text: "col-lg-3"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 3; AppCard { title: "2"; Text { text: "col-lg-3"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 3; AppCard { title: "3"; Text { text: "col-lg-3"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 3; AppCard { title: "4"; Text { text: "col-lg-3"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
             }
-            // Column merging: a row that totals exactly 12 (6+6) reads as
-            // "half + half"; AppGridRow is a HorizontalLayout (no wrapping),
-            // so a 12-span item gets its OWN row — putting span 12 and two
-            // span-6 items in one row would squeeze all three side by side.
+            // sm (>=576px but <lg): two 6-span cells per row.
+            if grid.at-sm && !grid.at-lg : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 6; AppCard { title: "1"; Text { text: "col-sm-6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 6; AppCard { title: "2"; Text { text: "col-sm-6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+            if grid.at-sm && !grid.at-lg : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 6; AppCard { title: "3"; Text { text: "col-sm-6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 6; AppCard { title: "4"; Text { text: "col-sm-6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+            // xs (<576px): one 12-span cell per row (stacked).
+            if !grid.at-sm : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 12; AppCard { title: "1"; Text { text: "col-12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+            if !grid.at-sm : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 12; AppCard { title: "2"; Text { text: "col-12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+            if !grid.at-sm : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 12; AppCard { title: "3"; Text { text: "col-12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+            if !grid.at-sm : AppGridRow {
+                grid-gap: Metrics.space-3;
+                AppGridItem { span: 12; AppCard { title: "4"; Text { text: "col-12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+            }
+
+            // Mixed spans still compose: a full-width row, then a split row.
             AppGridRow {
                 grid-gap: Metrics.space-3;
                 AppGridItem {
                     span: 12;
-                    AppCard { title: "Full width"; Text { text: "span 12 — the whole row"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
+                    AppCard { title: "Full width"; Text { text: "span 12 - the whole row"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
                 }
             }
-            AppGridRow {
+            if grid.at-sm : AppGridRow {
                 grid-gap: Metrics.space-3;
-                AppGridItem {
-                    span: grid.at-sm ? 6 : 12;
-                    AppCard { title: "Half"; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
-                AppGridItem {
-                    span: grid.at-sm ? 6 : 12;
-                    AppCard { title: "Half"; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
+                AppGridItem { span: 6; AppCard { title: "Half"; Text { text: "span 6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
+                AppGridItem { span: 6; AppCard { title: "Half"; Text { text: "span 6"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
             }
-            // 2-up on large, stacked below.
-            AppGridRow {
+            if !grid.at-sm : AppGridRow {
                 grid-gap: Metrics.space-3;
-                AppGridItem {
-                    span: grid.at-lg ? 6 : 12;
-                    AppCard { title: "5"; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
-                AppGridItem {
-                    span: grid.at-lg ? 6 : 12;
-                    AppCard { title: "6"; Text { text: "span 6 / 12"; color: Palette.text-muted; font-size: Typography.font-size-sm; } }
-                }
+                AppGridItem { span: 12; AppCard { title: "Half"; Text { text: "span 12 (stacked at xs)"; color: Palette.text-muted; font-size: Typography.font-size-sm; } } }
             }
         }
     }

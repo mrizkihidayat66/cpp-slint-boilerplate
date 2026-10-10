@@ -218,7 +218,8 @@ AppCard {
             VerticalLayout { alignment: center; AppAvatar { initials: "MH"; name: "Margaret Hamilton"; size: AppAvatarSize.lg; show-status: true; status-color: Palette.danger; } }
         }
 
-        // Icon set on its own line, left-aligned.
+        // Icon set on two lines: 16 icons in a single row is wider
+        // than the minimum window width and Slint layouts do not wrap.
         HorizontalLayout {
             spacing: Metrics.space-3;
             alignment: start;
@@ -230,6 +231,11 @@ AppCard {
             VerticalLayout { alignment: center; AppIcon { name: "document"; size: 18px; } }
             VerticalLayout { alignment: center; AppIcon { name: "folder"; size: 18px; } }
             VerticalLayout { alignment: center; AppIcon { name: "edit"; size: 18px; } }
+        }
+
+        HorizontalLayout {
+            spacing: Metrics.space-3;
+            alignment: start;
             VerticalLayout { alignment: center; AppIcon { name: "trash"; size: 18px; } }
             VerticalLayout { alignment: center; AppIcon { name: "check"; size: 18px; } }
             VerticalLayout { alignment: center; AppIcon { name: "warning"; size: 18px; } }
