@@ -17,8 +17,38 @@ REM Usage: build-matrix.cmd [branch ...]   (default: main simple intermediate ad
 setlocal enabledelayedexpansion
 set "ROOT=%~dp0.."
 for %%I in ("%ROOT%") do set "ROOT=%%~fI"
-set "CMAKE=C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
-set "VCVARS=C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat"
+
+REM Locate Visual Studio through vswhere so any edition, version, or install
+REM location works (the previous hardcoded Community/18 path only matched one
+REM machine). Requires the "Desktop development with C++" workload.
+set "PF86=%ProgramFiles(x86)%"
+if not defined PF86 set "PF86=%ProgramFiles%"
+set "VSWHERE=%PF86%\Microsoft Visual Studio\Installer\vswhere.exe"
+if not exist "%VSWHERE%" (
+    echo ERROR: vswhere.exe not found under "%PF86%\Microsoft Visual Studio\Installer".
+    echo        Install Visual Studio 2022 or newer with the "Desktop development
+    echo        with C++" workload: https://visualstudio.microsoft.com/downloads/
+    exit /b 1
+)
+set "VSINSTALL="
+for /f "usebackq tokens=*" %%I in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set "VSINSTALL=%%I"
+if not defined VSINSTALL (
+    echo ERROR: no Visual Studio install with the C++ toolset was found.
+    echo        Install the "Desktop development with C++" workload.
+    exit /b 1
+)
+set "VCVARS=%VSINSTALL%\VC\Auxiliary\Build\vcvarsall.bat"
+set "CMAKE=%VSINSTALL%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+if not exist "%VCVARS%" (
+    echo ERROR: vcvarsall.bat missing under "%VSINSTALL%".
+    exit /b 1
+)
+if not exist "%CMAKE%" (
+    echo ERROR: the Visual Studio CMake was not found under "%VSINSTALL%".
+    echo        Install the "C++ CMake tools for Windows" component.
+    exit /b 1
+)
+
 set "BINOUT=%ROOT%\build\bin"
 set "WORK=%ROOT%\build\build-win"
 
