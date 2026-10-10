@@ -73,6 +73,8 @@ export component DashboardPage inherits Rectangle {
                         alignment: center;
                         HorizontalLayout {
                             spacing: Metrics.space-2;
+                            // Demo affordances: inert on purpose. Wire them to
+                            // AppState callbacks when adding real behaviour.
                             AppButton {
                                 variant: AppButtonVariant.outline;
                                 text: "Export";
