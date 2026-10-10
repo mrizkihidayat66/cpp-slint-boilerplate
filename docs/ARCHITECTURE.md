@@ -47,7 +47,7 @@ Two channels, each with one direction of authority:
 **C++ → UI (state & data):** C++ owns the data. Window-level model properties
 (`stat-cards`, `recent-activity`) are set from `Application` with
 `slint::VecModel` instances; pages consume them read-only. Global state
-(`AppState.current-page`, `AppState.about-text`) is set via property setters.
+(`AppState.current-page`, `AppState.about-description`, `AppState.about-version`, …) is set via property setters.
 
 **UI → C++ (intents):** the UI never mutates business state directly. It
 invokes callbacks (`request-navigation(int)`, `request-quit()`); `Application`
