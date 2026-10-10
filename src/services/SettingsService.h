@@ -17,8 +17,7 @@ namespace cpp_slint_boilerplate::services {
 /// JSON shape (hand-rolled — no dependency needed for six keys):
 ///   { "displayName": "...", "theme": "light", "language": "en",
 ///     "notifications": true, "autoStart": false }
-class SettingsService : public IService
-{
+class SettingsService : public IService {
 public:
     void initialize() override;
     void shutdown() override;

@@ -8,8 +8,7 @@
 namespace cpp_slint_boilerplate::services {
 
 /// Supplies the About page with build/runtime metadata.
-class AboutService : public IService
-{
+class AboutService : public IService {
 public:
     void initialize() override;
     void shutdown() override;

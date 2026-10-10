@@ -6,8 +6,7 @@ namespace cpp_slint_boilerplate::services {
 
 /// Lifecycle contract for all registered services. Services are initialized
 /// in registration order and shut down in reverse order.
-class IService
-{
+class IService {
 public:
     virtual ~IService() = default;
 

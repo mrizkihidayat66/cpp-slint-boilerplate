@@ -9,8 +9,7 @@ namespace cpp_slint_boilerplate::services {
 
 /// Applies the business rules a task draft must satisfy before it can be
 /// stored. Stateless — one instance can be shared.
-class TaskValidationService : public IService
-{
+class TaskValidationService : public IService {
 public:
     /// Minimum title length.
     static constexpr int kMinTitleLength = 3;

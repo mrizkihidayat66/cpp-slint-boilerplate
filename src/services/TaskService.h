@@ -18,8 +18,7 @@ namespace cpp_slint_boilerplate::services {
 /// Outcome of a create/update attempt. `errors` carries per-field messages
 /// the dialog shows next to the inputs; a failed attempt keeps the dialog
 /// open, a successful one closes it.
-struct TaskMutationResult
-{
+struct TaskMutationResult {
     bool success = false;
     models::ValidationResult errors;
     std::string errorMessage; // non-field summary (e.g. duplicate title)
@@ -29,8 +28,7 @@ struct TaskMutationResult
 /// Reads and mutates tasks through the repository, applying validation
 /// first. Sorts and paginates on read. The chain is wired by the
 /// ServiceLocator: TaskService is registered AFTER its dependencies.
-class TaskService : public IService
-{
+class TaskService : public IService {
 public:
     /// Rows per page in the tasks table.
     static constexpr int kPageSize = 10;
@@ -44,8 +42,7 @@ public:
 
     /// One sorted, paginated page of tasks.
     [[nodiscard]] models::TaskPage page(models::TaskSortColumn column,
-                                        models::TaskSortDirection direction,
-                                        int pageNumber) const;
+                                        models::TaskSortDirection direction, int pageNumber) const;
 
     /// All tasks in the current sort order (export, tests).
     [[nodiscard]] std::vector<models::Task> sorted(models::TaskSortColumn column,

@@ -92,7 +92,7 @@ void Application::registerServices()
     const auto repository = m_services.registerConstructed<services::TaskRepository>();
     const auto validation = m_services.registerConstructed<services::TaskValidationService>();
     m_services.registerService<services::TaskService>(
-            std::make_shared<services::TaskService>(repository, validation));
+        std::make_shared<services::TaskService>(repository, validation));
 }
 
 void Application::bindUiCallbacks()
@@ -168,7 +168,7 @@ void Application::bindUiCallbacks()
             state.set_task_form_title(slint::SharedString("ab"));
             state.set_task_form_assignee(slint::SharedString(""));
             state.set_task_form_title_error(
-                    slint::SharedString("Title must be at least 3 characters"));
+                slint::SharedString("Title must be at least 3 characters"));
             state.set_task_form_assignee_error(slint::SharedString("Assignee is required"));
             state.set_tasks_form_visible(true);
         }
@@ -201,8 +201,8 @@ void Application::bindUiCallbacks()
     });
 
     state.on_request_task_edit_by_cell([this, &state](slint::SharedString idCell) {
-        const auto task = m_services.get<services::TaskService>()
-                                  ->find(std::atoi(std::string(idCell).c_str()));
+        const auto task =
+            m_services.get<services::TaskService>()->find(std::atoi(std::string(idCell).c_str()));
         if (!task) {
             state.set_status_message(slint::SharedString("That task no longer exists"));
             return;
@@ -231,17 +231,16 @@ void Application::bindUiCallbacks()
         if (!result.success) {
             // Per-field messages land under the inputs; the summary (e.g.
             // duplicate title) goes to the top of the dialog.
-            state.set_task_form_title_error(
-                    slint::SharedString(result.errors.messageFor("title")));
+            state.set_task_form_title_error(slint::SharedString(result.errors.messageFor("title")));
             state.set_task_form_assignee_error(
-                    slint::SharedString(result.errors.messageFor("assignee")));
+                slint::SharedString(result.errors.messageFor("assignee")));
             state.set_task_form_error(slint::SharedString(result.errorMessage));
             return;
         }
 
-        state.set_status_message(slint::SharedString(
-                draft.id == 0 ? "Created “" + result.task.title + "”"
-                              : "Updated “" + result.task.title + "”"));
+        state.set_status_message(slint::SharedString(draft.id == 0
+                                                         ? "Created “" + result.task.title + "”"
+                                                         : "Updated “" + result.task.title + "”"));
         clearFormErrors(state);
         state.set_task_form_id(0);
         state.set_tasks_form_visible(false);
@@ -257,7 +256,7 @@ void Application::bindUiCallbacks()
     // confirmation dialog (its Delete button fires request-task-delete).
     state.on_request_task_confirm_delete([this, &state]() {
         const auto existing =
-                m_services.get<services::TaskService>()->find(state.get_task_form_id());
+            m_services.get<services::TaskService>()->find(state.get_task_form_id());
         if (!existing) {
             state.set_status_message(slint::SharedString("Task no longer exists"));
             state.set_tasks_form_visible(false);
@@ -272,8 +271,8 @@ void Application::bindUiCallbacks()
         const auto tasks = m_services.get<services::TaskService>();
         const auto existing = tasks->find(id);
         const bool removed = existing && tasks->remove(id);
-        state.set_status_message(slint::SharedString(
-                removed ? "Deleted “" + existing->title + "”" : "Task no longer exists"));
+        state.set_status_message(slint::SharedString(removed ? "Deleted “" + existing->title + "”"
+                                                             : "Task no longer exists"));
         if (removed) {
             // A deletion from the form also closes it.
             state.set_tasks_form_visible(false);
@@ -299,7 +298,7 @@ void Application::loadInitialData()
         activity.push_back(std::move(converted));
     }
     window.set_recent_activity(
-            std::make_shared<slint::VectorModel<::app::ActivityItem>>(std::move(activity)));
+        std::make_shared<slint::VectorModel<::app::ActivityItem>>(std::move(activity)));
 
     const auto &about = m_services.get<services::AboutService>()->aboutInfo();
     auto &state = window.global<::app::AppState>();
@@ -334,7 +333,7 @@ void Application::pushTasks(const ::app::AppState &state)
 {
     const auto tasks = m_services.get<services::TaskService>();
     const auto direction = m_sortAscending ? models::TaskSortDirection::Ascending
-                                            : models::TaskSortDirection::Descending;
+                                           : models::TaskSortDirection::Descending;
     const auto page = tasks->page(m_sortColumn, direction, m_taskPage);
 
     state.set_tasks_rows(models::taskRowsToModel(page.tasks));

@@ -15,16 +15,14 @@ using models::TaskStatus;
 namespace {
 
 /// Fresh chain wired the same way Application wires it.
-struct TaskChain
-{
+struct TaskChain {
     std::shared_ptr<services::TaskRepository> repository =
-            std::make_shared<services::TaskRepository>();
+        std::make_shared<services::TaskRepository>();
     std::shared_ptr<services::TaskValidationService> validation =
-            std::make_shared<services::TaskValidationService>();
+        std::make_shared<services::TaskValidationService>();
     std::shared_ptr<services::TaskService> service;
 
-    TaskChain()
-        : service(std::make_shared<services::TaskService>(repository, validation))
+    TaskChain() : service(std::make_shared<services::TaskService>(repository, validation))
     {
         repository->initialize();
         validation->initialize();
@@ -77,8 +75,8 @@ TEST_CASE("TaskValidationService rejects empty and short fields", "[tasks]")
     CHECK(result.messageFor("assignee") == "Assignee is required");
 
     Task tooShort = draft("ab", "M Rizki");
-    CHECK(validation.validate(tooShort).messageFor("title")
-          == "Title must be at least 3 characters");
+    CHECK(validation.validate(tooShort).messageFor("title") ==
+          "Title must be at least 3 characters");
 
     Task trimmed = draft("   ok title   ", "M Rizki");
     CHECK(validation.validate(trimmed).ok()); // leading/trailing spaces trimmed
@@ -129,21 +127,20 @@ TEST_CASE("TaskService sorts by title, assignee, and status", "[tasks]")
 {
     TaskChain chain;
 
-    const auto byTitle = chain.service->sorted(TaskSortColumn::Title,
-                                               TaskSortDirection::Ascending);
+    const auto byTitle = chain.service->sorted(TaskSortColumn::Title, TaskSortDirection::Ascending);
     REQUIRE(byTitle.size() >= 2);
     for (std::size_t i = 1; i < byTitle.size(); ++i) {
         CHECK(byTitle[i - 1].title <= byTitle[i].title);
     }
 
-    const auto byAssignee = chain.service->sorted(TaskSortColumn::Assignee,
-                                                  TaskSortDirection::Descending);
+    const auto byAssignee =
+        chain.service->sorted(TaskSortColumn::Assignee, TaskSortDirection::Descending);
     for (std::size_t i = 1; i < byAssignee.size(); ++i) {
         CHECK(byAssignee[i - 1].assignee >= byAssignee[i].assignee);
     }
 
-    const auto byStatus = chain.service->sorted(TaskSortColumn::Status,
-                                                TaskSortDirection::Ascending);
+    const auto byStatus =
+        chain.service->sorted(TaskSortColumn::Status, TaskSortDirection::Ascending);
     for (std::size_t i = 1; i < byStatus.size(); ++i) {
         CHECK(static_cast<int>(byStatus[i - 1].status) <= static_cast<int>(byStatus[i].status));
     }
@@ -156,16 +153,14 @@ TEST_CASE("TaskService paginates and clamps out-of-range pages", "[tasks]")
     const int total = chain.service->count();
     REQUIRE(total > services::TaskService::kPageSize); // pagination is observable
 
-    const auto first = chain.service->page(TaskSortColumn::Id,
-                                           TaskSortDirection::Ascending, 1);
+    const auto first = chain.service->page(TaskSortColumn::Id, TaskSortDirection::Ascending, 1);
     CHECK(first.pageNumber == 1);
     CHECK(static_cast<int>(first.tasks.size()) == services::TaskService::kPageSize);
     CHECK(first.totalCount == total);
-    CHECK(first.pageCount == (total + services::TaskService::kPageSize - 1)
-                              / services::TaskService::kPageSize);
+    CHECK(first.pageCount ==
+          (total + services::TaskService::kPageSize - 1) / services::TaskService::kPageSize);
 
-    const auto beyond = chain.service->page(TaskSortColumn::Id,
-                                            TaskSortDirection::Ascending, 999);
+    const auto beyond = chain.service->page(TaskSortColumn::Id, TaskSortDirection::Ascending, 999);
     CHECK(beyond.pageNumber == beyond.pageCount); // clamped to last page
     CHECK(static_cast<int>(beyond.tasks.size()) <= services::TaskService::kPageSize);
 }
@@ -174,8 +169,7 @@ TEST_CASE("Deleting tasks shrinks pages and keeps sort order", "[tasks]")
 {
     TaskChain chain;
 
-    const auto page1 = chain.service->page(TaskSortColumn::Title,
-                                           TaskSortDirection::Ascending, 1);
+    const auto page1 = chain.service->page(TaskSortColumn::Title, TaskSortDirection::Ascending, 1);
     REQUIRE_FALSE(page1.tasks.empty());
 
     // Delete every task on the first page.
@@ -183,8 +177,7 @@ TEST_CASE("Deleting tasks shrinks pages and keeps sort order", "[tasks]")
         REQUIRE(chain.service->remove(task.id));
     }
 
-    const auto after = chain.service->page(TaskSortColumn::Title,
-                                           TaskSortDirection::Ascending, 1);
+    const auto after = chain.service->page(TaskSortColumn::Title, TaskSortDirection::Ascending, 1);
     CHECK(after.totalCount == page1.totalCount - static_cast<int>(page1.tasks.size()));
     // Still sorted after deletion.
     for (std::size_t i = 1; i < after.tasks.size(); ++i) {

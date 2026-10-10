@@ -5,10 +5,10 @@
 #include <memory>
 #include <optional>
 
+#include "app-window.h"
 #include "app/ServiceLocator.h"
 #include "models/SettingsModels.h"
 #include "models/TaskModels.h"
-#include "app-window.h"
 
 namespace cpp_slint_boilerplate::app {
 
@@ -18,8 +18,7 @@ namespace cpp_slint_boilerplate::app {
 ///   3. bindUiCallbacks()   — connect AppState callbacks to services
 ///   4. loadInitialData()   — push service data into UI models
 ///   5. run_event_loop()    — hand control to Slint
-class Application
-{
+class Application {
 public:
     Application();
     ~Application();

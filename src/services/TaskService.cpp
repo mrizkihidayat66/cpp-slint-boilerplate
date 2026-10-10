@@ -8,8 +8,7 @@ namespace cpp_slint_boilerplate::services {
 
 TaskService::TaskService(std::shared_ptr<TaskRepository> repository,
                          std::shared_ptr<TaskValidationService> validation)
-    : m_repository(std::move(repository)),
-      m_validation(std::move(validation))
+    : m_repository(std::move(repository)), m_validation(std::move(validation))
 {
 }
 
@@ -19,13 +18,10 @@ void TaskService::initialize()
     // to do here.
 }
 
-void TaskService::shutdown()
-{
-}
+void TaskService::shutdown() {}
 
 models::TaskPage TaskService::page(models::TaskSortColumn column,
-                                   models::TaskSortDirection direction,
-                                   int pageNumber) const
+                                   models::TaskSortDirection direction, int pageNumber) const
 {
     const std::vector<models::Task> all = sorted(column, direction);
 
@@ -121,9 +117,8 @@ TaskMutationResult TaskService::persist(models::Task draft)
     // Duplicate titles are a cross-record rule — needs the repository's
     // contents, so it runs here rather than in the stateless validator.
     if (TaskValidationService::isDuplicateTitle(draft.title, m_repository->all(),
-                                                draft.id > 0
-                                                        ? std::optional<int>(draft.id)
-                                                        : std::nullopt)) {
+                                                draft.id > 0 ? std::optional<int>(draft.id)
+                                                             : std::nullopt)) {
         result.errorMessage = "A task with this title already exists";
         return result;
     }

@@ -18,16 +18,14 @@
 namespace cpp_slint_boilerplate::models {
 
 /// Task lifecycle. Ordering matches the UI badge mapping.
-enum class TaskStatus
-{
+enum class TaskStatus {
     Todo,
     InProgress,
     Done,
 };
 
 /// One row of the tasks table.
-struct Task
-{
+struct Task {
     int id = 0;
     std::string title;
     std::string description;
@@ -38,8 +36,7 @@ struct Task
 };
 
 /// Sort keys — mirror the table columns (id = created order).
-enum class TaskSortColumn
-{
+enum class TaskSortColumn {
     Id,
     Title,
     Assignee,
@@ -47,15 +44,13 @@ enum class TaskSortColumn
 };
 
 /// Direction toggle for the active sort.
-enum class TaskSortDirection
-{
+enum class TaskSortDirection {
     Ascending,
     Descending,
 };
 
 /// Field errors keyed by name ("title", "assignee"). Empty map = valid.
-struct ValidationResult
-{
+struct ValidationResult {
     std::vector<std::pair<std::string, std::string>> errors;
 
     [[nodiscard]] bool ok() const { return errors.empty(); }
@@ -73,8 +68,7 @@ struct ValidationResult
 };
 
 /// One page of tasks plus the totals the pagination bar needs.
-struct TaskPage
-{
+struct TaskPage {
     std::vector<Task> tasks;
     int totalCount = 0;
     int pageCount = 1;

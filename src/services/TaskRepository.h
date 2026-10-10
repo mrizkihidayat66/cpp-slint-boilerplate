@@ -13,8 +13,7 @@ namespace cpp_slint_boilerplate::services {
 /// Owns the task data. The advanced branch keeps it in memory with a seeded
 /// demo set; a real app would swap the implementation for a database while
 /// keeping the interface.
-class TaskRepository : public IService
-{
+class TaskRepository : public IService {
 public:
     void initialize() override;
     void shutdown() override;
