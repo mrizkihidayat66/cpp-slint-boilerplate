@@ -44,11 +44,16 @@ set(SLINT_FEATURE_BACKEND_WINIT ON CACHE BOOL "winit backend (default windowing)
 # Default renderer: femtovg (OpenGL ES 2.0). Switch with:
 #   -DSLINT_FEATURE_RENDERER_FEMTOVG=OFF -DSLINT_FEATURE_RENDERER_SKIA=ON   (skia)
 #   -DSLINT_FEATURE_RENDERER_FEMTOVG=OFF -DSLINT_FEATURE_RENDERER_SOFTWARE=ON (CPU)
-# The software renderer is also selectable at runtime when compiled in:
+#
+# The software renderer is compiled in alongside femtovg so the app runs where
+# no OpenGL context can be created — CI runners, VMs, RDP sessions:
 #   SLINT_BACKEND=winit-software ./slint-boilerplate.exe
+# Without it that variable is silently ignored (Slint falls back to femtovg)
+# and the app then aborts on a GPU-less machine. femtovg stays the default;
+# the software renderer is used only when asked for.
 set(SLINT_FEATURE_RENDERER_FEMTOVG ON CACHE BOOL "femtovg renderer (default)")
 set(SLINT_FEATURE_RENDERER_SKIA OFF CACHE BOOL "skia renderer")
-set(SLINT_FEATURE_RENDERER_SOFTWARE OFF CACHE BOOL "software renderer")
+set(SLINT_FEATURE_RENDERER_SOFTWARE ON CACHE BOOL "software renderer")
 
 # --- Acquire ----------------------------------------------------------------
 #
