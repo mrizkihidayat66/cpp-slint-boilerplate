@@ -72,15 +72,20 @@ jobs:
       - name: Build
         run: cmake --build --preset ${{ matrix.arch }}-${{ matrix.build_type }} --parallel
 
+      # SLINT_BACKEND=winit-software needs the software renderer compiled in
+      # (SLINT_FEATURE_RENDERER_SOFTWARE=ON, the default in FetchSlint.cmake).
+      # The runner has no GPU: femtovg would abort with 0xC0000409 here.
       - name: Smoke run (software renderer, GPU-less runner)
         shell: pwsh
         run: |
           $exe = "build/${{ matrix.arch }}-${{ matrix.build_type }}/slint-boilerplate.exe"
+          $log = "smoke-${{ matrix.arch }}-${{ matrix.build_type }}.log"
           $env:SLINT_BACKEND = "winit-software"
           try {
-            $proc = Start-Process -FilePath $exe -PassThru
+            $proc = Start-Process -FilePath $exe -PassThru -RedirectStandardOutput $log -RedirectStandardError "$log.err"
             Start-Sleep -Seconds 5
             if ($proc.HasExited) {
+              Get-Content $log, "$log.err" -ErrorAction SilentlyContinue
               throw "App exited prematurely with code $($proc.ExitCode)"
             }
             Stop-Process -Id $proc.Id -Force
