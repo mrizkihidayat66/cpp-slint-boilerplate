@@ -78,6 +78,11 @@ interaction and alignment checks) is described in
 - CMake 3.21+ with Ninja (both ship with VS)
 - Rust stable ≥ 1.92 ([rustup](https://rustup.rs)) — Slint is built from source
 
+CI also builds and tests on Linux and macOS; those legs use the `native-*`
+presets and need a host toolchain (`g++` / `clang++`) plus, on Linux, a few
+development packages — see
+[docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos).
+
 The first configure fetches Slint 1.18.1 and Catch2 3.7.1 via CMake
 `FetchContent` and compiles Slint's Rust core — expect 10–20 minutes once;
 the per-architecture cache under `.deps-cache/` makes every later build fast.
@@ -97,7 +102,7 @@ the per-architecture cache under `.deps-cache/` makes every later build fast.
 - [x] Dark palette + runtime theme switching — see `examples/intermediate`
 - [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
 - [ ] Richer icon set (bundled vector assets)
-- [ ] Linux/macOS CI legs
+- [x] Linux/macOS CI legs (`native-*` presets) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md#linux-and-macos)
 - [ ] Release artifact workflow (packaged zip/installer)
 
 ## License

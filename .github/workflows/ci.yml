@@ -95,3 +95,84 @@ jobs:
           } finally {
             Remove-Item Env:\SLINT_BACKEND -ErrorAction SilentlyContinue
           }
+
+  # Linux and macOS build/test legs. The Windows presets are named by
+  # architecture (x64/x86) and drive the MSVC toolchain; on these platforms the
+  # `native-*` presets build with the host compiler instead (g++ on Linux,
+  # clang++ on macOS).
+  build-unix:
+    name: ${{ matrix.os }}-${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    needs: format
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        build_type: [debug, release]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Slint's winit backend links xcb/xkbcommon/fontconfig on Linux. This
+      # mirrors slint-ui/slint's own Linux dependency action. xvfb is only for
+      # the headless smoke run below.
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libxcb-shape0-dev libxcb-xfixes0-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev \
+            libfontconfig-dev libwayland-dev \
+            libudev-dev libgbm-dev \
+            xvfb
+
+      # The macOS images do not guarantee Ninja, which the presets require.
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache dependencies (Slint source + cargo)
+        uses: actions/cache@v4
+        with:
+          path: |
+            .deps-cache
+            ~/.cargo/registry
+            ~/.cargo/git
+          # Per-OS key: the Slint binaries are not portable across platforms.
+          key: slint-${{ matrix.os }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-${{ github.sha }}
+          restore-keys: |
+            slint-${{ matrix.os }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-
+            slint-${{ matrix.os }}-
+
+      - name: Configure
+        run: cmake --preset native-${{ matrix.build_type }}
+
+      - name: Build
+        run: cmake --build --preset native-${{ matrix.build_type }} --parallel
+
+      - name: Test
+        run: ctest --preset native-${{ matrix.build_type }} --output-on-failure
+
+      # No GPU on the runners: SLINT_BACKEND=winit-software uses the software
+      # renderer compiled in by default (CMake/FetchSlint.cmake). Linux runners
+      # are headless, so wrap in xvfb; macOS runners have a window server and
+      # run the binary directly.
+      - name: Smoke run (software renderer, GPU-less runner)
+        if: runner.os == 'Linux'
+        run: |
+          exe="build/native-${{ matrix.build_type }}/slint-boilerplate"
+          SLINT_BACKEND=winit-software xvfb-run -a "$exe" &
+          pid=$!
+          sleep 6
+          if kill -0 "$pid" 2>/dev/null; then
+            echo "App stayed up for 6s - OK"
+            kill "$pid" 2>/dev/null || true
+          else
+            echo "App exited prematurely"
+            exit 1
+          fi
