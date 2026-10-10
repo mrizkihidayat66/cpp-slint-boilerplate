@@ -18,8 +18,7 @@
 namespace cpp_slint_boilerplate::models {
 
 /// One KPI tile on the dashboard.
-struct StatCard
-{
+struct StatCard {
     std::string title;
     std::string value;
     std::string delta;
@@ -28,8 +27,7 @@ struct StatCard
 };
 
 /// One entry in the recent-activity list.
-struct ActivityItem
-{
+struct ActivityItem {
     std::string actor;
     std::string action;
     std::string timestamp;

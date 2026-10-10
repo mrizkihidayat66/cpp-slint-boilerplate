@@ -11,8 +11,7 @@ namespace cpp_slint_boilerplate::services {
 
 /// Serves KPI cards and the recent-activity feed. On the main branch this
 /// returns static demo data; the example branches swap in real sources.
-class DashboardService : public IService
-{
+class DashboardService : public IService {
 public:
     void initialize() override;
     void shutdown() override;
