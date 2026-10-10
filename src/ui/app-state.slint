@@ -23,12 +23,14 @@ export struct ActivityItem {
     icon-name: string,
 }
 
-// Shared state between pages. On this branch it is pure UI state: the
-// current page lives on the window (in-out property), and the about text is
-// a constant — no C++ pushes anything in.
+// Shared state between pages. On this branch it is pure UI state: the current
+// page lives on the window (in-out property), and the about fields are
+// constants — no C++ pushes anything in. The About page lays them out as
+// key/value rows, the same shell the other examples use.
 export global AppState {
-    in-out property <string> about-text: "cpp-slint-boilerplate — simple example\n\n"
-        + "This branch shows how little C++ a Slint application actually needs:\n"
-        + "create the window, run the event loop, done. All data lives in the\n"
-        + ".slint markup itself.";
+    in property <string> about-description: "This branch shows how little C++ a Slint application needs: create the window, run the event loop, done. All data lives in the .slint markup itself.";
+    in property <string> about-version: "(development)";
+    in property <string> about-slint-version: "Slint 1.18.1";
+    in property <string> about-compiler: "(see build)";
+    in property <string> about-build-type: "(see build)";
 }

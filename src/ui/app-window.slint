@@ -19,6 +19,12 @@ export component AppWindow inherits Window {
     // Pure UI state: which sidebar entry is selected.
     in-out property <int> current-page: 0;
 
+    // Derived from width, but stored so the binding does not loop: writing
+    // to a property that also drives the layout from inside its own change
+    // handler makes the value flip-flop.
+    private property <bool> sidebar-collapsed: false;
+    changed width => { root.sidebar-collapsed = root.width < 600px; }
+
     HorizontalLayout {
         AppSidebar {
             brand-title: "Boilerplate";
@@ -28,7 +34,7 @@ export component AppWindow inherits Window {
                 { icon-name: "info", label: "About" },
             ];
             current-index <=> root.current-page;
-            collapsed: root.width < 600px;
+            collapsed: root.sidebar-collapsed;
         }
 
         Rectangle {

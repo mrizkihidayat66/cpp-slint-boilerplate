@@ -19,6 +19,9 @@ export component AppProgress inherits Rectangle {
     private property <float> clamped: min(1, max(0, root.value));
 
     bar := Rectangle {
+        // A child Rectangle without an explicit x is horizontally CENTERED
+        // by default — anchor to the left so the fill grows left→right.
+        x: 0;
         y: root.show-percentage
             ? (parent.height - root.thickness) / 2
             : 0;
@@ -28,31 +31,39 @@ export component AppProgress inherits Rectangle {
         height: root.thickness;
         border-radius: root.thickness / 2;
         background: Palette.surface-alt;
+        // Clip the moving blocks to the track: without this the determinate
+        // fill and the indeterminate runner paint past the rounded ends.
+        clip: true;
 
-        fill := Rectangle {
-            width: root.indeterminate
-                ? parent.width * 0.3
-                : parent.width * root.clamped;
+        // Determinate: one fill anchored at x:0 growing strictly left→right.
+        if !root.indeterminate : fill := Rectangle {
+            x: 0;
+            width: parent.width * root.clamped;
             height: parent.height;
             border-radius: root.thickness / 2;
             background: Palette.primary;
 
             animate width { duration: 300ms; easing: ease-out; }
+        }
 
-            if root.indeterminate : Rectangle {
-                x: parent.width * Math.mod(animation-tick(), 1.2s) / 1.2s - parent.width / 2;
-                width: parent.width;
-                height: parent.height;
-                border-radius: root.thickness / 2;
-                background: Palette.primary;
-            }
+        // Indeterminate: a single runner looping -w → (track + w). Rendering
+        // it ON TOP of a static fill (the old shape) read as the bar
+        // "expanding both ways" — there must be exactly one moving block.
+        if root.indeterminate : Rectangle {
+            width: parent.width * 0.3;
+            height: parent.height;
+            border-radius: root.thickness / 2;
+            background: Palette.primary;
+            x: -self.width
+                + Math.mod(animation-tick(), 1.2s) / 1.2s
+                    * (parent.width + 2 * self.width);
         }
     }
 
     percentage-text := Text {
         visible: root.show-percentage;
         x: parent.width - self.preferred-width;
-        y: root.thickness / 2 - self.height / 2;
+        y: (parent.height - self.preferred-height) / 2;
         text: round(root.clamped * 100) + "%";
         font-size: Typography.font-size-xs;
         color: Palette.text-muted;

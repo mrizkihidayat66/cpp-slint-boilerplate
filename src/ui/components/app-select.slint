@@ -36,6 +36,7 @@ export component AppSelect inherits Rectangle {
         mouse-cursor: root.disabled ? MouseCursor.default : MouseCursor.pointer;
         clicked => {
             root.open = !root.open;
+            if (root.open) { popup.show(); } else { popup.close(); }
         }
     }
 
@@ -69,23 +70,33 @@ export component AppSelect inherits Rectangle {
         }
     }
 
-    if root.open : popup := Rectangle {
+    // PopupWindow renders in a top layer above everything — a plain child
+    // Rectangle would be covered by siblings painted after this component.
+    popup := PopupWindow {
         x: 0;
-        y: parent.height + Metrics.space-1;
+        y: root.height + Metrics.space-1;
         width: root.width;
-        border-radius: Metrics.radius-md;
-        background: Palette.surface;
-        border-width: Metrics.border-width;
-        border-color: Palette.border;
-        drop-shadow-blur: Metrics.elevation-2;
-        drop-shadow-color: Palette.shadow;
-        clip: true;
         height: root.popup-height;
 
-        ListView {
-            x: Metrics.space-1;
-            width: parent.width - 2 * Metrics.space-1;
+        // PopupWindow has no visual properties of its own (no background,
+        // border, clip, ...) — everything visual lives on this child.
+        panel := Rectangle {
+            x: 0;
+            y: 0;
+            width: parent.width;
             height: parent.height;
+            border-radius: Metrics.radius-md;
+            background: Palette.surface;
+            border-width: Metrics.border-width;
+            border-color: Palette.border;
+            drop-shadow-blur: Metrics.elevation-2;
+            drop-shadow-color: Palette.shadow;
+            clip: true;
+
+            ListView {
+                x: Metrics.space-1;
+                width: parent.width - 2 * Metrics.space-1;
+                height: parent.height;
 
             for option[i] in root.model : Rectangle {
                 height: root.option-height;
@@ -97,6 +108,7 @@ export component AppSelect inherits Rectangle {
                         root.selected-index = i;
                         root.selected(i, option);
                         root.open = false;
+                        popup.close();
                     }
                 }
 
@@ -111,6 +123,7 @@ export component AppSelect inherits Rectangle {
                         horizontal-stretch: 1;
                     }
                 }
+            }
             }
         }
     }

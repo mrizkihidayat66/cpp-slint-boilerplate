@@ -43,7 +43,8 @@ export component AppAlert inherits Rectangle {
 
     content := HorizontalLayout {
         x: Metrics.space-4;
-        width: parent.width - Metrics.space-4 - (root.dismissible ? Metrics.space-4 : Metrics.space-3);
+        width: parent.width - Metrics.space-4
+            - (root.dismissible ? 32px : Metrics.space-3);
         y: 0;
         height: parent.height;
         spacing: Metrics.space-2;
@@ -65,9 +66,10 @@ export component AppAlert inherits Rectangle {
 
         VerticalLayout {
             alignment: center;
-            Text {
+            // Conditionally instantiated so an empty title takes no space
+            // (a `visible: false` Text would still shift the body down).
+            if root.title != "" : Text {
                 text: root.title;
-                visible: root.title != "";
                 font-size: Typography.font-size-md;
                 font-weight: Typography.font-weight-bold;
                 color: root.accent;
@@ -80,18 +82,23 @@ export component AppAlert inherits Rectangle {
                 overflow: elide;
             }
         }
+    }
 
-        if root.dismissible : VerticalLayout {
-            alignment: center;
-            dismiss-touch := TouchArea {
-                width: close-icon.size + Metrics.space-2;
-                clicked => { root.dismissed(); }
-                close-icon := AppIcon {
-                    name: "close";
-                    size: Typography.font-size-sm;
-                    accent-color: Palette.text-muted;
-                }
-            }
+    // Dismiss button pinned to the top-right corner, outside the content
+    // layout so it never pushes the text around.
+    if root.dismissible : dismiss-touch := TouchArea {
+        x: parent.width - self.width;
+        y: 0;
+        width: 32px;
+        height: 32px;
+        clicked => { root.dismissed(); }
+
+        close-icon := AppIcon {
+            name: "close";
+            size: Typography.font-size-sm;
+            accent-color: Palette.text-muted;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
         }
     }
 }

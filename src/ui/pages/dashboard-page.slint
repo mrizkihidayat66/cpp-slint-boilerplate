@@ -50,6 +50,7 @@ export component DashboardPage inherits Rectangle {
             VerticalLayout {
                 padding: Metrics.space-6;
                 spacing: Metrics.space-5;
+                alignment: start;
 
                 // --- Page header -----------------------------------------------------
                 HorizontalLayout {
@@ -74,18 +75,20 @@ export component DashboardPage inherits Rectangle {
                         }
                     }
 
-                    HorizontalLayout {
-                        spacing: Metrics.space-2;
+                    VerticalLayout {
                         alignment: center;
-                        AppButton {
-                            variant: AppButtonVariant.outline;
-                            text: "Export";
-                            icon-name: "document";
-                        }
-                        AppButton {
-                            variant: AppButtonVariant.primary;
-                            text: "New report";
-                            icon-name: "plus";
+                        HorizontalLayout {
+                            spacing: Metrics.space-2;
+                            AppButton {
+                                variant: AppButtonVariant.outline;
+                                text: "Export";
+                                icon-name: "document";
+                            }
+                            AppButton {
+                                variant: AppButtonVariant.primary;
+                                text: "New report";
+                                icon-name: "plus";
+                            }
                         }
                     }
                 }
@@ -96,6 +99,8 @@ export component DashboardPage inherits Rectangle {
 
                     for card[i] in stat-cards : AppCard {
                         elevation: AppCardElevation.raised;
+                        preferred-width: 0px;
+                        min-width: 120px;
                         horizontal-stretch: 1;
 
                         VerticalLayout {
@@ -138,12 +143,15 @@ export component DashboardPage inherits Rectangle {
                                 color: Palette.text;
                             }
 
-                            AppBadge {
-                                text: card.delta;
-                                variant: card.trend-positive
-                                    ? AppBadgeVariant.success
-                                    : AppBadgeVariant.danger;
-                                dot: true;
+                            HorizontalLayout {
+                                alignment: start;
+                                AppBadge {
+                                    text: card.delta;
+                                    variant: card.trend-positive
+                                        ? AppBadgeVariant.success
+                                        : AppBadgeVariant.danger;
+                                    dot: true;
+                                }
                             }
                         }
                     }
@@ -172,10 +180,15 @@ export component DashboardPage inherits Rectangle {
                                 spacing: Metrics.space-3;
                                 alignment: start;
 
-                                // Avatar tile
-                                AppAvatar {
-                                    initials: activity.initials;
-                                    width: 34px;
+                                // Avatar tile — wrapped in a VerticalLayout so
+                                // it centers vertically in the 56px row.
+                                VerticalLayout {
+                                    alignment: center;
+                                    AppAvatar {
+                                        initials: activity.initials;
+                                        width: 34px;
+                                        height: 34px;
+                                    }
                                 }
 
                                 VerticalLayout {
@@ -211,7 +224,7 @@ export component DashboardPage inherits Rectangle {
                             }
 
                             // Row divider (not after the last item)
-                            if i < recent-activity.length - 1 : Rectangle {
+                            if i < root.recent-activity.length - 1 : Rectangle {
                                 y: parent.height - 1px;
                                 height: 1px;
                                 x: Metrics.space-2 + 34px + Metrics.space-3;

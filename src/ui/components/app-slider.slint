@@ -69,6 +69,7 @@ export component AppSlider inherits Rectangle {
         background: Palette.surface-alt;
 
         fill := Rectangle {
+            x: 0;
             width: parent.width * root.fraction;
             height: parent.height;
             border-radius: 3px;
@@ -76,7 +77,8 @@ export component AppSlider inherits Rectangle {
         }
 
         thumb := Rectangle {
-            x: parent.width * root.fraction - self.width / 2;
+            x: min(parent.width - self.width,
+                   max(0, parent.width * root.fraction - self.width / 2));
             y: (parent.height - self.height) / 2;
             width: 16px;
             height: 16px;
