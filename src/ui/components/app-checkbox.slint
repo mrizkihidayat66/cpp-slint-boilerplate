@@ -28,6 +28,7 @@ export component AppCheckbox inherits Rectangle {
     }
 
     box := Rectangle {
+        x: 0;
         width: root.box-size;
         height: root.box-size;
         y: (root.height - root.box-size) / 2;
@@ -40,8 +41,11 @@ export component AppCheckbox inherits Rectangle {
 
         if root.checked : AppIcon {
             name: "check";
-            size: root.box-size - 4px;
-            color: Palette.text-on-primary;
+            size: root.box-size - 1px;
+            // accent-color is the PATH STROKE; plain `color:` would set the
+            // deprecated Rectangle background and paint a solid square under
+            // the glyph.
+            accent-color: Palette.text-on-primary;
             x: (parent.width - self.width) / 2;
             y: (parent.height - self.height) / 2;
         }

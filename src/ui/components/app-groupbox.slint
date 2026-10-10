@@ -14,6 +14,10 @@ export component AppGroupBox inherits Rectangle {
     in property <length> content-padding: Metrics.space-4;
     /// Fill the parent layout instead of hugging content.
     in property <bool> fill: false;
+    /// Color painted behind the caption to interrupt the top border
+    /// (`-[ Title ]---`). Must match the surrounding background; defaults
+    /// to the card surface most group boxes sit on.
+    in property <color> title-background: Palette.surface;
 
     // Height is driven by the layout (stretch or hug) — same contract as
     // AppPanel; see the note there.
@@ -40,11 +44,16 @@ export component AppGroupBox inherits Rectangle {
     private property <bool> has-title: root.title != "" || root.icon-name != "";
 
     if root.has-title : Rectangle {
-        x: Metrics.space-4;
+        // Align the caption TEXT with the first pixel of the content: the
+        // title row itself adds a space-2 left padding, so the box starts
+        // one space-2 to the left of the content inset.
+        x: root.content-padding - Metrics.space-2;
         y: -8px;
         height: 16px;
         width: title-row.preferred-width + 2 * Metrics.space-2;
-        background: transparent; // the page background shows through the gap
+        // Opaque backdrop interrupts the top border: `-[ Title ]---`.
+        // A transparent fill would leave the border line showing through.
+        background: root.title-background;
 
         title-row := HorizontalLayout {
             padding-left: Metrics.space-2;

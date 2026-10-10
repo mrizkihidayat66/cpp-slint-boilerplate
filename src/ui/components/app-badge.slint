@@ -13,6 +13,10 @@ export component AppBadge inherits Rectangle {
     in property <bool> dot: false;
 
     height: Typography.font-size-md + 2 * Metrics.space-1;
+    // Hug content: without an explicit width a badge in a HorizontalLayout
+    // stretches to the share the layout gives it, blowing out rows (the
+    // "page can be dragged sideways" effect on the gallery).
+    width: badge-row.preferred-width;
     border-radius: root.pill ? Metrics.radius-pill : Metrics.radius-sm;
 
     private property <color> fg-color:
@@ -32,19 +36,25 @@ export component AppBadge inherits Rectangle {
 
     background: root.bg-color;
 
-    HorizontalLayout {
-        padding-left: Metrics.space-2 + (root.dot ? 0 : 0);
+    badge-row := HorizontalLayout {
+        padding-left: Metrics.space-2;
         padding-right: Metrics.space-2;
         padding-top: 0;
         padding-bottom: 0;
         spacing: Metrics.space-1;
         alignment: center;
 
-        if root.dot : Rectangle {
-            width: 6px;
-            height: 6px;
-            border-radius: 3px;
-            background: root.fg-color;
+        if root.dot : VerticalLayout {
+            // VerticalLayout wrapper centers the 6px dot in the badge height
+            // (layout alignment is horizontal-only in a HorizontalLayout).
+            padding: 0;
+            alignment: center;
+            Rectangle {
+                width: 6px;
+                height: 6px;
+                border-radius: 3px;
+                background: root.fg-color;
+            }
         }
 
         Text {

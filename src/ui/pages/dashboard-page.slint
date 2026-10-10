@@ -39,6 +39,10 @@ export component DashboardPage inherits Rectangle {
             VerticalLayout {
                 padding: Metrics.space-6;
                 spacing: Metrics.space-5;
+                // Pin content to the top: without this a short page is
+                // vertically centered inside the tall Flickable viewport
+                // (same reason About/Settings/Gallery set alignment: start).
+                alignment: start;
 
                 // --- Page header -----------------------------------------------------
                 HorizontalLayout {
@@ -63,28 +67,38 @@ export component DashboardPage inherits Rectangle {
                         }
                     }
 
-                    HorizontalLayout {
-                        spacing: Metrics.space-2;
+                    // VerticalLayout wrapper centers the buttons against the
+                    // taller title block (40px vs control-height 34px).
+                    VerticalLayout {
                         alignment: center;
-                        AppButton {
-                            variant: AppButtonVariant.outline;
-                            text: "Export";
-                            icon-name: "document";
-                        }
-                        AppButton {
-                            variant: AppButtonVariant.primary;
-                            text: "New report";
-                            icon-name: "plus";
+                        HorizontalLayout {
+                            spacing: Metrics.space-2;
+                            AppButton {
+                                variant: AppButtonVariant.outline;
+                                text: "Export";
+                                icon-name: "document";
+                            }
+                            AppButton {
+                                variant: AppButtonVariant.primary;
+                                text: "New report";
+                                icon-name: "plus";
+                            }
                         }
                     }
                 }
 
                 // --- KPI grid --------------------------------------------------------
+                // Zero preferred width + equal stretch factors makes the
+                // layout divide the full row width equally: stretch only
+                // distributes the *leftover*, so content-based preferred
+                // widths would otherwise keep the cards unequal.
                 HorizontalLayout {
                     spacing: Metrics.space-4;
 
                     for card[i] in stat-cards : AppCard {
                         elevation: AppCardElevation.raised;
+                        preferred-width: 0px;
+                        min-width: 120px;
                         horizontal-stretch: 1;
 
                         VerticalLayout {
@@ -127,12 +141,18 @@ export component DashboardPage inherits Rectangle {
                                 color: Palette.text;
                             }
 
-                            AppBadge {
-                                text: card.delta;
-                                variant: card.trend-positive
-                                    ? AppBadgeVariant.success
-                                    : AppBadgeVariant.danger;
-                                dot: true;
+                            // HorizontalLayout wrapper keeps the badge hugging
+                            // its content: a VerticalLayout would stretch it to
+                            // the card width along the cross axis.
+                            HorizontalLayout {
+                                alignment: start;
+                                AppBadge {
+                                    text: card.delta;
+                                    variant: card.trend-positive
+                                        ? AppBadgeVariant.success
+                                        : AppBadgeVariant.danger;
+                                    dot: true;
+                                }
                             }
                         }
                     }
@@ -161,10 +181,15 @@ export component DashboardPage inherits Rectangle {
                                 spacing: Metrics.space-3;
                                 alignment: start;
 
-                                // Avatar tile
-                                AppAvatar {
-                                    initials: activity.initials;
-                                    width: 34px;
+                                // Avatar tile — wrapped in a VerticalLayout so
+                                // it centers vertically in the 56px row.
+                                VerticalLayout {
+                                    alignment: center;
+                                    AppAvatar {
+                                        initials: activity.initials;
+                                        width: 34px;
+                                        height: 34px;
+                                    }
                                 }
 
                                 VerticalLayout {
@@ -199,7 +224,8 @@ export component DashboardPage inherits Rectangle {
                                 }
                             }
 
-                            // Row divider (not after the last item)
+                            // Row divider (not after the last item); indented
+                            // past the avatar column (space-2 + 34 + space-3).
                             if i < root.recent-activity.length - 1 : Rectangle {
                                 y: parent.height - 1px;
                                 height: 1px;

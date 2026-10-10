@@ -23,21 +23,27 @@ import {
 export component SettingsPage inherits Rectangle {
     background: Palette.background;
 
-    Flickable {
+    Rectangle {
         x: 0;
         y: 0;
         width: 100%;
         height: 100%;
+        clip: true;
 
-        Rectangle {
+        // The Flickable's only child must be a LAYOUT: a plain Rectangle child
+        // is vertically centered by Slint's default geometry (and, being no
+        // layout, never extends the scrollable height). A layout fills the
+        // viewport and makes the page scroll exactly as tall as its content.
+        Flickable {
+            x: 0;
+            y: 0;
             width: 100%;
-            height: content-column.preferred-height + 2 * Metrics.space-6;
+            height: 100%;
 
-            content-column := VerticalLayout {
-                x: Metrics.space-6;
-                width: parent.width - 2 * Metrics.space-6;
-                y: Metrics.space-6;
+            VerticalLayout {
+                padding: Metrics.space-6;
                 spacing: Metrics.space-5;
+                alignment: start;
 
                 // --- Header ------------------------------------------------------------
                 HorizontalLayout {
@@ -52,11 +58,18 @@ export component SettingsPage inherits Rectangle {
                             font-size: Typography.font-size-xl;
                             font-weight: Typography.font-weight-bold;
                             color: Palette.text;
+                            vertical-alignment: center;
                         }
                         Text {
                             text: "Preferences are persisted to %APPDATA%\\cpp-slint-boilerplate\\settings.json";
                             font-size: Typography.font-size-md;
                             color: Palette.text-muted;
+                            vertical-alignment: center;
+                            // The path is a single unbreakable token, so
+                            // word-wrap cannot shrink it below its full width.
+                            // Elide instead: the header stays one line and can
+                            // shrink with the window.
+                            overflow: elide;
                         }
                     }
 
@@ -108,11 +121,13 @@ export component SettingsPage inherits Rectangle {
                                 font-size: Typography.font-size-md;
                                 font-weight: Typography.font-weight-medium;
                                 color: Palette.text;
+                                wrap: word-wrap;
                             }
                             Text {
                                 text: "Switch between light and dark palettes";
                                 font-size: Typography.font-size-sm;
                                 color: Palette.text-muted;
+                                wrap: word-wrap;
                             }
                         }
                         Rectangle { horizontal-stretch: 1; }
@@ -140,11 +155,13 @@ export component SettingsPage inherits Rectangle {
                                     font-size: Typography.font-size-md;
                                     font-weight: Typography.font-weight-medium;
                                     color: Palette.text;
+                                    wrap: word-wrap;
                                 }
                                 Text {
                                     text: "Show a toast when a task completes";
                                     font-size: Typography.font-size-sm;
                                     color: Palette.text-muted;
+                                    wrap: word-wrap;
                                 }
                             }
                             Rectangle { horizontal-stretch: 1; }
@@ -162,11 +179,13 @@ export component SettingsPage inherits Rectangle {
                                     font-size: Typography.font-size-md;
                                     font-weight: Typography.font-weight-medium;
                                     color: Palette.text;
+                                    wrap: word-wrap;
                                 }
                                 Text {
                                     text: "Start minimized in the tray";
                                     font-size: Typography.font-size-sm;
                                     color: Palette.text-muted;
+                                    wrap: word-wrap;
                                 }
                             }
                             Rectangle { horizontal-stretch: 1; }
@@ -193,11 +212,13 @@ export component SettingsPage inherits Rectangle {
                                 font-size: Typography.font-size-md;
                                 font-weight: Typography.font-weight-medium;
                                 color: Palette.text;
+                                wrap: word-wrap;
                             }
                             Text {
                                 text: "Requires a restart to fully apply";
                                 font-size: Typography.font-size-sm;
                                 color: Palette.text-muted;
+                                wrap: word-wrap;
                             }
                         }
                         Rectangle { horizontal-stretch: 1; }
@@ -214,17 +235,17 @@ export component SettingsPage inherits Rectangle {
                 }
 
                 // --- Save bar ------------------------------------------------------------
+                // Status alert on its own line so it never competes with
+                // the buttons for width; buttons get a fixed-height row.
+                if AppState.status-message != "" : AppAlert {
+                    variant: AppAlertVariant.success;
+                    title: "Saved";
+                    text: AppState.status-message;
+                }
+
                 HorizontalLayout {
-                    height: 56px;
                     alignment: end;
                     spacing: Metrics.space-3;
-
-                    if AppState.status-message != "" : AppAlert {
-                        variant: AppAlertVariant.success;
-                        title: "Saved";
-                        text: AppState.status-message;
-                        vertical-stretch: 1;
-                    }
 
                     AppButton {
                         variant: AppButtonVariant.outline;
