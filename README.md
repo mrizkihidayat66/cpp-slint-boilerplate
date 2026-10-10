@@ -55,7 +55,7 @@ makes every later build fast.
 ## Roadmap
 
 - [x] Dark palette + runtime theme switching — see `examples/intermediate`
-- [ ] Skia renderer preset
+- [x] Skia renderer preset (`x64-*-skia`; x64 only) — see [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md)
 - [ ] Richer icon set (bundled vector assets)
 - [ ] Linux/macOS CI legs
 - [ ] Release artifact workflow (packaged zip/installer)
