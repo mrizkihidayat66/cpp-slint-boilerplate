@@ -40,18 +40,17 @@ CMake Tools, clangd) — tasks and launch configs are provided in `.vscode/`.
 ## Before every PR
 
 ```bash
-# 1. Formatting (C++)
-clang-format --dry-run --Werror $(git diff --name-only main | grep -E '\.(h|cpp)$')
-
-# 2. Build
+# 1. Build
 cmake --build --preset x64-debug
 
-# 3. Tests
+# 2. Tests
 ctest --preset x64-debug
 ```
 
-All three must pass. CI runs the same matrix (format, x64/x86 × Debug/Release,
-tests, smoke run).
+Formatting is checked in CI with `clang-format` (see the `format` job in
+`.github/workflows/ci.yml` for the exact invocation); run it on your changed
+C++ files before pushing. All checks must pass. CI runs the same matrix
+(format, x64/x86 × Debug/Release, tests, smoke run).
 
 ## Adding a component
 

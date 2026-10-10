@@ -14,7 +14,7 @@ main ──┬── examples/simple        (minimal: UI only)
 | Branch                   | Demonstrates                                        |
 | ------------------------ | --------------------------------------------------- |
 | `main`                  | Clean scaffold, full 25-component library, layered architecture, CI |
-| `examples/simple`       | You can ship a Slint app with ~30 lines of C++. No services, no DI — static data inline in `.slint` |
+| `examples/simple`       | You can ship a Slint app with ~17 lines of C++. No services, no DI — static data inline in `.slint` |
 | `examples/intermediate`  | State management + a real service: settings page persisted to `%APPDATA%` JSON, theme toggle, component gallery page showing every control live |
 | `examples/advanced`     | CRUD the professional way: `TaskRepository → TaskValidationService → TaskService` chain via ServiceLocator, sortable + paginated `AppTable`, dialog forms with validation errors, delete confirmations, loading states |
 
@@ -30,12 +30,37 @@ cmake --build --preset x64-debug
 Each branch builds on its own — same presets, same docs (the branch's README
 describes its specific demo).
 
+## Comparing all branches side by side
+
+The `examples/advanced` branch ships `scripts/build-matrix.cmd`, which builds
+every branch × every preset and collects the finished binaries into one place
+for direct comparison:
+
+```
+build/bin/Debug/x64/slint-boilerplate-main.exe
+build/bin/Debug/x64/slint-boilerplate-simple.exe
+build/bin/Debug/x64/slint-boilerplate-intermediate.exe
+build/bin/Debug/x64/slint-boilerplate-advanced.exe      + slint_cpp.dll
+build/bin/Release/x64/...
+build/bin/Debug/x86/...
+build/bin/Release/x86/...
+```
+
+The per-branch worktrees and build trees live under
+`build/build-win/<arch>/<branch>/` and can be deleted once you are done
+comparing; the shared Slint cache (`.deps-cache/`) is reused from the main
+checkout, so a full matrix run only compiles each architecture's Rust runtime
+once.
+
 ## Maintenance policy
 
-- The branches are **forks of `main`**, cut after `main` is tagged
-- Shared fixes (build breakage, Slint API changes) are **cherry-picked**
-  from `main` into each branch and re-tagged
+- The branches are **parallel timelines** forked from a common ancestor —
+  none is a superset of another. `main` is the source of truth.
+- Shared fixes (build breakage, Slint API changes, layout regressions) are
+  made **on `main` first**, then cherry-picked into each branch
 - Nothing merges back into `main` by default — `main` stays the clean
   reference scaffold
 - New components land in `main`'s library and are cherry-picked when a branch
   needs them
+- Tagging is currently repo-wide (`v0.1.0` on all branches); per-branch tags
+  may be added later if the demos start to diverge
