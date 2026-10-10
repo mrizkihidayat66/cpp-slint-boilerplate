@@ -224,11 +224,45 @@ Callback `page-changed(int)`.
 
 #### AppIcon
 
-`name`, `size`, `accent-color`, `stroke-weight`. There is no `AppIcons` global:
-the glyph is selected by an `if/else if` chain over `name` inside
-`app-icon.slint`, each branch returning one 24-unit viewBox path. Unknown names
-render a neutral **circle + dot placeholder** (not a warning glyph). To add an
-icon, append another `else if (name == "…")` branch there.
+`name`, `size`, `accent-color`, `stroke-weight`. The glyph is selected by an
+`if/else if` chain over `name` inside `app-icon.slint`, each branch returning
+one 24-unit viewBox stroke path drawn by a single `Path` element — no font or
+image dependency, so icons stay crisp at any size (the earlier glyph-font
+approach rendered as tofu under femtovg). Unknown names render a neutral
+**circle + dot placeholder** (not a warning glyph), so a typo stays visible.
+
+`AppIcons`, exported alongside `AppIcon` from `library.slint`, is the catalog:
+`AppIcons.names` is a `[string]` array of every built-in name, for pickers and
+galleries. The component gallery enumerates it into a reflowing grid, so a new
+name shows up there automatically.
+
+The mechanism is deliberate. Measured against Slint 1.18:
+
+- a `for` over an array with per-element `visible:` instantiates one element per
+  entry, and `visible:` lowers to an injected `Clip`, so ~2N elements — wasteful
+  for a 1-of-N lookup;
+- `array.index-of` / `find-index` / `any` / `all` are experimental features
+  (they need `SLINT_FEATURE_EXPERIMENTAL`);
+- `@image-url()` is resolved at compile time, so a runtime `name` cannot select
+  an SVG file — bundling `.svg` assets would need a C++ load path plus a chain
+  anyway.
+
+The chain keeps each icon at exactly one element and adds no dependency.
+
+To add an icon, append an `else if (name == "…")` branch in `app-icon.slint`
+**and** add the name to `AppIcons.names`.
+
+Built-in names (95):
+
+| Group                 | Names                                                                                                                                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Navigation & arrows   | `home`, `menu`, `chevron-up`, `chevron-down`, `chevron-left`, `chevron-right`, `chevrons-left`, `chevrons-right`, `arrow-up`, `arrow-down`, `arrow-left`, `arrow-right`, `external-link`                                                          |
+| Actions               | `plus`, `minus`, `close`, `check`, `edit`, `trash`, `copy`, `save`, `download`, `upload`, `refresh`, `search`, `filter`, `sort`, `link`, `share`, `more-horizontal`, `more-vertical`, `logout`, `log-in`                                            |
+| Status & feedback     | `info`, `warning`, `error`, `check-circle`, `x-circle`, `help-circle`, `activity`                                                                                                                                                                 |
+| Files & data          | `document`, `folder`, `clipboard`, `chart`, `pie-chart`, `database`, `image`, `trending-up`, `trending-down`                                                                                                                                       |
+| Media & communication | `play`, `pause`, `stop`, `skip-back`, `skip-forward`, `volume`, `mute`, `camera`, `video`, `mail`, `bell`, `send`                                                                                                                                  |
+| People                | `user`, `users`, `user-plus`                                                                                                                                                                                                                      |
+| Objects & misc        | `settings`, `grid`, `calendar`, `clock`, `lock`, `unlock`, `eye`, `eye-off`, `star`, `bookmark`, `tag`, `globe`, `map-pin`, `sun`, `moon`, `cloud`, `wifi`, `battery`, `power`, `zap`, `shield`, `award`, `shopping-cart`, `credit-card`, `gift`, `package`, `layers`, `monitor`, `smartphone`, `printer`, `coffee` |
 
 ### Forms (extended)
 
