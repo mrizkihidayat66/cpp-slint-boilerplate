@@ -14,7 +14,7 @@ main ──┬── examples/simple        (minimal: UI only)
 | Branch                   | Demonstrates                                        |
 | ------------------------ | --------------------------------------------------- |
 | `main`                  | Clean scaffold, full 25-component library, layered architecture, CI |
-| `examples/simple`       | You can ship a Slint app with ~30 lines of C++. No services, no DI — static data inline in `.slint` |
+| `examples/simple`       | You can ship a Slint app with ~17 lines of C++. No services, no DI — static data inline in `.slint` |
 | `examples/intermediate`  | State management + a real service: settings page persisted to `%APPDATA%` JSON, theme toggle, component gallery page showing every control live |
 | `examples/advanced`     | CRUD the professional way: `TaskRepository → TaskValidationService → TaskService` chain via ServiceLocator, sortable + paginated `AppTable`, dialog forms with validation errors, delete confirmations, loading states |
 
@@ -32,8 +32,9 @@ describes its specific demo).
 
 ## Comparing all branches side by side
 
-`scripts/build-matrix.cmd` builds every branch × every preset and
-collects the finished binaries into one place for direct comparison:
+The `examples/advanced` branch ships `scripts/build-matrix.cmd`, which builds
+every branch × every preset and collects the finished binaries into one place
+for direct comparison:
 
 ```
 build/bin/Debug/x64/slint-boilerplate-main.exe
@@ -45,10 +46,11 @@ build/bin/Debug/x86/...
 build/bin/Release/x86/...
 ```
 
-Intermediate worktrees/build trees live under `build/build-win/<arch>/<branch>/`
-and can be deleted once you are done comparing; the shared Slint cache
-(`.deps-cache/`) is reused from the main checkout, so a full matrix run
-only compiles each architecture's Rust runtime once.
+The per-branch worktrees and build trees live under
+`build/build-win/<arch>/<branch>/` and can be deleted once you are done
+comparing; the shared Slint cache (`.deps-cache/`) is reused from the main
+checkout, so a full matrix run only compiles each architecture's Rust runtime
+once.
 
 ## Maintenance policy
 
