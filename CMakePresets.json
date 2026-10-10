@@ -98,6 +98,20 @@
       "output": {
         "outputOnFailure": true
       }
+    },
+    {
+      "name": "x86-debug",
+      "configurePreset": "x86-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "x86-release",
+      "configurePreset": "x86-release",
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }
