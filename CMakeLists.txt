@@ -116,3 +116,42 @@ if(BOILERPLATE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# ---------------------------------------------------------------------------
+# Packaging — a portable ZIP, produced by the release workflow
+# (.github/workflows/release.yml) and usable locally:
+#
+#   cmake --build --preset x64-release --target package
+#   -> build/x64-release/cpp-slint-boilerplate-<version>-windows-<arch>.zip
+#
+# The ZIP holds the executable and Slint's C++ runtime DLL side by side, so it
+# unpacks and runs. It does not bundle the MSVC runtime (the build uses the
+# default dynamic CRT) — that is a Visual C++ Redistributable dependency.
+# ---------------------------------------------------------------------------
+
+install(TARGETS slint-boilerplate RUNTIME DESTINATION .)
+
+# Slint's C++ API is a shared library; ship it next to the exe (mirrors the
+# POST_BUILD copy above, which only covers the build tree).
+install(FILES "$<TARGET_FILE:slint_cpp-shared>" DESTINATION .)
+
+# CMAKE_VS_PLATFORM_NAME is only set by the VS generators; the Ninja presets
+# carry no generator platform, so fall back to the pointer size.
+if(CMAKE_VS_PLATFORM_NAME)
+    set(_pkg_arch "${CMAKE_VS_PLATFORM_NAME}")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(_pkg_arch "x64")
+else()
+    set(_pkg_arch "x86")
+endif()
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_NAME "cpp-slint-boilerplate")
+set(CPACK_PACKAGE_VENDOR "cpp-slint-boilerplate")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
+set(CPACK_PACKAGE_FILE_NAME
+    "cpp-slint-boilerplate-${PROJECT_VERSION}-windows-${_pkg_arch}")
+# Extract into a named folder rather than scattering files at the archive root.
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY ON)
+include(CPack)
