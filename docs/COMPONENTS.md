@@ -29,22 +29,23 @@ Every component follows the same rules (see also
 
 | Token group  | Members                                                        |
 | ------------ | -------------------------------------------------------------- |
-| Brand        | `primary`, `primary-hover`, `primary-active`, `primary-disabled` |
-| Feedback     | `success(-surface)`, `warning(-surface)`, `danger(-hover, -surface)`, `info(-surface)` |
-| Neutrals     | `background`, `surface`, `surface-alt`, `border`, `border-strong` |
-| Text         | `text`, `text-muted`, `text-disabled`, `text-on-primary`       |
-| Effects      | `shadow`, `overlay`                                            |
+| Brand        | `primary`, `primary-hover`, `primary-active`, `primary-disabled`, `primary-tint` |
+| Feedback     | `success(-hover, -surface)`, `warning(-surface)`, `danger(-hover, -surface)`, `info(-surface)` |
+| Neutrals     | `background`, `surface`, `surface-alt`, `surface-sunken`, `border`, `border-strong`, `hairline` |
+| Text         | `text`, `text-muted`, `text-faint`, `text-disabled`, `text-on-primary` |
+| Sidebar      | `sidebar`, `sidebar-hover`, `sidebar-active`, `sidebar-text(-active)`, `sidebar-brand`, `sidebar-border` |
+| Effects      | `shadow`, `shadow-strong`, `overlay`                           |
 
 ### Typography (`theme/typography.slint`)
 
-`font-family` (Segoe UI Variable stack), `font-size-xs … 2xl`
-(11→28 px), `font-weight-regular/medium/bold`, `line-height-tight/normal`.
+`font-family` (Segoe UI Variable stack), `font-family-mono`, `font-size-xs … 2xl`
+(11→26 px), `font-weight-regular/medium/semibold/bold`, `line-height-tight/normal`.
 
 ### Metrics (`theme/metrics.slint`)
 
 `space-1…6` (4→32 px), `radius-sm/md/lg/pill`, `control-height-sm/md/lg`
-(28/36/44 px), layout constants (`sidebar-width`, `navbar-height`,
-`window-min-*`), `elevation-1/2/3`.
+(28/34/42 px), layout constants (`sidebar-width`, `sidebar-width-collapsed`,
+`navbar-height`, `page-max-width`, `window-min-*`), `elevation-1/2/3`.
 
 ## Catalog
 
@@ -55,9 +56,12 @@ Every component follows the same rules (see also
 | Property   | Type               | Default                      | Description                        |
 | ---------- | ------------------ | ---------------------------- | ---------------------------------- |
 | `text`     | `string`           | `""`                         | Label (empty → icon-only)          |
-| `variant`  | `AppButtonVariant` | `primary`                    | `primary` `secondary` `outline` `ghost` `danger` |
+| `variant`  | `AppButtonVariant` | `primary`                    | `primary` `secondary` `outline` `ghost` `danger` `success` |
 | `size`     | `AppButtonSize`    | `md`                         | `sm` `md` `lg`                     |
-| `icon`     | `image`            | —                            | Leading icon                       |
+| `icon-name` | `string`          | `""`                         | Leading AppIcon name               |
+| `trailing-icon-name` | `string` | `""`                       | Trailing AppIcon name              |
+| `text-align` | `AppButtonTextAlign` | `center`                 | `left` `center` `right`            |
+| `square`   | `bool`             | `false`                      | Square icon-only shape             |
 | `loading`  | `bool`             | `false`                      | Spinner + swallow clicks           |
 | `disabled` | `bool`             | `false`                      | Muted, non-interactive             |
 | `block`    | `bool`             | `false`                      | Full width                         |
@@ -66,7 +70,7 @@ Callback: `clicked()`.
 
 #### AppSpinner
 
-`size: length` (16px), `color: color` (Palette.primary). Indeterminate arc.
+`size: length` (16px), `accent-color: color` (Palette.primary). Indeterminate arc.
 
 ### Forms
 
@@ -89,7 +93,7 @@ Callbacks: `accepted()`, `edited()`, `cleared()`.
 #### AppTextarea
 
 `text` (in-out), `label`, `placeholder`, `maxlength` (0 = no counter),
-`error-text`, `disabled`, `read-only`. Callbacks `edited()`, `accepted()`.
+`error-text`, `disabled`, `read-only`. Callback `edited()`.
 
 #### AppCheckbox
 
@@ -150,8 +154,8 @@ Wraps any content (`@children`); shows `text` on hover. `placement`
 
 #### AppCard
 
-`title`, `subtitle`, `header-icon`, `elevation` (`flat`/`raised`/`floating`),
-`padding`, `bordered`. Body via `@children`.
+`title`, `subtitle`, `header-icon-name`, `elevation` (`flat`/`raised`/`floating`),
+`body-padding`, `bordered`. Body via `@children`.
 
 #### AppDialog
 
@@ -178,9 +182,11 @@ body and call `accepted()`/`rejected()` from the buttons themselves.
 
 #### AppAvatar
 
-`name` (first character becomes the fallback glyph), `initials-override`,
-`second-initial`, `source: image` (overrides initials), `size`
-(`sm`/`md`/`lg`), `show-status`, `status-color`.
+`initials` (pre-built fallback text, e.g. `"AL"`), `name` (fallback when
+`initials` is empty), `source: image` (overrides initials), `size`
+(`sm`/`md`/`lg`), `show-status`, `status-color`. Slint strings cannot be split
+or indexed, so initials are computed **C++-side** and passed in via `initials`
+— the component does not derive them from `name`.
 
 #### AppAccordion
 
@@ -218,9 +224,11 @@ Callback `page-changed(int)`.
 
 #### AppIcon
 
-`name` (see the `AppIcons` global for the built-in set), `size`, `color`.
-Unknown names render the warning glyph — extend `AppIcons` in
-`app-icon.slint` when you need more.
+`name`, `size`, `accent-color`, `stroke-weight`. There is no `AppIcons` global:
+the glyph is selected by an `if/else if` chain over `name` inside
+`app-icon.slint`, each branch returning one 24-unit viewBox path. Unknown names
+render a neutral **circle + dot placeholder** (not a warning glyph). To add an
+icon, append another `else if (name == "…")` branch there.
 
 ## Responsive patterns
 
@@ -240,4 +248,4 @@ Slint has no CSS media queries; the idiomatic equivalents used here:
 1. Create `src/ui/components/app-<name>.slint` following the API contract
 2. Export it from `components/library.slint`
 3. Add a catalog entry (this file)
-4. (Example branches) add it to the component-gallery page
+4. Add it to the component-gallery page (the branches that ship one)
