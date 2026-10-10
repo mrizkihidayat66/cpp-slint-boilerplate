@@ -37,6 +37,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Activate the MSVC toolchain. Without this, CMake on windows-latest
+      # finds MinGW (C:/mingw64/bin) first: x64 then links a C++/Rust ABI
+      # mismatch into the app, and x86 links a 32-bit Rust/MSVC slint_cpp.dll
+      # with the 64-bit MinGW linker. See docs/BUILDING_SLINT.md.
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -49,10 +58,13 @@ jobs:
             .deps-cache
             ~/.cargo/registry
             ~/.cargo/git
-          key: slint-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-${{ github.sha }}
+          # "msvc" is part of the key so caches built by an older MinGW
+          # toolchain are never reused (the Slint binaries are not portable
+          # across C++ toolchains).
+          key: slint-msvc-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-${{ github.sha }}
           restore-keys: |
-            slint-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-
-            slint-${{ matrix.arch }}-
+            slint-msvc-${{ matrix.arch }}-${{ hashFiles('CMake/FetchSlint.cmake') }}-
+            slint-msvc-${{ matrix.arch }}-
 
       - name: Configure
         run: cmake --preset ${{ matrix.arch }}-${{ matrix.build_type }}
