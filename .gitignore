@@ -1,4 +1,6 @@
-# Build directories (CMake presets)
+# Build directories — CMake preset output (build/<preset>/) and the build
+# harness output (build/bin/, build/build-win/, build/build-*/). The
+# `build/` rule covers every artifact tree; `out/` covers MSBuild layouts.
 build/
 out/
 
