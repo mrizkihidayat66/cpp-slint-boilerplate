@@ -17,7 +17,7 @@ applications on Windows — x64 **and** x86 (32-bit).
 - **x64 + x86 builds from one setup** — CMake presets for both architectures;
   Slint is built from source via `FetchContent`, the only integration that
   supports 32-bit targets. See [docs/BUILDING_SLINT.md](docs/BUILDING_SLINT.md).
-- **Progressive examples** — from a ~30-line app to full CRUD with service
+- **Progressive examples** — from a ~17-line app to full CRUD with service
   chains, on separate branches. See [docs/BRANCHES.md](docs/BRANCHES.md).
 - **CI** — Windows matrix (x64 + x86 × Debug/Release), formatting check,
   unit tests, GPU-less smoke run.
