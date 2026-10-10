@@ -1,8 +1,11 @@
 # Notice
 
-This boilerplate repository does not carry an explicit license for its own
-scaffolding code. You are free to use it as a starting point for your own
-projects; add the license of your choice when you fork it.
+This boilerplate's own scaffolding code is released under the MIT License — see
+[LICENSE](LICENSE). You are free to use it as a starting point for your own
+projects.
+
+That license covers this repository's code only. It does **not** cover Slint,
+which you must license separately for any application you ship — see below.
 
 ## Slint licensing
 

@@ -88,5 +88,6 @@ the per-architecture cache under `.deps-cache/` makes every later build fast.
 
 ## License
 
-No license is applied to this repository — see [NOTICE.md](NOTICE.md) for the
-Slint licensing options you must choose between when shipping an app.
+This repository's scaffolding code is released under the [MIT License](LICENSE).
+That covers this boilerplate only — Slint is licensed separately, and you must
+choose one of its licenses for any app you ship. See [NOTICE.md](NOTICE.md).
